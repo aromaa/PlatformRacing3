@@ -1,0 +1,6 @@
+{
+  "database_host": "localhost",
+  "database_user": "postgres",
+  "database_pass": "joni",
+  "database_name": "pr3"
+}
