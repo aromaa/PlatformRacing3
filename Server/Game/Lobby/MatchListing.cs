@@ -99,14 +99,21 @@ namespace Platform_Racing_3_Server.Game.Lobby
         {
             if (this._SpotsLeft <= 0) //No spots left, started or died
             {
+                new AlertOutgoingMessage("The are no spots left! The match may have either started or died.");
                 return false;
             }
             else if (this.HostSocketId == session.SocketId)
             {
                 return true;
             }
-            else if ((this.MinRank > session.UserData.Rank || this.MaxRank < session.UserData.Rank) && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
+            else if (this.MinRank > session.UserData.Rank && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
             {
+                new AlertOutgoingMessage("The minimum rank requirement is " + this.MinRank + ". You'll need a higher rank to join the match listing.");
+                return false;
+            }
+            else if (this.MaxRank < session.UserData.Rank && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
+            {
+                new AlertOutgoingMessage("The maximum rank requirement is " + this.MaxRank + ". You'll need a lower rank to join the match listing.");
                 return false;
             }
             else if (this.OnlyFriends && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_ONLY_FRIENDS))
