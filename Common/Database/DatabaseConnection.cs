@@ -25,8 +25,8 @@ namespace Platform_Racing_3_Common.Database
 
         static DatabaseConnection()
         {
-            NpgsqlConnection.MapEnumGlobally<LevelMode>();
-            NpgsqlConnection.MapEnumGlobally<CampaignPrizeType>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<LevelMode>();
+            NpgsqlConnection.GlobalTypeMapper.MapEnum<CampaignPrizeType>();
         }
 
         public static void Init(IDatabaseConfig dbConfig)

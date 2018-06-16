@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Platform_Racing_3_Common.Database;
+using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Web.Config;
 
@@ -32,7 +33,10 @@ namespace Platform_Racing_3_Web
                 Console.WriteLine($"Failed to setup logging! {ex.ToString()}");
             }
 
-            DatabaseConnection.Init(JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json")));
+            WebConfig config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));
+
+            DatabaseConnection.Init(config);
+            RedisConnection.Init(config);
 
             _ = Program.ServerManager.LoadServersAsync(); //Load it async, continue other code
 
