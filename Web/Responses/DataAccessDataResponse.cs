@@ -20,7 +20,7 @@ namespace Platform_Racing_3_Web.Responses
         [XmlElement("NumRows")]
         public uint NumRows
         {
-            get => (uint)this.Rows.Count;
+            get => (uint?)this.Rows?.Count ?? 0u;
             set => throw new XmlSerializerCompatibleException();
         }
         
