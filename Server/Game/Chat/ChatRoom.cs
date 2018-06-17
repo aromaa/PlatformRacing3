@@ -138,21 +138,33 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private void SendChatMessage(ClientSession session, string message, bool sendToSelf = true)
         {
-            ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
-            
-            this.RecentMessages.Enqueue(packet);
-            while (this.RecentMessages.Count > ChatRoom.MAX_RECENT_MESSAGES)
+            if (message.StartsWith("/"))
             {
-                this.RecentMessages.TryDequeue(out _);
-            }
+                string[] args = message.Substring(1).Split(' ');
 
-            if (sendToSelf)
-            {
-                this.Clients.SendPacket(packet);
+                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan().Slice(1, args.Length - 1)))
+                {
+                    session.SendPacket(new AlertOutgoingMessage("Unknown command"));
+                }
             }
             else
             {
-                this.Clients.SendPacket(packet, session);
+                ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
+
+                this.RecentMessages.Enqueue(packet);
+                while (this.RecentMessages.Count > ChatRoom.MAX_RECENT_MESSAGES)
+                {
+                    this.RecentMessages.TryDequeue(out _);
+                }
+
+                if (sendToSelf)
+                {
+                    this.Clients.SendPacket(packet);
+                }
+                else
+                {
+                    this.Clients.SendPacket(packet, session);
+                }
             }
         }
 

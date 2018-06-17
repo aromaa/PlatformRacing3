@@ -8,6 +8,7 @@ using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Server.Config;
 using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Client;
+using Platform_Racing_3_Server.Game.Commands;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server.Net;
@@ -38,10 +39,11 @@ namespace Platform_Racing_3_Server.Core
         public static ServerConfig ServerConfig { get; set; }
 
         public static ServerManager ServerManager { get; private set; }
+        public static CommandManager CommandManager { get; private set; }
         public static ChatRoomManager ChatRoomManager { get; private set; }
         public static MatchListingManager MatchListingManager { get; private set; }
         public static MatchManager MatchManager { get; private set; }
-        
+
         public static CampaignManager CampaignManager { get; private set; }
 
         public static ClientManager ClientManager { get; private set; }
@@ -64,6 +66,7 @@ namespace Platform_Racing_3_Server.Core
 
                 PlatformRacing3Server.ServerManager = new ServerManager();
                 PlatformRacing3Server.ServerManager.LoadServersAsync().Wait();
+                PlatformRacing3Server.CommandManager = new CommandManager();
                 PlatformRacing3Server.ChatRoomManager = new ChatRoomManager();
                 PlatformRacing3Server.MatchListingManager = new MatchListingManager();
                 PlatformRacing3Server.MatchManager = new MatchManager();

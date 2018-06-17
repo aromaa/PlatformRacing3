@@ -15,5 +15,7 @@ namespace Platform_Racing_3_Common.User
         public const string ACCESS_MATCH_LISTING_NO_MEMBERS_LIMIT = "access_match_listing_no_members_limit";
         public const string ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT = "access_bypass_match_listing_rank_requirement";
         public const string ACCESS_BYPASS_MATCH_LISTING_ONLY_FRIENDS = "access_bypass_match_listing_only_friends";
+
+        public const string SHUTDOWN = "shutdown";
     }
 }

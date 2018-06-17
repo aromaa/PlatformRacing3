@@ -8,6 +8,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server.Net;
+using Platform_Racing_3_Server_API.Game.Commands;
 using Platform_Racing_3_Server_API.Net;
 using System;
 using System.Collections;
@@ -18,7 +19,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Client
 {
-    internal class ClientSession
+    internal class ClientSession : ICommandExecutor
     {
         private ClientStatus ClientStatus { get; set; }
         private INetworkConnectionGame Connection { get; }
@@ -192,7 +193,14 @@ namespace Platform_Racing_3_Server.Game.Client
             }
         }
 
+        public void SendMessage(string message)
+        {
+            this.SendPacket(new AlertOutgoingMessage(message));
+        }
+
         internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
         internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
+
+        public bool HasPermission(string permission) => this.UserData?.HasPermissions(permission) ?? false;
     }
 }

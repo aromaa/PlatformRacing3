@@ -1,6 +1,7 @@
 ﻿using log4net;
 using log4net.Config;
 using Platform_Racing_3_Server.Core;
+using Platform_Racing_3_Server.Game.Commands.Executors;
 using System;
 using System.IO;
 using System.Reflection;
@@ -30,18 +31,23 @@ namespace Platform_Racing_3_Server
             Program.Instance.Init();
             Program.Logger.Info("Server is ready!");
 
+            ConsoleCommandExecutor consoleExecutor = new ConsoleCommandExecutor();
+
             while (true)
             {
                 string line = Console.ReadLine();
-                if (line == "shutdown")
+                string[] commmandArgs = line.Split(' ');
+
+                if (!PlatformRacing3Server.CommandManager.Execte(consoleExecutor, commmandArgs[0], commmandArgs.AsSpan().Slice(1, commmandArgs.Length - 1)))
                 {
-                    Program.Instance.Shutdown();
-                }
-                else
-                {
-                    Console.WriteLine($"Command {line} is unknown!");
+                    Console.WriteLine($"Unknown command!");
                 }
             }
+        }
+
+        internal static void Shutdown()
+        {
+            Program.Instance.Shutdown();
         }
     }
 }
