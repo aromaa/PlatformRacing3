@@ -8,8 +8,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
     {
         Failed,
         Banned,
+        NoRankRequirement,
+        FriendsOnly,
         Full,
         Started,
+        Died,
         Success,
     }
 }

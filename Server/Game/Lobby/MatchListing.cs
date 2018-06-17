@@ -21,6 +21,9 @@ namespace Platform_Racing_3_Server.Game.Lobby
 {
     internal class MatchListing
     {
+        private const int SPOTS_LEFT_GAME_STARTED = int.MinValue;
+        private const int SPOTS_LEFT_DIED = int.MinValue + 1;
+
         internal LevelData LevelData { get; }
 
         [JsonProperty("roomName")]
@@ -95,37 +98,37 @@ namespace Platform_Racing_3_Server.Game.Lobby
             this.Leave0(session, MatchListingLeaveReason.Disconnected);
         }
 
-        internal bool CanJoin(ClientSession session)
+        internal MatchListingJoinStatus CanJoin(ClientSession session)
         {
             if (this._SpotsLeft <= 0) //No spots left, started or died
             {
-                return false;
+                return this._SpotsLeft == MatchListing.SPOTS_LEFT_DIED ? MatchListingJoinStatus.Died : this._SpotsLeft == MatchListing.SPOTS_LEFT_GAME_STARTED ? MatchListingJoinStatus.Started : MatchListingJoinStatus.Full;
             }
             else if (this.HostSocketId == session.SocketId)
             {
-                return true;
+                return MatchListingJoinStatus.Success;
             }
             else if ((this.MinRank > session.UserData.Rank || this.MaxRank < session.UserData.Rank) && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
             {
-                return false;
+                return MatchListingJoinStatus.NoRankRequirement;
             }
             else if (this.OnlyFriends && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_ONLY_FRIENDS))
             {
                 if (session.IsGuest)
                 {
-                    return false;
+                    return MatchListingJoinStatus.FriendsOnly;
                 }
                 else if (this._Clients.TryGetClientSession(this.HostSocketId, out ClientSession host) && !host.IsGuest)
                 {
-                    return host.UserData.Friends.Contains(session.UserData.Id);
+                    return host.UserData.Friends.Contains(session.UserData.Id) ? MatchListingJoinStatus.Success : MatchListingJoinStatus.FriendsOnly;
                 }
             }
             else if (this.BannedClients.Any((i) => i.Matches(session.UserData.Id, session.SocketId, session.IPAddres)))
             {
-                return false;
+                return MatchListingJoinStatus.Banned;
             }
 
-            return true;
+            return MatchListingJoinStatus.Success;
         }
 
         internal bool JoinLobby(ClientSession session)
@@ -159,9 +162,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
         {
             if (!this._Clients.Contains(session))
             {
-                if (!this.CanJoin(session))
+                MatchListingJoinStatus canJoinStatus = this.CanJoin(session);
+                if (canJoinStatus != MatchListingJoinStatus.Success)
                 {
-                    return MatchListingJoinStatus.Banned; //L
+                    return canJoinStatus;
                 }
 
                 while (true) //Concurrency complexity
@@ -174,13 +178,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
                             break;
                         }
                     }
-                    else if (spotsLeft == int.MinValue) //We are assuming if spotsLeft is int.MinValue it means the match has been started or is in progress of starting
-                    {
-                        return MatchListingJoinStatus.Started;
-                    }
                     else
                     {
-                        return MatchListingJoinStatus.Full;
+                        //We are assuming if spotsLeft is int.MinValue it means the match has been started or is in progress of starting
+                        return spotsLeft == MatchListing.SPOTS_LEFT_GAME_STARTED ? MatchListingJoinStatus.Started : MatchListingJoinStatus.Full;
                     }
                 }
 
@@ -221,7 +222,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     //Concurrency complexity
                     if (Interlocked.Increment(ref this.UsersReady) == this.MaxMembers) //Ensures that there is no race condition while the SpotsLeft check is passed and user is being added to the clients list and ensuring safe start
                     {
-                        if (Interlocked.CompareExchange(ref this._SpotsLeft, int.MinValue, 0) == 0) //If no spots are left set the value to int.MinValue and start the match, starting should be thread-safe
+                        if (Interlocked.CompareExchange(ref this._SpotsLeft, MatchListing.SPOTS_LEFT_GAME_STARTED, 0) == 0) //If no spots are left set the value to int.MinValue and start the match, starting should be thread-safe
                         {
                             this.Start();
                         }
@@ -270,7 +271,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             while (true)
             {
                 int spotsLeft = this._SpotsLeft;
-                if (spotsLeft != int.MinValue) //Match has not been started or it is in progress of starting
+                if (spotsLeft != MatchListing.SPOTS_LEFT_GAME_STARTED) //Match has not been started or it is in progress of starting
                 {
                     if (Interlocked.CompareExchange(ref this._SpotsLeft, spotsLeft + 1, spotsLeft) == spotsLeft)
                     {
@@ -296,7 +297,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 session.SendPacket(new UserLeaveRoomOutgoingMessage(this.Name, session.SocketId));
             }
 
-            if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, int.MinValue + 1) != (int)this.MaxMembers)
+            if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, MatchListing.SPOTS_LEFT_DIED) != (int)this.MaxMembers)
             {
                 uint currentHost = this._HostSocketId;
                 if (currentHost == session.SocketId) //Time to pick new host
@@ -351,7 +352,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 while (true)
                 {
                     int spotsLeft = this._SpotsLeft;
-                    if (spotsLeft != int.MinValue)
+                    if (spotsLeft != MatchListing.SPOTS_LEFT_GAME_STARTED)
                     {
                         if (Interlocked.CompareExchange(ref this._SpotsLeft, 0, spotsLeft) == spotsLeft) //Drain all spots, no new clients are accepted
                         {
@@ -361,7 +362,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                             }
 
                             //We know there is no users trying to join, we can safely start the game
-                            if (Interlocked.CompareExchange(ref this._SpotsLeft, 0, int.MinValue) == 0)
+                            if (Interlocked.CompareExchange(ref this._SpotsLeft, 0, MatchListing.SPOTS_LEFT_GAME_STARTED) == 0)
                             {
                                 this.Start();
                             }
@@ -411,7 +412,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void CheckState()
         {
-            if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, int.MinValue + 1) == (int)this.MaxMembers)
+            if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, MatchListing.SPOTS_LEFT_DIED) == (int)this.MaxMembers)
             {
                 foreach (ClientSession other in this.LobbyClients.Values)
                 {
