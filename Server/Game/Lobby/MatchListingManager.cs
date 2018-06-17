@@ -56,7 +56,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                             {
                                 if (maxMembers > 0) //Can we will it up more
                                 {
-                                    if (listing.CanJoin(other) && this.QuickJoinClients.Remove(other))
+                                    if (listing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
                                     {
                                         other.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
 
@@ -113,7 +113,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal List<MatchListing> RequestsMatches(ClientSession session, uint num)
         {
-            return this.MatchListings.Values.Except(session.LobbySession.Matches).Where((m) => m.CanJoin(session)).OrderByDescending((l) => l.ClientsCount).Take((int)num).ToList();
+            return this.MatchListings.Values.Except(session.LobbySession.Matches).Where((m) => m.CanJoin(session) == MatchListingJoinStatus.Success).OrderByDescending((l) => l.ClientsCount).Take((int)num).ToList();
         }
 
         internal void Die(MatchListing matchListing)
@@ -127,7 +127,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             foreach(MatchListing listing in this.MatchListings.Values)
             {
-                if (listing.CanJoin(session) && this.QuickJoinClients.Remove(session))
+                if (listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(session))
                 {
                     session.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
                     break;
