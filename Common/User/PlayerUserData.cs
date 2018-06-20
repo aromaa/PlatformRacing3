@@ -92,9 +92,7 @@ namespace Platform_Racing_3_Common.User
             {
                 this._Ignored.UnionWith(ignored_.Select((i) => (uint)i));
             }
-
-            int goldMedalsCount = 0;
-
+            
             object campaignRuns = reader["campaign_runs"]; //Might be null
             if (campaignRuns is int[,] campaignRuns_)
             {
@@ -103,38 +101,119 @@ namespace Platform_Racing_3_Common.User
                     uint levelId = (uint)campaignRuns_[i, 0];
                     if (levelId > 0)
                     {
-                        uint finishTime = (uint)campaignRuns_[i, 1];
+                        int finishTime = campaignRuns_[i, 1];
                         
-                        if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out Dictionary<CampaignMedal, uint> level))
-                        {
-                            if (this.CampaignLevelRecords.TryGetValue(levelId, out CampaignLevelRecord record) && record.Time > finishTime)
-                            {
-                                continue;
-                            }
-
-                            CampaignMedal medal = CampaignMedal.None;
-                            if (level[CampaignMedal.Gold] > finishTime)
-                            {
-                                medal = CampaignMedal.Gold;
-
-                                goldMedalsCount++;
-                            }
-                            else if (level[CampaignMedal.Silver] > finishTime)
-                            {
-                                medal = CampaignMedal.Silver;
-                            }
-                            else if(level[CampaignMedal.Bronze] > finishTime)
-                            {
-                                medal = CampaignMedal.Bronze;
-                            }
-
-                            this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, medal);
-                        }
+                        this.CheckCampaignTime(levelId, finishTime);
                     }
                 }
             }
 
-            foreach(CampaignPrize prize in CampaignManager.DefaultPrizes)
+            this.CheckCampaignPrizes();
+
+            this._Permissions = new HashSet<string>(); //TODO: Permission system
+
+            this.RemoveRestrictedParts();
+        }
+
+        public PlayerUserData(RedisValue[] hashEntries)
+        {
+            this.Id = (uint)hashEntries[0];
+            this.Username = hashEntries[1];
+
+            this.PermissionRank = (uint)hashEntries[2];
+            this.NameColor = Color.FromArgb((int)hashEntries[3]);
+            this.Group = hashEntries[4];
+
+            this.LastLogin = DateTimeOffset.FromUnixTimeMilliseconds((long)hashEntries[5]);
+            this.LastOnline = DateTimeOffset.FromUnixTimeMilliseconds((long)hashEntries[6]);
+
+            this.SetTotalExp((ulong)hashEntries[7]); //Gonna calc the rank and exp
+            this.BonusExp = (uint)hashEntries[8];
+
+            this._Hats.UnionWith(hashEntries[9].ToString().Split(',').Select((h) => (Hat)uint.Parse(h)));
+            this._Heads.UnionWith(hashEntries[10].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
+            this._Bodys.UnionWith(hashEntries[11].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
+            this._Feets.UnionWith(hashEntries[12].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
+
+            Hat hat = (Hat)(uint)hashEntries[13];
+            Color hatColor = Color.FromArgb((int)hashEntries[14]);
+
+            Part head = (Part)(uint)hashEntries[15];
+            Color headColor = Color.FromArgb((int)hashEntries[16]);
+
+            Part body = (Part)(uint)hashEntries[17];
+            Color bodyColor = Color.FromArgb((int)hashEntries[18]);
+
+            Part feet = (Part)(uint)hashEntries[19];
+            Color feetColor = Color.FromArgb((int)hashEntries[20]);
+
+            this.SetParts(hat, hatColor, head, headColor, body, bodyColor, feet, feetColor);
+
+            uint speed = (uint)hashEntries[21];
+            uint accel = (uint)hashEntries[22];
+            uint jump = (uint)hashEntries[23];
+
+            this.SetStats(speed, accel, jump);
+
+            this._Friends.UnionWith(hashEntries[25].ToString().Split(',').Select((f) => uint.Parse(f)));
+            this._Ignored.UnionWith(hashEntries[26].ToString().Split(',').Select((i) => uint.Parse(i)));
+
+            foreach (KeyValuePair<uint, int> record in hashEntries[24].ToString().Split(';').ToDictionary((l) => uint.Parse(l.Split(',')[0]), d => int.Parse(d.Split(',')[1])))
+            {
+                uint levelId = record.Key;
+                int finishTime = record.Value;
+
+                this.CheckCampaignTime(levelId, finishTime);
+            }
+
+            this.CheckCampaignPrizes();
+        }
+
+        private void CheckCampaignTime(uint levelId, int finishTime)
+        {
+            if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out Dictionary<CampaignMedal, uint> level))
+            {
+                if (this.CampaignLevelRecords.TryGetValue(levelId, out CampaignLevelRecord record_))
+                {
+                    if (finishTime < 0) //Died in deathmatch campaign
+                    {
+                        if (record_.Time > 0) //Current record is positive, so he finished, skip
+                        {
+                            return;
+                        }
+                        else if (record_.Time > finishTime) //Prefer longer time
+                        {
+                            return;
+                        }
+                    }
+                    else if (finishTime > record_.Time) //Normal race, prefer shorter time
+                    {
+                        return;
+                    }
+                }
+
+                CampaignMedal medal = CampaignMedal.None;
+                if (level[CampaignMedal.Gold] > finishTime)
+                {
+                    medal = CampaignMedal.Gold;
+                }
+                else if (level[CampaignMedal.Silver] > finishTime)
+                {
+                    medal = CampaignMedal.Silver;
+                }
+                else if (level[CampaignMedal.Bronze] > finishTime)
+                {
+                    medal = CampaignMedal.Bronze;
+                }
+
+                this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, medal);
+            }
+        }
+
+        private void CheckCampaignPrizes()
+        {
+            uint goldMedalsCount = this.CampaignGoldMedals;
+            foreach (CampaignPrize prize in CampaignManager.DefaultPrizes)
             {
                 if (prize.Type == CampaignPrizeType.Hat)
                 {
@@ -181,9 +260,10 @@ namespace Platform_Racing_3_Common.User
                     }
                 }
             }
+        }
 
-            this._Permissions = new HashSet<string>(); //TODO: Permission system
-
+        private void RemoveRestrictedParts()
+        {
             if (!this.HasPermissions("access_any_parts"))
             {
                 this._Hats.RemoveWhere((h) => PlayerUserData.RestrictedHats.Contains(h));
@@ -192,80 +272,6 @@ namespace Platform_Racing_3_Common.User
                 this._Bodys.RemoveWhere((p) => PlayerUserData.RestrictedParts.Contains(p));
                 this._Feets.RemoveWhere((p) => PlayerUserData.RestrictedParts.Contains(p));
             }
-        }
-
-        public PlayerUserData(RedisValue[] hashEntries)
-        {
-            this.Id = (uint)hashEntries[0];
-            this.Username = hashEntries[1];
-
-            this.PermissionRank = (uint)hashEntries[2];
-            this.NameColor = Color.FromArgb((int)hashEntries[3]);
-            this.Group = hashEntries[4];
-
-            this.LastLogin = DateTimeOffset.FromUnixTimeMilliseconds((long)hashEntries[5]);
-            this.LastOnline = DateTimeOffset.FromUnixTimeMilliseconds((long)hashEntries[6]);
-
-            this.SetTotalExp((ulong)hashEntries[7]); //Gonna calc the rank and exp
-            this.BonusExp = (uint)hashEntries[8];
-
-            this._Hats.UnionWith(hashEntries[9].ToString().Split(',').Select((h) => (Hat)uint.Parse(h)));
-            this._Heads.UnionWith(hashEntries[10].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
-            this._Bodys.UnionWith(hashEntries[11].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
-            this._Feets.UnionWith(hashEntries[12].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
-
-            Hat hat = (Hat)(uint)hashEntries[13];
-            Color hatColor = Color.FromArgb((int)hashEntries[14]);
-
-            Part head = (Part)(uint)hashEntries[15];
-            Color headColor = Color.FromArgb((int)hashEntries[16]);
-
-            Part body = (Part)(uint)hashEntries[17];
-            Color bodyColor = Color.FromArgb((int)hashEntries[18]);
-
-            Part feet = (Part)(uint)hashEntries[19];
-            Color feetColor = Color.FromArgb((int)hashEntries[20]);
-
-            this.SetParts(hat, hatColor, head, headColor, body, bodyColor, feet, feetColor);
-
-            uint speed = (uint)hashEntries[21];
-            uint accel = (uint)hashEntries[22];
-            uint jump = (uint)hashEntries[23];
-
-            this.SetStats(speed, accel, jump);
-
-            foreach(KeyValuePair<uint, uint> record in hashEntries[24].ToString().Split(';').ToDictionary((l) => uint.Parse(l.Split(',')[0]), d => uint.Parse(d.Split(',')[1])))
-            {
-                uint levelId = record.Key;
-                uint finishTime = record.Value;
-
-                if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out Dictionary<CampaignMedal, uint> level))
-                {
-                    if (this.CampaignLevelRecords.TryGetValue(levelId, out CampaignLevelRecord record_) && record_.Time > finishTime)
-                    {
-                        continue;
-                    }
-
-                    CampaignMedal medal = CampaignMedal.None;
-                    if (level[CampaignMedal.Gold] > finishTime)
-                    {
-                        medal = CampaignMedal.Gold;
-                    }
-                    else if (level[CampaignMedal.Silver] > finishTime)
-                    {
-                        medal = CampaignMedal.Silver;
-                    }
-                    else if (level[CampaignMedal.Bronze] > finishTime)
-                    {
-                        medal = CampaignMedal.Bronze;
-                    }
-
-                    this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, medal);
-                }
-            }
-
-            this._Friends.UnionWith(hashEntries[25].ToString().Split(',').Select((f) => uint.Parse(f)));
-            this._Ignored.UnionWith(hashEntries[26].ToString().Split(',').Select((i) => uint.Parse(i)));
         }
         
         internal void Merge(PlayerUserData playerUserData)
@@ -441,6 +447,8 @@ namespace Platform_Racing_3_Common.User
             this._Feets.IntersectWith(feets);
         }
 
+        public uint CampaignGoldMedals => (uint)this._CampaignLevelRecords.Values.Count((m) => m.Medal == CampaignMedal.Gold);
+
         public HashEntry[] ToRedis()
         {
             return new HashEntry[]
@@ -460,10 +468,10 @@ namespace Platform_Racing_3_Common.User
                 new HashEntry("exp", this.Exp),
                 new HashEntry("bonus_exp", this.BonusExp),
 
-                new HashEntry("hats", string.Join(',', this._Hats)),
-                new HashEntry("heads", string.Join(',', this._Heads)),
-                new HashEntry("bodys", string.Join(',', this._Bodys)),
-                new HashEntry("feets", string.Join(',', this._Feets)),
+                new HashEntry("hats", string.Join(',', this._Hats.Select((h) => (uint)h))),
+                new HashEntry("heads", string.Join(',', this._Heads.Select((p) => (uint)p))),
+                new HashEntry("bodys", string.Join(',', this._Bodys.Select((p) => (uint)p))),
+                new HashEntry("feets", string.Join(',', this._Feets.Select((p) => (uint)p))),
 
                 new HashEntry("hat", (uint)this.CurrentHat),
                 new HashEntry("hatcolor", this.CurrentHatColor.ToArgb()),

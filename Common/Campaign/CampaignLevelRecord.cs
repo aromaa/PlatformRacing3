@@ -8,12 +8,12 @@ namespace Platform_Racing_3_Common.Campaign
     public struct CampaignLevelRecord
     {
         [JsonProperty("timeMS")]
-        public uint Time { get; }
+        public int Time { get; }
 
         [JsonProperty("medal")]
         public CampaignMedal Medal { get; }
 
-        public CampaignLevelRecord(uint time, CampaignMedal medal)
+        public CampaignLevelRecord(int time, CampaignMedal medal)
         {
             this.Time = time;
             this.Medal = medal;
