@@ -202,7 +202,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (mode == "user")
             {
-                query.Append("u.username LIKE @searchStr ");
+                query.Append("u.username ILIKE @searchStr ");
             }
             else
             {
