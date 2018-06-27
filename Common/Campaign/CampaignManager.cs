@@ -63,7 +63,7 @@ namespace Platform_Racing_3_Common.Campaign
             this._Prizes = prizes; //Thread-safety
         }
 
-        public static Task SaveCampaignRun(uint userId, uint levelId, uint levelVersion, string recordedRun, uint finishTime)
+        public static Task SaveCampaignRun(uint userId, uint levelId, uint levelVersion, string recordedRun, int finishTime)
         {
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.campaigns_runs(level_id, level_version, user_id, recorded_run, finish_time) VALUES({levelId}, {levelVersion}, {userId}, {recordedRun}, {finishTime})"));
         }
