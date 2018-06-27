@@ -35,10 +35,10 @@ namespace Platform_Racing_3_Common.User
 
         private PlayerUserData()
         {
-
+            this._Permissions = new HashSet<string>();
         }
 
-        public PlayerUserData(DbDataReader reader) : base()
+        public PlayerUserData(DbDataReader reader) : this()
         {
             this.Id = (uint)(int)reader["id"];
             this.Username = (string)reader["username"];
@@ -110,12 +110,12 @@ namespace Platform_Racing_3_Common.User
 
             this.CheckCampaignPrizes();
 
-            this._Permissions = new HashSet<string>(); //TODO: Permission system
+            //TODO: Set up permissions based on permission rank
 
             this.RemoveRestrictedParts();
         }
 
-        public PlayerUserData(RedisValue[] hashEntries)
+        public PlayerUserData(RedisValue[] hashEntries) : this()
         {
             this.Id = (uint)hashEntries[0];
             this.Username = hashEntries[1];
