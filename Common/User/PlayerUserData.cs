@@ -193,17 +193,20 @@ namespace Platform_Racing_3_Common.User
                 }
 
                 CampaignMedal medal = CampaignMedal.None;
-                if (level[CampaignMedal.Gold] > finishTime)
+                if (finishTime > 0) //Only give medals for finished times
                 {
-                    medal = CampaignMedal.Gold;
-                }
-                else if (level[CampaignMedal.Silver] > finishTime)
-                {
-                    medal = CampaignMedal.Silver;
-                }
-                else if (level[CampaignMedal.Bronze] > finishTime)
-                {
-                    medal = CampaignMedal.Bronze;
+                    if (level[CampaignMedal.Gold] > finishTime)
+                    {
+                        medal = CampaignMedal.Gold;
+                    }
+                    else if (level[CampaignMedal.Silver] > finishTime)
+                    {
+                        medal = CampaignMedal.Silver;
+                    }
+                    else if (level[CampaignMedal.Bronze] > finishTime)
+                    {
+                        medal = CampaignMedal.Bronze;
+                    }
                 }
 
                 this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, medal);
