@@ -47,20 +47,29 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
                     MatchListing listing = new MatchListing(session, level, "match-listing-" + this.GetNextMatchListingId(), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
-                    listing.Join(session);
-                    if (maxMembers == 1 || this.MatchListings.TryAdd(listing.Name, listing))
+
+                    if (this.MatchListings.TryAdd(listing.Name, listing))
                     {
-                        if (--maxMembers > 0) //Can we do qucick join?
+                        //Don't do quick join for one player matches, host only obviously
+                        if (maxMembers == 1)
                         {
+                            return listing;
+                        }
+                        else if (listing.SpotsLeft > 0) //Can we do quick join?
+                        {
+                            //As we use packets some players might not join
+                            //So keep track of the current spots and decrease as we send packets to avoid sending too many players
+                            //Also other players might join while the packet has not yet arrieved to the client
+                            uint spotsLeft = listing.SpotsLeft;
                             foreach (ClientSession other in this.QuickJoinClients.Values)
                             {
-                                if (maxMembers > 0) //Can we will it up more
+                                if (spotsLeft > 0) //Can we fill it up even more
                                 {
                                     if (listing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
                                     {
                                         other.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
 
-                                        maxMembers--;
+                                        spotsLeft--;
                                     }
                                 }
                             }

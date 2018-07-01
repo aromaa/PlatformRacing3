@@ -8,6 +8,7 @@ using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server.Game.User.Identifiers;
+using Platform_Racing_3_Server_API.Net;
 using Platform_Racing_3_UnsafeHelpers.Extensions;
 using System;
 using System.Collections.Concurrent;
@@ -88,6 +89,12 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             this._HostSocketId = creator.SocketId;
             this._SpotsLeft = (int)maxMembers;
+
+            creator.OnDisconnect += this.OnCreatorDisconnectEarly;
+            if (creator.Disconnected)
+            {
+                this.OnCreatorDisconnectEarly();
+            }
         }
 
         internal ICollection<ClientSession> Clients => this._Clients.Values;
@@ -96,6 +103,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
         private void OnDisconnect(ClientSession session)
         {
             this.Leave0(session, MatchListingLeaveReason.Disconnected);
+        }
+
+        private void OnCreatorDisconnectEarly(INetworkConnection networkConnection = null)
+        {
+            PlatformRacing3Server.MatchListingManager.Die(this); //We can pull the plug no biggie
         }
 
         internal MatchListingJoinStatus CanJoin(ClientSession session)
@@ -107,6 +119,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
             else if (this.HostSocketId == session.SocketId)
             {
                 return MatchListingJoinStatus.Success;
+            }
+            else if (!this._Clients.Contains(this.HostSocketId))
+            {
+                return MatchListingJoinStatus.WaitingForHost;
             }
             else if ((this.MinRank > session.UserData.Rank || this.MaxRank < session.UserData.Rank) && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
             {
@@ -187,6 +203,8 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
                 if (this._Clients.Add(session))
                 {
+                    session.OnDisconnect -= this.OnCreatorDisconnectEarly;
+
                     session.LobbySession.MatchListing = this;
                     session.LobbySession.RemoveMatch(this);
 

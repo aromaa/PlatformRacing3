@@ -41,6 +41,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                                         session.SendPacket(new AlertOutgoingMessage("Failed to join the match listing due to unknown error, sorry"));
                                         break;
                                     }
+                                case MatchListingJoinStatus.WaitingForHost:
+                                    {
+                                        session.SendPacket(new AlertOutgoingMessage("You are trying to join the match too early, chill"));
+                                        break;
+                                    }
                                 case MatchListingJoinStatus.Banned:
                                     {
                                         session.SendPacket(new AlertOutgoingMessage("You have been banned from this match listing"));

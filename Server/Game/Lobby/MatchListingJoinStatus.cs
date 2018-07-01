@@ -7,6 +7,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
     public enum MatchListingJoinStatus
     {
         Failed,
+        WaitingForHost,
         Banned,
         NoRankRequirement,
         FriendsOnly,
