@@ -18,9 +18,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
         internal IReadOnlyCollection<IReadOnlyDictionary<string, object>> Users { get; set; }
 
         [JsonProperty("results")]
-        internal uint Results => (uint)this.Users.Count;
+        internal uint Results { get; private set; }
 
-        internal JsonUserListOutgoingMessage(uint requestId, IReadOnlyCollection<ClientSession> sessions)
+        internal JsonUserListOutgoingMessage(uint requestId, IReadOnlyCollection<ClientSession> sessions, uint total)
         {
             this.RequestId = requestId;
 
@@ -31,6 +31,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             }
 
             this.Users = users;
+
+            this.Results = total;
         }
     }
 }

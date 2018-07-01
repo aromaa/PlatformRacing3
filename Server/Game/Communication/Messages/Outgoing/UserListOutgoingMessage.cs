@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
     internal class UserListOutgoingMessage : JsonOutgoingMessage
     {
-        internal UserListOutgoingMessage(uint requestId, IReadOnlyCollection<ClientSession> sessions) : base(new JsonUserListOutgoingMessage(requestId, sessions))
+        internal UserListOutgoingMessage(uint requestId, IReadOnlyCollection<ClientSession> sessions, uint total) : base(new JsonUserListOutgoingMessage(requestId, sessions, total))
         {
         }
     }
