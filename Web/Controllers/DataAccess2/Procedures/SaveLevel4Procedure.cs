@@ -30,7 +30,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
         private const uint SONG_ID_MAX = 26;
 
         private const uint BG_ID_MIN = 0;
-        private const uint BG_ID_MAX = 10;
+        private const uint BG_ID_MAX = 11;
 
         private static readonly HashSet<string> SupportedItems = new HashSet<string>()
         {
