@@ -667,16 +667,15 @@ namespace Platform_Racing_3_Server.Game.Match
                         }
                     }
 
-                    if (!leave)
+                    //If player dosen't have finish time it should always be considered as forfiet
+                    if (player.FinishTime == null)
                     {
-                        if (player.FinishTime == null)
-                        {
-                            player.Forfiet = true;
+                        player.Forfiet = true;
 
-                            this.Clients.SendPacket(new ForfietOutgoingMessage(session.SocketId));
-                        }
+                        this.Clients.SendPacket(new ForfietOutgoingMessage(session.SocketId));
                     }
-                    else
+
+                    if (leave)
                     {
                         player.Gone = true;
                     }
