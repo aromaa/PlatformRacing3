@@ -9,16 +9,11 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
 {
     internal class ShutdownCommand : ICommand
     {
+        public string Permission => "command.shutdown.use";
+
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            if (executor.HasPermission(Permissions.SHUTDOWN))
-            {
-                Program.Shutdown();
-            }
-            else
-            {
-                executor.SendMessage("You lack the permissions to use this command!");
-            }
+            Program.Shutdown();
         }
     }
 }

@@ -140,22 +140,22 @@ namespace Platform_Racing_3_Common.User
         public override bool HasBody(Part body) => this._Bodys.Contains(body);
         public override bool HasFeet(Part feet) => this._Feets.Contains(feet);
 
-        public override void GiveHat(Hat hat)
+        public override void GiveHat(Hat hat, bool temporary = false)
         {
             this._Hats.Add(hat);
         }
 
-        public override void GiveHead(Part part)
+        public override void GiveHead(Part part, bool temporary = false)
         {
             this._Heads.Add(part);
         }
 
-        public override void GiveBody(Part part)
+        public override void GiveBody(Part part, bool temporary = false)
         {
             this._Bodys.Add(part);
         }
 
-        public override void GiveFeet(Part part)
+        public override void GiveFeet(Part part, bool temporary = false)
         {
             this._Feets.Add(part);
         }

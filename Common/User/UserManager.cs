@@ -306,6 +306,7 @@ namespace Platform_Racing_3_Common.User
         public static Task GiveHead(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET heads = ARRAY_APPEND(heads, {(uint)part}) WHERE id = {userId} AND NOT heads @> '{{{(uint)part}}}' RETURNING id, heads").ContinueWith(UserManager.ParseSqlAddHead));
         public static Task GiveBody(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bodys = ARRAY_APPEND(bodys, {(uint)part}) WHERE id = {userId} AND NOT bodys @> '{{{(uint)part}}}' RETURNING id, bodys").ContinueWith(UserManager.ParseSqlAddBody));
         public static Task GiveFeet(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET feets = ARRAY_APPEND(feets, {(uint)part}) WHERE id = {userId} AND NOT feets @> '{{{(uint)part}}}' RETURNING id, feets").ContinueWith(UserManager.ParseSqlAddFeet));
+        public static Task GiveSet(uint userId, Part part) => Task.WhenAll(UserManager.GiveHead(userId, part), UserManager.GiveBody(userId, part), UserManager.GiveFeet(userId, part)); //TODO: More optimized version
 
         private static PlayerUserData ParseRedisUserData(Task<RedisValue[]> task)
         {

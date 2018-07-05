@@ -43,7 +43,7 @@ namespace Platform_Racing_3_Common.Customization
         MEME = 34,
         Sword = 35,
         Snowman = 36,
-        Devil = 37,
-        Angel = 38,
+        Angel = 37,
+        Devil = 38,
     }
 }

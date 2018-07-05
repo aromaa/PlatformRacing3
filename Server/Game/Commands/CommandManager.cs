@@ -1,13 +1,18 @@
-﻿using Platform_Racing_3_Server.Game.Commands.Misc;
+﻿using log4net;
+using Platform_Racing_3_Server.Game.Commands.Misc;
+using Platform_Racing_3_Server.Game.Commands.User;
 using Platform_Racing_3_Server_API.Game.Commands;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands
 {
     internal class CommandManager
     {
+        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private Dictionary<string, ICommand> Commands;
 
         internal CommandManager()
@@ -16,6 +21,8 @@ namespace Platform_Racing_3_Server.Game.Commands
             {
                 { "hello", new HelloCommand() },
                 { "shutdown", new ShutdownCommand() },
+                { "givepart", new GivePartCommand() },
+                { "givehat", new GiveHatCommand() },
             };
         }
 
@@ -23,13 +30,22 @@ namespace Platform_Racing_3_Server.Game.Commands
         {
             if (this.Commands.TryGetValue(label, out ICommand command))
             {
-                try
+                if (command.Permission == null || executor.HasPermission(command.Permission))
                 {
-                    command.OnCommand(executor, label, args);
+                    try
+                    {
+                        command.OnCommand(executor, label, args);
+                    }
+                    catch(Exception ex)
+                    {
+                        CommandManager.Logger.Error(ex);
+
+                        executor.SendMessage("Critical error while executing the command!");
+                    }
                 }
-                catch
+                else
                 {
-                    executor.SendMessage("Critical error while executing the command!");
+                    executor.SendMessage("You are lacking the permissions to use this command!");
                 }
 
                 return true;

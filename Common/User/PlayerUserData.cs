@@ -338,32 +338,50 @@ namespace Platform_Racing_3_Common.User
         public override bool HasBody(Part body) => this._Bodys.Contains(body);
         public override bool HasFeet(Part feet) => this._Feets.Contains(feet);
 
-        public override void GiveHat(Hat hat)
+        public override void GiveHat(Hat hat, bool temporary = false)
         {
             base.GiveHat(hat);
 
-            UserManager.GiveHat(this.Id, hat);
+            if (!temporary)
+            {
+                UserManager.GiveHat(this.Id, hat);
+            }
         }
 
-        public override void GiveHead(Part part)
+        public override void GiveHead(Part part, bool temporary = false)
         {
             base.GiveHead(part);
 
-            UserManager.GiveHead(this.Id, part);
+            if (!temporary)
+            {
+                UserManager.GiveHead(this.Id, part);
+            }
         }
 
-        public override void GiveBody(Part part)
+        public override void GiveBody(Part part, bool temporary = false)
         {
             base.GiveBody(part);
 
-            UserManager.GiveBody(this.Id, part);
+            if (!temporary)
+            {
+                UserManager.GiveBody(this.Id, part);
+            }
         }
 
-        public override void GiveFeet(Part part)
+        public override void GiveFeet(Part part, bool temporary = false)
         {
             base.GiveFeet(part);
 
-            UserManager.GiveFeet(this.Id, part);
+            if (!temporary)
+            {
+                UserManager.GiveFeet(this.Id, part);
+            }
+        }
+
+        public override void GiveSet(Part part, bool temporary = false)
+        {
+            //TODO: More optimized version
+            base.GiveSet(part, temporary);
         }
 
         public override void AddFriend(uint id)
@@ -394,7 +412,7 @@ namespace Platform_Racing_3_Common.User
             UserManager.RemoveIgnoredAsync(this.Id, id);
         }
 
-        public override bool HasPermissions(string permission) => this._Permissions.Contains(permission);
+        public override bool HasPermissions(string permission) => this.PermissionRank >= 100 || this._Permissions.Contains(permission);
 
         //Called by UserManager after updating total exp to database and returning its result
         internal void SetTotalExp(ulong totalExp)

@@ -178,10 +178,16 @@ namespace Platform_Racing_3_Common.User
         public virtual bool HasBody(Part body) => this.Bodys.Contains(body);
         public virtual bool HasFeet(Part feet) => this.Feets.Contains(feet);
 
-        public abstract void GiveHat(Hat hat);
-        public abstract void GiveHead(Part part);
-        public abstract void GiveBody(Part part);
-        public abstract void GiveFeet(Part part);
+        public abstract void GiveHat(Hat hat, bool temporary = false);
+        public abstract void GiveHead(Part part, bool temporary = false);
+        public abstract void GiveBody(Part part, bool temporary = false);
+        public abstract void GiveFeet(Part part, bool temporary = false);
+        public virtual void GiveSet(Part part, bool temporary = false)
+        {
+            this.GiveHead(part, temporary);
+            this.GiveBody(part, temporary);
+            this.GiveFeet(part, temporary);
+        }
 
         public virtual void AddExp(ulong exp)
         {

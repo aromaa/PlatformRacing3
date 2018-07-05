@@ -8,6 +8,8 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
 {
     internal class HelloCommand : ICommand
     {
+        public string Permission => null;
+
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
             if (executor is ClientSession client)
