@@ -78,8 +78,7 @@ namespace Platform_Racing_3_Common.Level
 
         public bool HasPrize { get; }
 
-        public string PrizeType { get; }
-        public uint PrizeId { get; }
+        public List<(string prizeType, uint prizeId)> Prizes { get; }
 
         private LevelData()
         {
@@ -137,8 +136,16 @@ namespace Platform_Racing_3_Common.Level
             this.HasPrize = (bool)reader["has_prize"];
             if (this.HasPrize)
             {
-                this.PrizeType = reader["prize_type"].ToString().ToLower();
-                this.PrizeId = (uint)(int)reader["prize_id"];
+                this.Prizes = new List<(string, uint)>();
+
+                string[,] prizes = (string[,])reader["prizes"];
+                for (int i = 0; i < prizes.Length / prizes.Rank; i++)
+                {
+                    string prizeType = prizes[i, 0].ToLower();
+                    uint prizeId = uint.Parse(prizes[i, 1]);
+
+                    this.Prizes.Add((prizeType, prizeId));
+                }
             }
         }
 

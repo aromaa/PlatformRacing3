@@ -340,9 +340,11 @@ namespace Platform_Racing_3_Server.Game.Match
                 events.Add("aliens");
             }
 
-            if (this.LevelData.HasPrize)
+            if (this.LevelData.HasPrize && this.LevelData.Prizes.Count > 0)
             {
-                this.Prize = new MatchPrize(this.LevelData.PrizeType, this.LevelData.PrizeId, rewardsExpBonus: false);
+                (string prizeType, uint prizeId) = this.LevelData.Prizes[random.Next(this.LevelData.Prizes.Count)];
+
+                this.Prize = new MatchPrize(prizeType, prizeId, rewardsExpBonus: false);
             }
             else if (this.Players.Count >= 2)
             {
