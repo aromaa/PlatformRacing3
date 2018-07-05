@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Exceptions;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Utils;
@@ -75,6 +76,11 @@ namespace Platform_Racing_3_Common.Level
         [JsonProperty("medalsRequired")]
         public uint MedalsRequired { get; internal set; }
 
+        public bool HasPrize { get; }
+
+        public string PrizeType { get; }
+        public uint PrizeId { get; }
+
         private LevelData()
         {
 
@@ -126,6 +132,13 @@ namespace Platform_Racing_3_Common.Level
                 this.GoldTime = (uint)(int)reader["gold_time"];
 
                 this.MedalsRequired = (uint)(int)reader["medals_required"];
+            }
+
+            this.HasPrize = (bool)reader["has_prize"];
+            if (this.HasPrize)
+            {
+                this.PrizeType = reader["prize_type"].ToString().ToLower();
+                this.PrizeId = (uint)(int)reader["prize_id"];
             }
         }
 

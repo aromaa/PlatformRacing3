@@ -340,7 +340,11 @@ namespace Platform_Racing_3_Server.Game.Match
                 events.Add("aliens");
             }
 
-            if (this.Players.Count >= 2)
+            if (this.LevelData.HasPrize)
+            {
+                this.Prize = new MatchPrize(this.LevelData.PrizeType, this.LevelData.PrizeId, rewardsExpBonus: false);
+            }
+            else if (this.Players.Count >= 2)
             {
                 int diffIpsCount = this.Players.Values.Select((p) => p.IPAddress).Distinct().Count();
                 if (diffIpsCount >= 2)
@@ -502,12 +506,12 @@ namespace Platform_Racing_3_Server.Game.Match
                             }
                         }
                     }
-
-                    if (this.Prize != null)
-                    {
-                        this.Clients.SendPacket(new PrizeOutgoingMessage(this.Prize, "available"));
-                    }
                 }
+            }
+
+            if (this.Prize != null)
+            {
+                this.Clients.SendPacket(new PrizeOutgoingMessage(this.Prize, "available"));
             }
 
             new Timer(this.GameBegun, null, 2664, 0);
@@ -847,6 +851,11 @@ namespace Platform_Racing_3_Server.Game.Match
                                 {
                                     player.UserData.GiveFeet((Part)prize.Id);
                                 }
+                            }
+
+                            if (!prize.RewardsExpBonus)
+                            {
+                                partExp = false;
                             }
 
                             if (partExp)
