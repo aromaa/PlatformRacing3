@@ -37,6 +37,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             [JsonProperty("koth", DefaultValueHandling = DefaultValueHandling.Ignore)]
             internal string Koth { get; set; }
 
+            [JsonProperty("dash", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            internal uint Dash { get; set; }
+
             [JsonProperty("gone")]
             internal bool Gone { get; set; }
 
@@ -47,6 +50,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
                 this.FinishTime = matchPlayer.Forfiet ? "forfeit" : matchPlayer.FinishTime?.ToString().Replace(',', '.') ?? "";
                 this.Koth = matchPlayer.Koth;
                 this.Coins = matchPlayer.Coins;
+				this.Dash = matchPlayer.Dash;
                 this.Gone = matchPlayer.Gone;
             }
         }

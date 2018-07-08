@@ -228,7 +228,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.StartedOn?.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
                     if (timeRanOut)
                     {
-                        if (this.LevelData.Mode == LevelMode.CoinFiend)
+                        if (this.LevelData.Mode == LevelMode.CoinFiend || this.LevelData.Mode == LevelMode.DamageDash)
                         {
                             foreach (ClientSession session in this.Clients.Values)
                             {
@@ -757,6 +757,10 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         expArray.Add(new object[] { "Coin meizer", expEarned });
                     }
+                    else if (this.LevelData.Mode == LevelMode.DamageDash)
+                    {
+                        expArray.Add(new object[] { "Damage dealer", expEarned });
+                    }
                     else if (this.LevelData.Mode == LevelMode.KingOfTheHat)
                     {
                         expArray.Add(new object[] { "Hat holder", expEarned });
@@ -780,6 +784,9 @@ namespace Platform_Racing_3_Server.Game.Match
                                     break;
                                 case LevelMode.CoinFiend:
                                     defeated = other.Forfiet || player.Coins > other.Coins;
+                                    break;
+                                case LevelMode.DamageDash:
+                                    defeated = other.Forfiet || player.Dash > other.Dash;
                                     break;
                             }
 
@@ -1062,6 +1069,19 @@ namespace Platform_Racing_3_Server.Game.Match
                 if (!player.Forfiet && player.FinishTime == null)
                 {
                     player.Coins = coins;
+
+                    this.Clients.SendPacket(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                }
+            }
+        }
+
+        internal void UpdateDash(ClientSession session, uint dash)
+        {
+            if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
+            {
+                if (!player.Forfiet && player.FinishTime == null)
+                {
+                    player.Dash = dash;
 
                     this.Clients.SendPacket(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }

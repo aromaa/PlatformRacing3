@@ -47,6 +47,7 @@ namespace Platform_Racing_3_Server.Game.Match
         private uint _Life;
         private bool _Hurt;
         private uint _Coins;
+        internal uint Dash;
 
         internal double? FinishTime { get; set; }
         internal bool Forfiet { get; set; }
