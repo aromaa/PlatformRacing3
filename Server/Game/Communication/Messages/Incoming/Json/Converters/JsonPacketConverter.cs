@@ -117,6 +117,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json.Con
                 case "koth":
                     target = new JsonKothIncomingMessage();
                     break;
+                case "dash":
+                    target = new JsonDashIncomingMessage();
+                    break;
                 default:
                     target = new JsonPacket();
                     break;

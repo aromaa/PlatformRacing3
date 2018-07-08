@@ -15,6 +15,8 @@ namespace Platform_Racing_3_Common.Level
         HatAttack,
         [PgName("coinFiend")]
         CoinFiend,
+        [PgName("damageDash")]
+        DamageDash,
         [PgName("kingOfTheHat")]
         KingOfTheHat,
     }

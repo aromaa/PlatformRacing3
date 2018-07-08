@@ -65,6 +65,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "accept_thing_transfer", new AcceptThingTransferIncomingMessage() },
                 { "report_pm", new ReportPmIncomingMessage() },
                 { "koth", new KothIncomingMessage() },
+				{ "dash", new DashIncomingMessage() },
             };
         }
 
