@@ -129,7 +129,7 @@ namespace Platform_Racing_3_Common.User
             {
                 if (!UserManager.UserIds.TryGetValue(username, out Lazy<uint> lazyUserId))
                 {
-                    lazyUserId = UserManager.UserIds.GetOrCreate(UserIds, (cacheEntry) =>
+                    lazyUserId = UserManager.UserIds.GetOrCreate(username, (cacheEntry) =>
                     {
                         cacheEntry.SlidingExpiration = UserManager.UserIdsCacheTime;
 

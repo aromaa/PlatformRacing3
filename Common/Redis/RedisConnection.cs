@@ -33,8 +33,6 @@ namespace Platform_Racing_3_Common.Redis
             {
                 RedisConnection.Redis = ConnectionMultiplexer.Connect(redisConfig.RedisHost + ":" + redisConfig.RedisPort);
             }
-
-            RedisConnection.Redis.PreserveAsyncOrder = false;
         }
 
         public static ConnectionMultiplexer GetConnectionMultiplexer() => RedisConnection.Redis;
