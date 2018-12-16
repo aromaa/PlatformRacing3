@@ -29,7 +29,6 @@ namespace Platform_Racing_3_Web
         {
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.ExpireTimeSpan = TimeSpan.FromDays(30);
                 options.SlidingExpiration = true;
 
@@ -41,6 +40,7 @@ namespace Platform_Racing_3_Web
             });
 
             services.AddMvc().AddXmlSerializerFormatters();
+            services.AddCors();
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -53,6 +53,11 @@ namespace Platform_Racing_3_Web
 
             app.UseMiddleware<CloudflareMiddleware>();
             app.UseAuthentication();
+            app.UseCors(options =>
+            {
+                options.WithOrigins("http://pr3hub.com", "https://pr3hub.com").AllowAnyMethod().AllowCredentials();
+            });
+
             app.UseMvc();
 
             app.Run(async context =>
