@@ -81,7 +81,10 @@ namespace Platform_Racing_3_Web.Extensions
                     identity.AddClaim(new Claim(ClaimTypes.Name, HttpContextExtensions.AUTHENICATION_IDENTITY));
                     identity.AddClaim(new Claim(ClaimTypes.Sid, userId.ToString(), ClaimValueTypes.UInteger32));
 
-                    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+                    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties()
+                    {
+                        IsPersistent = true,
+                    });
                 }
                 else if (task.IsFaulted)
                 {
