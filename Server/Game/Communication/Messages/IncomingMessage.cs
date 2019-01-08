@@ -39,14 +39,15 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
 
         internal double ReadDouble()
         {
-            try
+            Span<byte> reverse = stackalloc byte[8];
+            for(int i = 0; i < reverse.Length; i++)
             {
-                return BitConverter.ToDouble(this.Data, this.Pointer);
+                reverse[i] = this.ReadByte();
             }
-            finally
-            {
-                this.Pointer += 8;
-            }
+
+            reverse.Reverse();
+
+            return BitConverter.ToDouble(reverse);
         }
 
         internal float ReadFloat()

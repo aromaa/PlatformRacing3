@@ -299,6 +299,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 events.Add("wind");
             }
 
+            //TODO: Move hat stuff to GetVars sometime
             if (this.LevelData.Mode != LevelMode.KingOfTheHat)
             {
                 if (this.LevelData.Sfchm > random.NextDouble() * 100)
@@ -329,9 +330,16 @@ namespace Platform_Racing_3_Server.Game.Match
             {
                 Hat hat = (Hat)this.LevelData.KingOfTheHat[0];
                 Color hatColor = Color.FromArgb((int)this.LevelData.KingOfTheHat[1]);
+
                 foreach (Point point in this.FinishBlocks)
                 {
                     this.DropHat(hat, hatColor, (point.X * 40) + 20, (point.Y * 40) + 20);
+                }
+
+                //Resend hats to avoid graphical bug on client side
+                foreach (MatchPlayer player in this.Players.Values)
+                {
+                    this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
                 }
             }
 

@@ -40,10 +40,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     {
                         maxMembers = 1;
                     }
-                    else if (maxMembers > 8 && !session.HasPermissions(Permissions.ACCESS_MATCH_LISTING_NO_MEMBERS_LIMIT))
-                    {
-                        maxMembers = 8;
-                    }
+                    //else if (maxMembers > 8 && !session.HasPermissions(Permissions.ACCESS_MATCH_LISTING_NO_MEMBERS_LIMIT))
+                    //{
+                    //    maxMembers = 8;
+                    //}
 
                     MatchListing listing = new MatchListing(session, level, "match-listing-" + this.GetNextMatchListingId(), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
