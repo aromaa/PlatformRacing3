@@ -51,7 +51,9 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
             "p",
             "sn",
             "j",
-            "sp"
+            "sp",
+            "h",
+            "lc",
         };
 
         public async Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml)
