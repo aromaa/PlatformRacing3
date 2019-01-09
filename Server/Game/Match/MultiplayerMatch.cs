@@ -24,6 +24,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Platform_Racing_3_Server.Game.Communication.Messages;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -653,7 +654,7 @@ namespace Platform_Racing_3_Server.Game.Match
             this.StartedOn = Stopwatch.StartNew();
         }
 
-        private void AddHatToPlayer(MatchPlayer player, Hat hat, Color color, bool spawned = true)
+        internal void AddHatToPlayer(MatchPlayer player, Hat hat, Color color, bool spawned = true)
         {
             player.AddHat(this.GetNextHatId(), hat, color, spawned);
 
@@ -979,15 +980,27 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void SendChatMessage(ClientSession session, string message, bool sendToSelf = true)
         {
-            ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
-
-            if (sendToSelf)
+            if (message.StartsWith("/"))
             {
-                this.Clients.SendPacket(packet);
+                string[] args = message.Substring(1).Split(' ');
+
+                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan().Slice(1, args.Length - 1)))
+                {
+                    session.SendPacket(new AlertOutgoingMessage("Unknown command"));
+                }
             }
             else
             {
-                this.Clients.SendPacket(packet, session);
+                ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
+
+                if (sendToSelf)
+                {
+                    this.Clients.SendPacket(packet);
+                }
+                else
+                {
+                    this.Clients.SendPacket(packet, session);
+                }
             }
         }
 
@@ -1128,6 +1141,11 @@ namespace Platform_Racing_3_Server.Game.Match
                     this.Clients.SendPacket(new CoinsOutgoingMessage(new MatchPlayer[] { player }));
                 }
             }
+        }
+
+        internal void SendPacket(IMessageOutgoing packet)
+        {
+            this.Clients.SendPacket(packet);
         }
     }
 }

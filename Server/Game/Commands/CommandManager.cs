@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Platform_Racing_3_Server.Game.Commands.Match;
 using Platform_Racing_3_Server.Game.Commands.Misc;
 using Platform_Racing_3_Server.Game.Commands.User;
 using Platform_Racing_3_Server_API.Game.Commands;
@@ -25,6 +26,11 @@ namespace Platform_Racing_3_Server.Game.Commands
                 { "givehat", new GiveHatCommand() },
                 { "broadcast", new BroadcastCommand() },
                 { "kick", new KickCommand() },
+                { "alert", new AlertCommand() },
+                { "addhat", new AddHatCommand() },
+                { "fakeprize", new FakePrizeCommand() },
+                { "spawnaliens", new SpawnAliensCommand() },
+                { "teleport", new TeleportCommand() },
             };
         }
 
