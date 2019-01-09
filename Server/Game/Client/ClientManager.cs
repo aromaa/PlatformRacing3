@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 
@@ -60,6 +61,8 @@ namespace Platform_Racing_3_Server.Game.Client
 
         internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetClientSession(socketId, out session);
         internal bool TryGetClientSessionByUserId(uint userId, out ClientSession session) => this.ClientsByUserId.TryGetValue(userId, out session);
+
+        internal ClientSession GetClientSessionByUsername(string username) => this.ClientsByUserId.Values.FirstOrDefault((c) => c.UserData?.Username == username);
 
         internal ICollection<ClientSession> GetLoggedInUsers() => this.ClientsBySocketId.Values;
         internal uint Count => this.ClientsBySocketId.Count;

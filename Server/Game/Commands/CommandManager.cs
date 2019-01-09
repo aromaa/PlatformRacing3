@@ -23,6 +23,8 @@ namespace Platform_Racing_3_Server.Game.Commands
                 { "shutdown", new ShutdownCommand() },
                 { "givepart", new GivePartCommand() },
                 { "givehat", new GiveHatCommand() },
+                { "broadcast", new BroadcastCommand() },
+                { "kick", new KickCommand() },
             };
         }
 

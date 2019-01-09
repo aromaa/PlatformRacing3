@@ -47,7 +47,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
 
         public void WriteDouble(double value)
         {
-            this.Data.AddRange(BitConverter.GetBytes(value));
+            byte[] bytes = BitConverter.GetBytes(value);
+
+            Array.Reverse(bytes);
+
+            this.Data.AddRange(bytes);
         }
 
         public void WriteFloat(float value)
