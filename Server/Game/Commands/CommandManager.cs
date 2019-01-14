@@ -31,6 +31,7 @@ namespace Platform_Racing_3_Server.Game.Commands
                 { "fakeprize", new FakePrizeCommand() },
                 { "spawnaliens", new SpawnAliensCommand() },
                 { "teleport", new TeleportCommand() },
+                { "tournament", new TournamentCommand() },
             };
         }
 

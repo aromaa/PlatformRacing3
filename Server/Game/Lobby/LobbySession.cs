@@ -26,10 +26,15 @@ namespace Platform_Racing_3_Server.Game.Lobby
         {
             foreach(MatchListing listing in listings)
             {
-                if (listing.JoinLobby(this.Session))
-                {
-                    this._Matches.Add(listing);
-                }
+                this.AddMatch(listing);
+            }
+        }
+
+        internal void AddMatch(MatchListing listing)
+        {
+            if (listing.JoinLobby(this.Session))
+            {
+                this._Matches.Add(listing);
             }
         }
 

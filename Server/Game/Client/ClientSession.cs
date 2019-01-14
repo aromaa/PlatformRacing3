@@ -30,6 +30,8 @@ namespace Platform_Racing_3_Server.Game.Client
         [JsonProperty("ping")]
         internal uint LastRoundtripTime { get; set; }
 
+        internal bool HostTournament { get; set; }
+
         private Lazy<LobbySession> _LobbySession;
 
         internal MultiplayerMatchSession MultiplayerMatchSession { get; set; }

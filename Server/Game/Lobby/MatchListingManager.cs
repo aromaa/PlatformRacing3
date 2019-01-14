@@ -1,6 +1,8 @@
 ﻿using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Server.Collections;
+using Platform_Racing_3_Server.Core;
+using Platform_Racing_3_Server.Extensions;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using System;
@@ -29,7 +31,12 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private uint GetNextMatchListingId() => (uint)Interlocked.Increment(ref this.NextMatchListingId);
 
-        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
+        internal Task<MatchListing> TryCreateMatchAsync(ClientSession session, LevelData levelData, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
+        {
+            return this.TryCreateMatchAsync(session, levelData.Id, levelData.Version, minRank, maxRank, maxMembers, onlyFriends, type);
+        }
+
+        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
         {
             if (session.LobbySession.MatchListing == null)
             {
@@ -45,7 +52,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     //    maxMembers = 8;
                     //}
 
-                    MatchListing listing = new MatchListing(session, level, "match-listing-" + this.GetNextMatchListingId(), minRank, maxRank, maxMembers, onlyFriends);
+                    MatchListing listing = new MatchListing(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
 
                     if (this.MatchListings.TryAdd(listing.Name, listing))
@@ -122,7 +129,32 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal List<MatchListing> RequestsMatches(ClientSession session, uint num)
         {
-            return this.MatchListings.Values.Except(session.LobbySession.Matches).Where((m) => m.CanJoin(session) == MatchListingJoinStatus.Success).OrderByDescending((l) => l.ClientsCount).Take((int)num).ToList();
+            return this.MatchListings.Values.Except(session.LobbySession.Matches).Where((m) => m.Type == MatchListingType.Normal && m.CanJoin(session) == MatchListingJoinStatus.Success).OrderByDescending((l) => l.ClientsCount).Take((int)num).ToList();
+        }
+
+        internal MatchListing GetTournament(ClientSession session)
+        {
+            return this.MatchListings.Values.Where((m) => m.Type == MatchListingType.Tournament && m.CanJoin(session) == MatchListingJoinStatus.Success).OrderByDescending((l) => l.ClientsCount).FirstOrDefault();
+        }
+
+        internal MatchListing GetLeveOfTheDay()
+        {
+            MatchListing listing = this.MatchListings.Values.Where((m) => m.Type == MatchListingType.LevelOfTheDay).OrderByDescending((l) => l.ClientsCount).FirstOrDefault();
+            if (listing == null)
+            {
+                IReadOnlyCollection<LevelData> levels = LevelManager.GetCampaignLevels().GetAwaiter().GetResult().Levels;
+
+                LevelData random = levels.ElementAt(new Random().Next(0, levels.Count));
+
+                listing = new MatchListing(MatchListingType.LevelOfTheDay, null, random, MatchListingType.LevelOfTheDay.GetLobbyId(this.GetNextMatchListingId()), 0, uint.MaxValue, 4, false);
+
+                if (!this.MatchListings.TryAdd(listing.Name, listing))
+                {
+                    return null;
+                }
+            }
+
+            return listing;
         }
 
         internal void Die(MatchListing matchListing)

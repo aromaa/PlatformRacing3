@@ -9,22 +9,22 @@ using Platform_Racing_3_Server.Game.Lobby;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class GetTournamentIncomingMessage : IMessageIncomingJson
+    internal class JoinTournamentIncomingMessage : IMessageIncomingJson
     {
         public void Handle(ClientSession session, JsonPacket message)
         {
             MatchListing matchListing = PlatformRacing3Server.MatchListingManager.GetTournament(session);
             if (matchListing != null)
             {
-                session.SendPacket(new TournamnetStatusOutgoingMessage(1));
+                session.SendPacket(new ForceMatchOutgoingMessage(matchListing));
             }
             else if (PlatformRacing3Server.MatchManager.HasOngoingTournaments)
             {
-                session.SendPacket(new TournamnetStatusOutgoingMessage(2));
+                session.SendMessage("Tournament is running, spectate coming \"soon\"!");
             }
             else
             {
-                session.SendPacket(new TournamnetStatusOutgoingMessage(0));
+                session.SendMessage("There are no tournaments running");
             }
         }
     }

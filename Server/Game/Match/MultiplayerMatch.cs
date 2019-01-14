@@ -25,16 +25,18 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Platform_Racing_3_Server.Game.Communication.Messages;
+using Platform_Racing_3_Server.Game.Lobby;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
     internal class MultiplayerMatch
     {
+        internal MatchListingType Type { get; }
         internal string Name { get; }
 
         internal LevelData LevelData { get; }
 
-        private MultiplayerMatchStatus Status;
+        private MultiplayerMatchStatus _Status;
         private ClientSessionCollection ReservedFor;
         private ClientSessionCollection Clients;
 
@@ -53,9 +55,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private HashSet<Point> FinishBlocks;
 
-        internal MultiplayerMatch(string name, LevelData levelData)
+        internal MultiplayerMatch(MatchListingType type, string name, LevelData levelData)
         {
-            this.Status = MultiplayerMatchStatus.PreparingForStart;
+            this.Type = type;
+
+            this._Status = MultiplayerMatchStatus.PreparingForStart;
             this.ReservedFor = new ClientSessionCollection(this.OnReservedDisconnect);
             this.Clients = new ClientSessionCollection(this.OnDisconnect);
 
@@ -71,6 +75,8 @@ namespace Platform_Racing_3_Server.Game.Match
 
             this.FinishBlocks = new HashSet<Point>();
         }
+
+        public MultiplayerMatchStatus Status => this._Status;
 
         private void OnReservedDisconnect(ClientSession session)
         {
@@ -88,7 +94,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal bool Reserve(ClientSession session)
         {
-            if (this.Status != MultiplayerMatchStatus.PreparingForStart)
+            if (this._Status != MultiplayerMatchStatus.PreparingForStart)
             {
                 throw new InvalidOperationException();
             }
@@ -107,7 +113,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (this.LevelData.Mode == LevelMode.KingOfTheHat)
             {
-                if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.ServerDrawing, MultiplayerMatchStatus.PreparingForStart) == MultiplayerMatchStatus.PreparingForStart)
+                if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.ServerDrawing, MultiplayerMatchStatus.PreparingForStart) == MultiplayerMatchStatus.PreparingForStart)
                 {
                     new Task(async () => await this.DrawLevelAsync()).Start(); //Start to draw the map
                     return;
@@ -115,7 +121,7 @@ namespace Platform_Racing_3_Server.Game.Match
             }
             else
             {
-                if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.PreparingForStart) == MultiplayerMatchStatus.PreparingForStart)
+                if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.PreparingForStart) == MultiplayerMatchStatus.PreparingForStart)
                 {
                     this.CheckGameState();
                     return;
@@ -199,22 +205,22 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             while (true)
             {
-                if (this.Status == MultiplayerMatchStatus.WaitingForUsersToJoin)
+                if (this._Status == MultiplayerMatchStatus.WaitingForUsersToJoin)
                 {
                     if (this.UsersReady == this.ReservedSlots)
                     {
-                        InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.WaitingForUsersToDraw, MultiplayerMatchStatus.WaitingForUsersToJoin);
+                        InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToDraw, MultiplayerMatchStatus.WaitingForUsersToJoin);
                     }
                     else
                     {
                         break;
                     }
                 }
-                else if (this.Status == MultiplayerMatchStatus.WaitingForUsersToDraw)
+                else if (this._Status == MultiplayerMatchStatus.WaitingForUsersToDraw)
                 {
                     if (this.DrawingUsers.Count == 0)
                     {
-                        if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw) == MultiplayerMatchStatus.WaitingForUsersToDraw)
+                        if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw) == MultiplayerMatchStatus.WaitingForUsersToDraw)
                         {
                             this.Start();
                         }
@@ -224,7 +230,7 @@ namespace Platform_Racing_3_Server.Game.Match
                         break;
                     }
                 }
-                else if (this.Status == MultiplayerMatchStatus.Ongoing)
+                else if (this._Status == MultiplayerMatchStatus.Ongoing)
                 {
                     bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.StartedOn?.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
                     if (timeRanOut)
@@ -240,7 +246,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     
                     if (timeRanOut || this.Players.Values.All((p) => p.Forfiet || p.FinishTime != null))
                     {
-                        if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.Ended, MultiplayerMatchStatus.Ongoing) == MultiplayerMatchStatus.Ongoing)
+                        if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ended, MultiplayerMatchStatus.Ongoing) == MultiplayerMatchStatus.Ongoing)
                         {
                             this.Clients.SendPacket(new EndGameOutgoingMessage());
                         }
@@ -250,11 +256,11 @@ namespace Platform_Racing_3_Server.Game.Match
                         break;
                     }
                 }
-                else if (this.Status == MultiplayerMatchStatus.Ended)
+                else if (this._Status == MultiplayerMatchStatus.Ended)
                 {
                     if (this.Clients.Count <= 0)
                     {
-                        if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.Died, MultiplayerMatchStatus.Ended) == MultiplayerMatchStatus.Ended)
+                        if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Died, MultiplayerMatchStatus.Ended) == MultiplayerMatchStatus.Ended)
                         {
                             PlatformRacing3Server.MatchManager.Die(this);
                         }
@@ -367,6 +373,15 @@ namespace Platform_Racing_3_Server.Game.Match
                         {
                             change *= 2;
                         }
+                    }
+
+                    if (this.Type == MatchListingType.Tournament)
+                    {
+                        change *= 2;
+                    }
+                    else if (this.Type == MatchListingType.LevelOfTheDay)
+                    {
+                        change *= 1.25;
                     }
 
                     if (change > random.NextDouble() * 100)
@@ -629,7 +644,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             }
                         }
 
-                        if (InterlockedExtansions.CompareExchange(ref this.Status, MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.ServerDrawing) == MultiplayerMatchStatus.ServerDrawing)
+                        if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.ServerDrawing) == MultiplayerMatchStatus.ServerDrawing)
                         {
                             this.CheckGameState();
                         }
@@ -665,7 +680,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             session.MultiplayerMatchSession = null;
 
-            if (this.Status < MultiplayerMatchStatus.Starting)
+            if (this._Status < MultiplayerMatchStatus.Starting)
             {
                 this.DrawingUsers.Remove(session.SocketId);
                 this.Players.TryRemove(session.SocketId, out _);
@@ -891,7 +906,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         if (!hat.Spawned && hat.Hat == Hat.BaseballCap)
                         {
-                            expHatBonus += expHatBonus == 0 ? 1f : 0.1f;
+                            expHatBonus += expHatBonus == 0 ? 1F : 0.1F;
                         }
                     }
 
@@ -899,6 +914,12 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         expEarned += (ulong)Math.Round(baseExp * expHatBonus);
                         expArray.Add(new object[] { "Exp hat", $"EXP X {expHatBonus + 1}" });
+                    }
+
+                    if (this.Type == MatchListingType.LevelOfTheDay)
+                    {
+                        expEarned += (ulong)Math.Round(baseExp * 1.10F);
+                        expArray.Add(new object[] { "LOTD bonus", "EXP X 1.10" });
                     }
 
                     ulong bonusExpDrained = 0;

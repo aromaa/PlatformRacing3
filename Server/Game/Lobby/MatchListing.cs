@@ -27,6 +27,8 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal LevelData LevelData { get; }
 
+        internal MatchListingType Type { get; }
+
         [JsonProperty("roomName")]
         internal string Name { get; }
 
@@ -71,7 +73,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private volatile int UsersReady;
 
-        internal MatchListing(ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
+        internal MatchListing(MatchListingType type, ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
         {
             this._Clients = new ClientSessionCollection(this.OnDisconnect);
             this.LobbyClients = new ClientSessionCollection();
@@ -87,13 +89,19 @@ namespace Platform_Racing_3_Server.Game.Lobby
             this.MaxMembers = maxMembers;
             this.OnlyFriends = onlyFriends;
 
-            this._HostSocketId = creator.SocketId;
             this._SpotsLeft = (int)maxMembers;
 
-            creator.OnDisconnect += this.OnCreatorDisconnectEarly;
-            if (creator.Disconnected)
+            this.Type = type;
+
+            if (creator != null)
             {
-                this.OnCreatorDisconnectEarly();
+                this._HostSocketId = creator.SocketId;
+
+                creator.OnDisconnect += this.OnCreatorDisconnectEarly;
+                if (creator.Disconnected)
+                {
+                    this.OnCreatorDisconnectEarly();
+                }
             }
         }
 
@@ -120,15 +128,15 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 return MatchListingJoinStatus.Success;
             }
-            else if (!this._Clients.Contains(this.HostSocketId))
+            else if (this.Type == MatchListingType.Normal && !this._Clients.Contains(this.HostSocketId))
             {
                 return MatchListingJoinStatus.WaitingForHost;
             }
-            else if ((this.MinRank > session.UserData.Rank || this.MaxRank < session.UserData.Rank) && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
+            else if (this.Type != MatchListingType.LevelOfTheDay && (this.MinRank > session.UserData.Rank || this.MaxRank < session.UserData.Rank) && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_RANK_REQUIREMENT))
             {
                 return MatchListingJoinStatus.NoRankRequirement;
             }
-            else if (this.OnlyFriends && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_ONLY_FRIENDS))
+            else if (this.Type != MatchListingType.LevelOfTheDay && this.OnlyFriends && !session.HasPermissions(Permissions.ACCESS_BYPASS_MATCH_LISTING_ONLY_FRIENDS))
             {
                 if (session.IsGuest)
                 {
@@ -139,7 +147,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     return host.UserData.Friends.Contains(session.UserData.Id) ? MatchListingJoinStatus.Success : MatchListingJoinStatus.FriendsOnly;
                 }
             }
-            else if (this.BannedClients.Any((i) => i.Matches(session.UserData.Id, session.SocketId, session.IPAddres)))
+            else if (this.Type != MatchListingType.LevelOfTheDay && this.BannedClients.Any((i) => i.Matches(session.UserData.Id, session.SocketId, session.IPAddres)))
             {
                 return MatchListingJoinStatus.Banned;
             }
@@ -221,7 +229,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     }
 
                     uint currentHost = this._HostSocketId;
-                    if (currentHost == session.SocketId || (currentHost == 0 && InterlockedExtansions.CompareExchange(ref this._HostSocketId, session.SocketId, currentHost) == currentHost))
+                    if (this.Type == MatchListingType.Normal && (currentHost == session.SocketId || (currentHost == 0 && InterlockedExtansions.CompareExchange(ref this._HostSocketId, session.SocketId, currentHost) == currentHost)))
                     {
                         session.SendPacket(new MatchOwnerOutgoingMessage(this.Name, true, true, true));
                     }
@@ -315,28 +323,35 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 session.SendPacket(new UserLeaveRoomOutgoingMessage(this.Name, session.SocketId));
             }
 
-            if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, MatchListing.SPOTS_LEFT_DIED) != (int)this.MaxMembers)
+            if (this.Type != MatchListingType.LevelOfTheDay)
             {
-                uint currentHost = this._HostSocketId;
-                if (currentHost == session.SocketId) //Time to pick new host
+                if (Interlocked.CompareExchange(ref this._SpotsLeft, (int)this.MaxMembers, MatchListing.SPOTS_LEFT_DIED) != (int)this.MaxMembers)
                 {
-                    //TODO: How should we handle friends only?
-
-                    while (this._Clients.Count > 0)
+                    uint currentHost = this._HostSocketId;
+                    if (this.Type == MatchListingType.Normal && currentHost == session.SocketId) //Time to pick new host
                     {
-                        ClientSession other = this._Clients.Values.FirstOrDefault();
-                        if (other != null)
+                        //TODO: How should we handle friends only?
+
+                        while (this._Clients.Count > 0)
                         {
-                            if (InterlockedExtansions.CompareExchange(ref this._HostSocketId, other.SocketId, currentHost) == currentHost)
+                            ClientSession other = this._Clients.Values.FirstOrDefault();
+                            if (other != null)
                             {
-                                if (this._Clients.Contains(other))
+                                if (InterlockedExtansions.CompareExchange(ref this._HostSocketId, other.SocketId, currentHost) == currentHost)
                                 {
-                                    other.SendPacket(new MatchOwnerOutgoingMessage(this.Name, true, true, true));
-                                    break;
+                                    if (this._Clients.Contains(other))
+                                    {
+                                        other.SendPacket(new MatchOwnerOutgoingMessage(this.Name, true, true, true));
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        currentHost = other.SocketId;
+                                    }
                                 }
                                 else
                                 {
-                                    currentHost = other.SocketId;
+                                    break;
                                 }
                             }
                             else
@@ -344,21 +359,17 @@ namespace Platform_Racing_3_Server.Game.Lobby
                                 break;
                             }
                         }
-                        else
-                        {
-                            break;
-                        }
                     }
                 }
-            }
-            else
-            {
-                foreach (ClientSession other in this.LobbyClients.Values)
+                else
                 {
-                    other.LobbySession.RemoveMatch(this);
-                }
+                    foreach (ClientSession other in this.LobbyClients.Values)
+                    {
+                        other.LobbySession.RemoveMatch(this);
+                    }
 
-                PlatformRacing3Server.MatchListingManager.Die(this);
+                    PlatformRacing3Server.MatchListingManager.Die(this);
+                }
             }
         }
 
