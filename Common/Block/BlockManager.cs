@@ -70,7 +70,7 @@ namespace Platform_Racing_3_Common.Block
                 throw new ArgumentException(nameof(userId));
             }
 
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT category FROM base.blocks_titles WHERE author_user_id = {userId} AND category != '' ORDER BY category").ContinueWith(BlockManager.ParseSqlGetCategorys));
+            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON (lower(category)) category FROM base.blocks_titles WHERE author_user_id = {userId} AND category != '' ORDER BY lower(category)").ContinueWith(BlockManager.ParseSqlGetCategorys));
         }
 
         public static Task<HashSet<uint>> GetMyBlocksAsync(uint userId, string category, uint start = 0, uint count = uint.MaxValue)
