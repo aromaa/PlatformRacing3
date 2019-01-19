@@ -286,7 +286,8 @@ namespace Platform_Racing_3_Common.User
         public static Task AddExpAsync(uint userId, ulong addExp, ulong totalExp, uint rank, ulong exp) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET total_exp = total_exp + {addExp}, rank = {rank}, exp = {exp} WHERE id = {userId} RETURNING id, total_exp").ContinueWith(UserManager.ParseSqlAddExp));
 
         //Update to sql and then call SetBonusExp on PlayerUserData and then update to redis
-        public static Task DrainBonusExp(uint userId, ulong drainBonusExp, ulong bonusExp) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp = GREATEST(bonus_exp - {drainBonusExp}, 0) WHERE id = {userId} RETURNING id, bonus_exp").ContinueWith(UserManager.ParseSqlDrainBonusExp));
+        public static Task GiveBonusExp(uint userId, ulong amount) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp = bonus_exp + {amount} WHERE id = {userId} RETURNING id, bonus_exp").ContinueWith(UserManager.ParseSqlBonusExpUpdate));
+        public static Task DrainBonusExp(uint userId, ulong drainBonusExp) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp = bonus_exp - {drainBonusExp} WHERE id = {userId} RETURNING id, bonus_exp").ContinueWith(UserManager.ParseSqlBonusExpUpdate));
 
         public static Task AddFriendAsync(uint userId, uint friendId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.friends(user_id, friend_user_id) VALUES({userId}, {friendId}) ON CONFLICT DO NOTHING"));
         public static Task RemoveFriendAsync(uint userId, uint ignoredId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"DELETE FROM base.friends WHERE user_id = {userId} AND friend_user_id = {ignoredId}"));
@@ -460,7 +461,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlDrainBonusExp(Task<DbDataReader> task)
+        private static void ParseSqlBonusExpUpdate(Task<DbDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

@@ -326,11 +326,18 @@ namespace Platform_Racing_3_Common.User
             UserManager.AddExpAsync(this.Id, exp, this.TotalExp, this.Rank, this.Exp);
         }
 
+        public override void GiveBonusExp(ulong bonusExp)
+        {
+            base.GiveBonusExp(bonusExp);
+
+            UserManager.GiveBonusExp(this.Id, bonusExp);
+        }
+
         public override void DrainBonusExp(ulong bonusExp)
         {
             base.DrainBonusExp(bonusExp);
 
-            UserManager.DrainBonusExp(this.Id, bonusExp, this.BonusExp);
+            UserManager.DrainBonusExp(this.Id, bonusExp);
         }
 
         public override bool HasHat(Hat hat) => this._Hats.Contains(hat);

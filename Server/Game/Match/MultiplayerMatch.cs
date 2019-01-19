@@ -55,6 +55,8 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private HashSet<Point> FinishBlocks;
 
+        internal bool Broadcaster { get; set; }
+
         internal MultiplayerMatch(MatchListingType type, string name, LevelData levelData)
         {
             this.Type = type;
@@ -700,6 +702,13 @@ namespace Platform_Racing_3_Server.Game.Match
                     //If player dosen't have finish time it should always be considered as forfiet
                     if (player.FinishTime == null)
                     {
+                        if (!player.Forfiet && this.Broadcaster)
+                        {
+                            int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
+
+                            this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfiet at place #{place}");
+                        }
+
                         player.Forfiet = true;
 
                         this.Clients.SendPacket(new ForfietOutgoingMessage(session.SocketId));
@@ -790,7 +799,7 @@ namespace Platform_Racing_3_Server.Game.Match
                         expArray.Add(new object[] { "Hat holder", expEarned });
                     }
 
-                    bool firstPlace = true;
+                    int place = this.Players.Count;
                     foreach(MatchPlayer other in this.Players.Values)
                     {
                         if (other != player)
@@ -816,6 +825,8 @@ namespace Platform_Racing_3_Server.Game.Match
 
                             if (defeated)
                             {
+                                place--;
+
                                 ulong playerExp = (ulong)Math.Round(ExpUtils.GetExpForDefeatingPlayer(other.UserData.Rank) * ExpUtils.GetPlaytimeMultiplayer(other.FinishTime ?? now) * ExpUtils.GetKeyPressMultiplayer(other.KeyPresses));
 
                                 if (other.IPAddress == player.IPAddress)
@@ -826,15 +837,11 @@ namespace Platform_Racing_3_Server.Game.Match
                                 expEarned += playerExp;
                                 expArray.Add(new object[] { "Defeated " + other.UserData.Username, playerExp });
                             }
-                            else
-                            {
-                                firstPlace = false;
-                            }
                         }
                     }
 
                     ulong baseExp = expEarned;
-                    if (firstPlace)
+                    if (place == 1)
                     {
                         MatchPrize prize = Interlocked.Exchange(ref this.Prize, null);
                         if (prize != null)
@@ -940,6 +947,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
                     player.UserData.AddExp(expEarned);
 
+                    if (this.Broadcaster)
+                    {
+                        this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} finished at place #{place}");
+                    }
+
                     this.CheckGameState();
                 }
             }
@@ -1023,6 +1035,13 @@ namespace Platform_Racing_3_Server.Game.Match
                     this.Clients.SendPacket(packet, session);
                 }
             }
+        }
+
+        private void SendChatMessage(string senderName, uint senderSocketId, uint senderUserId, Color senderNameColor, string message)
+        {
+            ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
+
+            this.Clients.SendPacket(packet);
         }
 
         private void SendShatterBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)

@@ -214,6 +214,21 @@ namespace Platform_Racing_3_Common.User
             this.Exp = expLeft;
         }
 
+        public virtual void GiveBonusExp(ulong bonusExp)
+        {
+            try
+            {
+                checked
+                {
+                    this.BonusExp += this.BonusExp;
+                }
+            }
+            catch (StackOverflowException)
+            {
+                this.BonusExp = 0;
+            }
+        }
+
         public virtual void DrainBonusExp(ulong bonusExp)
         {
             try
