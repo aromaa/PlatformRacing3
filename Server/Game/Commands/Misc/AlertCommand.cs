@@ -14,28 +14,21 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            if (executor is ClientSession session)
+            if (args.Length <= 0)
             {
-                if (args.Length <= 0)
+                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[0]);
+                if (target != null)
                 {
-                    ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[0]);
-                    if (target != null)
-                    {
-                        target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args.Slice(1).ToArray())));
-                    }
-                    else
-                    {
-                        executor.SendMessage($"Unable to find user online named {args[0]}");
-                    }
+                    target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args.Slice(1).ToArray())));
                 }
                 else
                 {
-                    executor.SendMessage("Usage: /alert [user]");
+                    executor.SendMessage($"Unable to find user online named {args[0]}");
                 }
             }
             else
             {
-                executor.SendMessage("This command may only be executed by client session!");
+                executor.SendMessage("Usage: /alert [user]");
             }
         }
     }
