@@ -17,24 +17,24 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
                 executor.SendMessage("<b><u>Developer / Administrator / Manager</u></b>"
 
                     + "\n\n- /addhat [hat id]"
-                    + "- /broadcaster"
-                    + "- /broadcast"
-                    + "- /fakeprize [type] [prize id]"
-                    + "- /spawnaliens [alien amount]"
-                    + "- /teleport [x] [y]"
-                    + "- /alert [username] [message]"
-                    + "- /kick [username] [reason]"
-                    + "- /shutdown"
-                    + "- /tournament"
-                    + "- /givebonusexp [username] [amount]"
-                    + "- /givehat [username] [hat id]"
-                    + "- /givepart [username] [part id]"
+                    + "\n- /broadcaster"
+                    + "\n- /broadcast"
+                    + "\n- /fakeprize [type] [prize id]"
+                    + "\n- /spawnaliens [alien amount]"
+                    + "\n- /teleport [x] [y]"
+                    + "\n- /alert [username] [message]"
+                    + "\n- /kick [username] [reason]"
+                    + "\n- /shutdown"
+                    + "\n- /tournament"
+                    + "\n- /givebonusexp [username] [amount]"
+                    + "\n- /givehat [username] [hat id]"
+                    + "\n- /givepart [username] [part id]"
 
                     + "\n\n<b><u>Everyone</u></b>"
 
-                    + "- /help"
-                    + "- /hello"
-                    + "- /setworkers [worker amount]");
+                    + "\n\n- /help"
+                    + "\n- /hello"
+                    + "\n- /setworkers [worker amount]");
             }
             else
             {
