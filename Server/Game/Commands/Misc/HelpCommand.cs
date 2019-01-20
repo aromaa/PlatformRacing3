@@ -12,34 +12,27 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            if (executor is ClientSession session)
-            {
-                executor.SendMessage("<b><u>Developer / Administrator / Manager</u></b>"
+            executor.SendMessage("<b><u>Developer / Administrator / Manager</u></b>"
 
-                    + "\n\n- /addhat [hat id]"
-                    + "\n- /broadcaster"
-                    + "\n- /broadcast"
-                    + "\n- /fakeprize [type] [prize id]"
-                    + "\n- /spawnaliens [alien amount]"
-                    + "\n- /teleport [x] [y]"
-                    + "\n- /alert [username] [message]"
-                    + "\n- /kick [username] [reason]"
-                    + "\n- /shutdown"
-                    + "\n- /tournament"
-                    + "\n- /givebonusexp [username] [amount]"
-                    + "\n- /givehat [username] [hat id]"
-                    + "\n- /givepart [username] [part id]"
+                + "\n\n- /addhat [hat id]"
+                + "\n- /broadcaster"
+                + "\n- /broadcast"
+                + "\n- /fakeprize [type] [prize id]"
+                + "\n- /spawnaliens [alien amount]"
+                + "\n- /teleport [x] [y]"
+                + "\n- /alert [username] [message]"
+                + "\n- /kick [username] [reason]"
+                + "\n- /shutdown"
+                + "\n- /tournament"
+                + "\n- /givebonusexp [username] [amount]"
+                + "\n- /givehat [username] [hat id]"
+                + "\n- /givepart [username] [part id]"
 
-                    + "\n\n<b><u>Everyone</u></b>"
+                + "\n\n<b><u>Everyone</u></b>"
 
-                    + "\n\n- /help"
-                    + "\n- /hello"
-                    + "\n- /setworkers [worker amount]");
-            }
-            else
-            {
-                executor.SendMessage("This command may only be executed by client session!");
-            }
+                + "\n\n- /help"
+                + "\n- /hello"
+                + "\n- /setworkers [worker amount]");
         }
     }
 }
