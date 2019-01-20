@@ -36,6 +36,8 @@ namespace Platform_Racing_3_Server.Game.Lobby
         internal uint LevelId => this.LevelData.Id;
         [JsonProperty("levelTitle")]
         internal string LevelTitle => this.LevelData.Title;
+        [JsonProperty("version")]
+        internal uint LevelVersion => this.LevelData.Version;
 
         [JsonProperty("creatorID")]
         internal uint CreatorId => this.LevelData.AuthorUserId;

@@ -18,6 +18,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
         internal uint LevelId { get; set; }
         [JsonProperty("levelTitle")]
         internal string LevelTitle { get; set; }
+        [JsonProperty("version")]
+        internal uint LevelVersion { get; set; }
 
         [JsonProperty("creatorID")]
         internal uint CreatorId { get; set; }
@@ -46,6 +48,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 
             this.LevelId = matchListing.LevelId;
             this.LevelTitle = matchListing.LevelTitle;
+            this.LevelVersion = matchListing.LevelVersion;
 
             this.CreatorId = matchListing.CreatorId;
             this.CreatorName = matchListing.CreatorName;
