@@ -26,7 +26,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                 }
                 else
                 {
-                    return new DataAccessGetBlock2Response();
+                    return new DataAccessGetBlock2Response(BlockData.GetDeletedBlock(blockId));
                 }
             }
             else

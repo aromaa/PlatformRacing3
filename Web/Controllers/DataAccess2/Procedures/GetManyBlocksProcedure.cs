@@ -28,6 +28,17 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                         response.AddBlock(block);
                     }
 
+                    if (blocks.Count != blockIds.Length)
+                    {
+                        foreach(uint blockId in blockIds)
+                        {
+                            if (!blocks.Any((b) => b.Id == blockId))
+                            {
+                                response.AddBlock(BlockData.GetDeletedBlock(blockId));
+                            }
+                        }
+                    }
+
                     return response;
                 }
                 else
