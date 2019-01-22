@@ -23,19 +23,24 @@ namespace Platform_Racing_3_Web.Extensions
 
         private const string HARDCORED_DOMAIN_BCS_IM_BAD = "pr3hub.com";
 
+        private const string PRELOADER_AIR_APP = "app:/Platform Racing 3 Preloader.swf";
+        private const string CLIENT_AIR_APP = "app:/Platform Racing 3 Client.swf";
+
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
         {
             if (httpContext.Request.Headers.TryGetValue("Referer", out StringValues referer))
             {
-                //TODO: FIX THIS WTF
-
                 string refererHost = referer;
                 if (!refererHost.StartsWith("http://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD) && !refererHost.StartsWith("https://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD))
                 {
                     int indexOf = refererHost.IndexOf("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD);
                     if (indexOf == -1 || (refererHost.Length >= indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length + 1 && refererHost[indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length] == '.'))
                     {
-                        return 0u; //Block possible bad request
+                        string unescapedUrl = Uri.UnescapeDataString(referer);
+                        if (!unescapedUrl.StartsWith(HttpContextExtensions.PRELOADER_AIR_APP) && !unescapedUrl.StartsWith(HttpContextExtensions.CLIENT_AIR_APP))
+                        {
+                            return 0u; //Block possible bad request
+                        }
                     }
                 }
             }
