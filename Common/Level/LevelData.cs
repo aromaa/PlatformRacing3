@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -186,7 +187,7 @@ namespace Platform_Racing_3_Common.Level
             writer.WriteElementString("mode", this.StringMode);
 
             writer.WriteElementString("seconds", this.Seconds.ToString());
-            writer.WriteElementString("gravity", this.Gravity.ToString());
+            writer.WriteElementString("gravity", this.Gravity.ToString(CultureInfo.InvariantCulture));
 
             writer.WriteElementString("alienChance", this.Alien.ToString());
             writer.WriteElementString("sfchm_chance", this.Sfchm.ToString());
