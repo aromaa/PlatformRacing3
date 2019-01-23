@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27205.2004
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{BE025446-D684-4BF5-9D93-A621DDB38B8A}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{A065B957-2C2A-4DF7-B81C-0D81F07913EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnsafeHelpers", "UnsafeHelpers\UnsafeHelpers.csproj", "{FAECFDFF-027E-4FFA-AF4D-EC041840F822}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnsafeHelpers", "UnsafeHelpers\UnsafeHelpers.csproj", "{FAECFDFF-027E-4FFA-AF4D-EC041840F822}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mobile Import", "Mobile Import\Mobile Import.csproj", "{F41CB226-6D10-4E78-A62D-021C4365F8DF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

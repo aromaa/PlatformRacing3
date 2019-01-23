@@ -1,0 +1,11 @@
+<Row>
+	<block_id>1424667</block_id>
+	<user_id>1257917</user_id>
+	<last_updated>2011-01-04 20:38:43</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>electricity</title>
+	<comment/>
+	<version>3</version>
+	<settings>v2 | {&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1,&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;type&quot;:&quot;change&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;changePattern&quot;:[14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,1424604,1424608,14440,14440,14440,14440,14440,1424604,14440,14440,14440,14440,14440,14440,14440,1424604,1424608,1424615,1424617,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440,14440],&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;changeFreq&quot;:1}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1,t330.8:223.2:0:10066329:14:0:MQ==&quot;]}</image_data>
+</Row>

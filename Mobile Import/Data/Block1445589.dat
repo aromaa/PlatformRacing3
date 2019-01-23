@@ -1,0 +1,12 @@
+<Row>
+	<block_id>1445589</block_id>
+	<user_id>1264976</user_id>
+	<last_updated>2011-01-06 22:07:58</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>rac - inactive invisible</title>
+	<comment>used to remove fireballs
+- finalcheetah</comment>
+	<version>1</version>
+	<settings>v2 | {&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;type&quot;:&quot;inactive&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1,&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;}}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1&quot;]}</image_data>
+</Row>

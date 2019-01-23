@@ -1,0 +1,11 @@
+<Row>
+	<block_id>1478610</block_id>
+	<user_id>1256770</user_id>
+	<last_updated>2011-01-10 00:17:51</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>special efex move 1</title>
+	<comment/>
+	<version>3</version>
+	<settings>v2 | {&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;changeFreq&quot;:10,&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1,&quot;changePattern&quot;:[1478542,1478543,1478547,1478548,1478549,1478552,1478555,1478559,1478561,1478562,1478563,1478564,1478565,1478566,1478568,1478570,1478572,1478573,1478575,1478576,1478577,1478579,1478580,1478582,1478585,1478586,1478587,1478589,1478590,1478592,1478594,1478595,1478596,1478599,1478600,1478601,1478602,1478603,1478605,1478607],&quot;type&quot;:&quot;change&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1&quot;]}</image_data>
+</Row>

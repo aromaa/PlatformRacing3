@@ -1,0 +1,11 @@
+<Row>
+	<block_id>6405</block_id>
+	<user_id>1259104</user_id>
+	<last_updated>2011-01-28 20:39:12</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>Invisible block</title>
+	<comment>It&apos;s invisible!</comment>
+	<version>4</version>
+	<settings>v2 | {&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;type&quot;:&quot;active&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1&quot;]}</image_data>
+</Row>

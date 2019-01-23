@@ -1,0 +1,11 @@
+<Row>
+	<block_id>1478525</block_id>
+	<user_id>1256770</user_id>
+	<last_updated>2011-01-09 23:53:44</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>testing and stufs</title>
+	<comment/>
+	<version>2</version>
+	<settings>v2 | {&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;statSupply&quot;:1,&quot;changePattern&quot;:[1478502,1478481,1478502,1478515,1478517,1478520,1478527,1478527,1478520,1478517,1478515,1478502,1478481],&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;changeFreq&quot;:500,&quot;type&quot;:&quot;change&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;}}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1&quot;]}</image_data>
+</Row>

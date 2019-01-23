@@ -1,0 +1,11 @@
+<Row>
+	<block_id>1424538</block_id>
+	<user_id>1257917</user_id>
+	<last_updated>2011-01-19 15:22:09</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>alien spore v2</title>
+	<comment/>
+	<version>3</version>
+	<settings>v2 | {&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1,&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;type&quot;:&quot;change&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;changePattern&quot;:[1424503,1424503,1424503,1424510,1424523,1424510,1424503,1424510,1424523,1424510,1424503,1424503,1424503,1424503,1424503],&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;changeFreq&quot;:3}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1,t326.3:213.1:25:10066329:8:0:YWxpZW4gc3BvcmU=&quot;]}</image_data>
+</Row>

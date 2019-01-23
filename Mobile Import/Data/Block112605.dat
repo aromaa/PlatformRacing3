@@ -1,0 +1,11 @@
+<Row>
+	<block_id>112605</block_id>
+	<user_id>1256770</user_id>
+	<last_updated>2011-01-04 23:00:12</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>hurt block</title>
+	<comment>ouch, I didn&apos;t see that coming</comment>
+	<version>3</version>
+	<settings>v2 | {&quot;itemSupply&quot;:1,&quot;bottom&quot;:{&quot;type&quot;:&quot;hurt&quot;},&quot;bump&quot;:{&quot;type&quot;:&quot;hurt&quot;},&quot;left&quot;:{&quot;type&quot;:&quot;hurt&quot;},&quot;health&quot;:100,&quot;statSupply&quot;:1,&quot;type&quot;:&quot;impervious&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;hurt&quot;},&quot;top&quot;:{&quot;type&quot;:&quot;hurt&quot;}}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1,m350:242:1:0:b:1,+,m4:-35,0:2,-11:26,-20:35,-7:12,+,m57:-75,-10:15,-21:40,-21:35,3:10,+,m48:-92:73:16777215:e:1,-2:0,-17:13,-22:26,-6:15,5:-2,26:-22,27:-32,4:-6,-1:0,+&quot;]}</image_data>
+</Row>

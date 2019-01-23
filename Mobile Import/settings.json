@@ -1,0 +1,8 @@
+﻿{
+  "database_host": "127.0.0.1",
+  "database_port": 5432,
+
+  "database_user": "postgres",
+  "database_pass": "joni",
+  "database_name": "pr3",
+}

@@ -1,0 +1,11 @@
+<Row>
+	<block_id>1424608</block_id>
+	<user_id>1257917</user_id>
+	<last_updated>2011-01-04 20:29:25</last_updated>
+	<ip>000.000.000.000</ip>
+	<title>electricity 1b</title>
+	<comment/>
+	<version>2</version>
+	<settings>v2 | {&quot;bottom&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;left&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;statSupply&quot;:1,&quot;bump&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;type&quot;:&quot;inactive&quot;,&quot;right&quot;:{&quot;type&quot;:&quot;active&quot;},&quot;health&quot;:100,&quot;itemSupply&quot;:1,&quot;top&quot;:{&quot;type&quot;:&quot;active&quot;}}</settings>
+	<image_data>v2 | {&quot;artArray&quot;:[&quot;1,101,1,Layer 1,m332:245:2:16777215:b:0.44,1:0,1:0,1:-1,2:-1,0:-1,1:-1,1:0,1:1,1:1,1:0,1:1,1:0,0:1,0:1,1:1,1:0,1:0,1:0,1:-2,0:-1,1:0,1:1,1:0,0:1,1:0,1:0,1:0,1:0,1:0,1:0,1:-1,1:0,0:-1,1:0,1:-1,2:0,1:-1,1:0,-1:0,+,m-33:3:1:16777215:b:0.44,1:-1,1:0,1:-1,0:-1,1:0,1:-1,1:0,1:0,1:1,0:1,1:1,1:0,1:0,1:1,1:0,1:1,1:0,1:0,0:-1,1:0,1:0,0:-1,1:0,0:-1,1:0,1:1,0:1,1:0,1:0,0:1,1:0,1:0,1:-1,1:-1,1:0,1:0,1:-1,0:-1,1:0,1:0,1:0,+&quot;]}</image_data>
+</Row>
