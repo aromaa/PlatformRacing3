@@ -30,7 +30,7 @@ namespace Platform_Racing_3_Common.Block
 
         public static Task<List<BlockData>> GetBlocksAsync(params uint[] blockIds)
         {
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON(t.id) t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.id IN({string.Join(',', blockIds):unsafe}) ORDER BY t.id, b.version DESC LIMIT {blockIds.Length}").ContinueWith(BlockManager.ParseSqlGetBlocks));
+            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON(t.id) t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.id = ANY({blockIds}) ORDER BY t.id, b.version DESC LIMIT {blockIds.Length}").ContinueWith(BlockManager.ParseSqlGetBlocks));
         }
 
         public static Task<uint> CountMyBlocksAsync(uint userId, string category)

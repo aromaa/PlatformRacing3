@@ -169,7 +169,7 @@ namespace Platform_Racing_3_Common.Level
                 return Task.FromException(new ArgumentException(nameof(rating)));
             }
 
-            return DatabaseConnection.NewAsyncConnection((dbconnection) => dbconnection.ExecuteNonQueryAsync($"INSERT INTO base.levels_ratings(level_id, user_id, rating) VALUES({levelId}, {userId}, '{(rating == 1 ? "like" : "dislike"):unsafe}') ON CONFLICT(level_id, user_id) DO UPDATE SET rating = excluded.rating, updated_on = NOW()"));
+            return DatabaseConnection.NewAsyncConnection((dbconnection) => dbconnection.ExecuteNonQueryAsync($"INSERT INTO base.levels_ratings(level_id, user_id, rating) VALUES({levelId}, {userId}, {(rating == 1 ? "like" : "dislike")}::base.level_rating) ON CONFLICT(level_id, user_id) DO UPDATE SET rating = excluded.rating, updated_on = NOW()"));
         }
 
         public static Task<uint> TransferLevelAsync(uint levelId, uint authorId, uint toUserId, string title)

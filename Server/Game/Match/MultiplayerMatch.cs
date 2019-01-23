@@ -604,7 +604,7 @@ namespace Platform_Racing_3_Server.Game.Match
                         {
                             using (DatabaseConnection dbConnection = new DatabaseConnection())
                             {
-                                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id IN({string.Join(',', blockIds):unsafe}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
+                                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
                                 while (reader?.Read() ?? false)
                                 {
                                     uint id = (uint)(int)reader["id"];

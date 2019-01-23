@@ -12,7 +12,7 @@ namespace Platform_Racing_3_Common.Database
         {
             if (typeof(ICustomFormatter).IsAssignableFrom(formatType))
             {
-                return new DatabaseCustomFormatter();
+                return DatabaseCustomFormatter.Instance;
             }
 
             return null;

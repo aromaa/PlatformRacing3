@@ -28,19 +28,19 @@ namespace Platform_Racing_3_Common.PrivateMessage
         {
             if (receiverUserId == default && senderUserId == default)
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE id IN({string.Join(',', pms):unsafe)}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE id = ANY({pms}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
             }
             else if (receiverUserId != default && senderUserId != default)
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE to_user_id = {receiverUserId} AND from_user_id = {senderUserId} AND id IN({string.Join(',', pms):unsafe}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE to_user_id = {receiverUserId} AND from_user_id = {senderUserId} AND id = ANY({pms}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
             }
             else if (receiverUserId != default)
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE to_user_id = {receiverUserId} AND id IN({string.Join(',', pms):unsafe}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE to_user_id = {receiverUserId} AND id = ANY({pms}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
             }
             else
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE from_user_id = {senderUserId} AND id IN({string.Join(',', pms):unsafe}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.pms WHERE from_user_id = {senderUserId} AND id = ANY({pms}) RETURNING id, to_user_id, from_user_id, type, sent_time) INSERT INTO base.pms_deleted(id, to_user_id, from_user_id, type, sent_time) SELECT id, to_user_id, from_user_id, type, sent_time FROM deleted RETURNING id").ContinueWith(PrivateMessageManager.ParseSqlDeletePms));
             }
         }
 
