@@ -21,7 +21,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 
         private const uint DESCRIPTION_MAX_LENGTH = 250;
 
-        private const uint SETTINGS_MAX_LENGTH = 1000;
+        private const uint SETTINGS_MAX_LENGTH = 20000;
 
         public async Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml)
         {
