@@ -15,7 +15,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                 return;
             }
 
-            session.MultiplayerMatchSession?.Match.FinishMatch(session);
+            session.MultiplayerMatchSession?.MatchPlayer?.Match.FinishMatch(session);
         }
     }
 }

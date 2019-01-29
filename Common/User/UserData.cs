@@ -31,7 +31,7 @@ namespace Platform_Racing_3_Common.User
         [JsonProperty("userID")]
         public abstract uint Id { get; }
         [JsonProperty("userName")]
-        public abstract string Username { get; }
+        public abstract string Username { get; protected set; }
 
         [JsonProperty("nameColor")]
         public abstract Color NameColor { get; protected set; }

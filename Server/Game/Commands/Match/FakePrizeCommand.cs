@@ -31,7 +31,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
                 }
 
                 MultiplayerMatchSession matchSession = session.MultiplayerMatchSession;
-                if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
+                if (matchSession != null && matchSession.Match != null)
                 {;
                     matchSession.Match.SendPacket(new PrizeOutgoingMessage(new MatchPrize(args[0], id), "available"));
                 }

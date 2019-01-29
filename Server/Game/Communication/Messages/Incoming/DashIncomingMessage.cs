@@ -10,7 +10,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
     {
         internal override void Handle(ClientSession session, JsonDashIncomingMessage message)
         {
-            session.MultiplayerMatchSession?.Match?.UpdateDash(session, message.Dash);
+            session.MultiplayerMatchSession?.MatchPlayer?.Match.UpdateDash(session, message.Dash);
         }
     }
 }

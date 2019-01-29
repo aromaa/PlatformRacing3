@@ -25,7 +25,7 @@ namespace Platform_Racing_3_Common.User
         public override bool IsGuest => false;
 
         public override uint Id { get; }
-        public override string Username { get; }
+        public override string Username { get; protected set; }
 
         public uint PermissionRank { get; protected set; }
         public override Color NameColor { get; protected set; }
@@ -61,26 +61,6 @@ namespace Platform_Racing_3_Common.User
             this._Bodys.UnionWith(((int[])reader["bodys"]).Select((p) => (Part)p));
             this._Feets.UnionWith(((int[])reader["feets"]).Select((p) => (Part)p));
 
-            Hat hat = (Hat)(int)reader["current_hat"];
-            Color hatColor = Color.FromArgb((int)reader["current_hat_color"]);
-
-            Part head = (Part)(int)reader["current_head"];
-            Color headColor = Color.FromArgb((int)reader["current_head_color"]);
-
-            Part body = (Part)(int)reader["current_body"];
-            Color bodyColor = Color.FromArgb((int)reader["current_body_color"]);
-
-            Part feet = (Part)(int)reader["current_feet"];
-            Color feetColor = Color.FromArgb((int)reader["current_feet_color"]);
-
-            this.SetParts(hat, hatColor, head, headColor, body, bodyColor, feet, feetColor);
-
-            uint speed = (uint)(int)reader["speed"];
-            uint accel = (uint)(int)reader["accel"];
-            uint jump = (uint)(int)reader["jump"];
-
-            this.SetStats(speed, accel, jump);
-
             object friends = reader["friends"]; //Might be null
             if (friends is int[] friends_)
             {
@@ -108,11 +88,30 @@ namespace Platform_Racing_3_Common.User
                 }
             }
 
+            //TODO: Load permission nodes
+
             this.CheckCampaignPrizes();
-
-            //TODO: Set up permissions based on permission rank
-
             this.RemoveRestrictedParts();
+
+            Hat hat = (Hat)(int)reader["current_hat"];
+            Color hatColor = Color.FromArgb((int)reader["current_hat_color"]);
+
+            Part head = (Part)(int)reader["current_head"];
+            Color headColor = Color.FromArgb((int)reader["current_head_color"]);
+
+            Part body = (Part)(int)reader["current_body"];
+            Color bodyColor = Color.FromArgb((int)reader["current_body_color"]);
+
+            Part feet = (Part)(int)reader["current_feet"];
+            Color feetColor = Color.FromArgb((int)reader["current_feet_color"]);
+
+            this.SetParts(hat, hatColor, head, headColor, body, bodyColor, feet, feetColor);
+
+            uint speed = (uint)(int)reader["speed"];
+            uint accel = (uint)(int)reader["accel"];
+            uint jump = (uint)(int)reader["jump"];
+
+            this.SetStats(speed, accel, jump);
         }
 
         public PlayerUserData(RedisValue[] hashEntries) : this()
@@ -135,6 +134,22 @@ namespace Platform_Racing_3_Common.User
             this._Bodys.UnionWith(hashEntries[11].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
             this._Feets.UnionWith(hashEntries[12].ToString().Split(',').Select((p) => (Part)uint.Parse(p)));
 
+            this._Friends.UnionWith(hashEntries[25].ToString().Split(',').Select((f) => uint.Parse(f)));
+            this._Ignored.UnionWith(hashEntries[26].ToString().Split(',').Select((i) => uint.Parse(i)));
+
+            foreach (KeyValuePair<uint, int> record in hashEntries[24].ToString().Split(';').ToDictionary((l) => uint.Parse(l.Split(',')[0]), d => int.Parse(d.Split(',')[1])))
+            {
+                uint levelId = record.Key;
+                int finishTime = record.Value;
+
+                this.CheckCampaignTime(levelId, finishTime);
+            }
+
+            //TODO: Load permissions
+
+            this.CheckCampaignPrizes();
+            this.RemoveRestrictedParts();
+
             Hat hat = (Hat)(uint)hashEntries[13];
             Color hatColor = Color.FromArgb((int)hashEntries[14]);
 
@@ -154,19 +169,6 @@ namespace Platform_Racing_3_Common.User
             uint jump = (uint)hashEntries[23];
 
             this.SetStats(speed, accel, jump);
-
-            this._Friends.UnionWith(hashEntries[25].ToString().Split(',').Select((f) => uint.Parse(f)));
-            this._Ignored.UnionWith(hashEntries[26].ToString().Split(',').Select((i) => uint.Parse(i)));
-
-            foreach (KeyValuePair<uint, int> record in hashEntries[24].ToString().Split(';').ToDictionary((l) => uint.Parse(l.Split(',')[0]), d => int.Parse(d.Split(',')[1])))
-            {
-                uint levelId = record.Key;
-                int finishTime = record.Value;
-
-                this.CheckCampaignTime(levelId, finishTime);
-            }
-
-            this.CheckCampaignPrizes();
         }
 
         private void CheckCampaignTime(uint levelId, int finishTime)
@@ -279,11 +281,13 @@ namespace Platform_Racing_3_Common.User
         
         internal void Merge(PlayerUserData playerUserData)
         {
+            this.Username = playerUserData.Username;
+
             this.PermissionRank = playerUserData.PermissionRank;
             this.NameColor = playerUserData.NameColor;
             this.Group = playerUserData.Group;
 
-            this.LastLogin=playerUserData.LastLogin;
+            this.LastLogin = playerUserData.LastLogin;
             this.LastOnline = playerUserData.LastOnline ;
 
             this.SetTotalExp(playerUserData.TotalExp); //Gonna calc the rank and exp
@@ -294,13 +298,18 @@ namespace Platform_Racing_3_Common.User
             this._Bodys = playerUserData._Bodys;
             this._Feets = playerUserData._Feets;
 
-            this.SetParts(playerUserData.CurrentHat, playerUserData.CurrentHatColor, playerUserData.CurrentHead, playerUserData.CurrentHeadColor, playerUserData.CurrentBody, playerUserData.CurrentBodyColor, playerUserData.CurrentFeet, playerUserData.CurrentFeetColor);
-            this.SetStats(playerUserData.Speed, playerUserData.Accel, playerUserData.Jump);
-
             this._CampaignLevelRecords = playerUserData._CampaignLevelRecords;
 
             this._Friends = playerUserData._Friends;
             this._Ignored = playerUserData._Ignored;
+
+            //TODO: Load permissions
+
+            this.CheckCampaignPrizes();
+            this.RemoveRestrictedParts();
+
+            this.SetParts(playerUserData.CurrentHat, playerUserData.CurrentHatColor, playerUserData.CurrentHead, playerUserData.CurrentHeadColor, playerUserData.CurrentBody, playerUserData.CurrentBodyColor, playerUserData.CurrentFeet, playerUserData.CurrentFeetColor);
+            this.SetStats(playerUserData.Speed, playerUserData.Accel, playerUserData.Jump);
         }
 
         public override IReadOnlyCollection<string> Permissions => this._Permissions;

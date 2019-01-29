@@ -16,7 +16,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
             if (executor is ClientSession session)
             {
                 MultiplayerMatchSession matchSession = session.MultiplayerMatchSession;
-                if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
+                if (matchSession != null && matchSession.Match != null)
                 {
                     matchSession.Match.Broadcaster = !matchSession.Match.Broadcaster;
 

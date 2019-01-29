@@ -51,7 +51,7 @@ namespace Platform_Racing_3_Server.Game.Match
         private ConcurrentDictionary<uint, MatchPlayerHat> DroppedHats;
 
         private MatchPrize Prize;
-        private Stopwatch StartedOn;
+        private MatchTimer MatchTimer;
 
         private HashSet<Point> FinishBlocks;
 
@@ -234,7 +234,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 }
                 else if (this._Status == MultiplayerMatchStatus.Ongoing)
                 {
-                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.StartedOn?.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
+                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.MatchTimer.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
                     if (timeRanOut)
                     {
                         if (this.LevelData.Mode == LevelMode.CoinFiend || this.LevelData.Mode == LevelMode.DamageDash)
@@ -542,7 +542,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 this.Clients.SendPacket(new PrizeOutgoingMessage(this.Prize, "available"));
             }
 
-            new Timer(this.GameBegun, null, 2664, 0);
+            this.MatchTimer = MatchTimer.StartNew(TimeSpan.FromMilliseconds(2664));
 
             this.Clients.SendPackets(new EventsOutgoingMessage(events), new BeginMatchOutgoingMessage());
 
@@ -666,11 +666,6 @@ namespace Platform_Racing_3_Server.Game.Match
             return false;
         }
 
-        private void GameBegun(object state)
-        {
-            this.StartedOn = Stopwatch.StartNew();
-        }
-
         internal void AddHatToPlayer(MatchPlayer player, Hat hat, Color color, bool spawned = true)
         {
             player.AddHat(this.GetNextHatId(), hat, color, spawned);
@@ -680,7 +675,14 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void Forfiet(ClientSession session, bool leave = false)
         {
-            session.MultiplayerMatchSession = null;
+            if (leave)
+            {
+                session.MultiplayerMatchSession = null;
+            }
+            else
+            {
+                session.MultiplayerMatchSession.Forfiet();
+            }
 
             if (this._Status < MultiplayerMatchStatus.Starting)
             {
@@ -757,203 +759,205 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void FinishMatch(ClientSession session)
         {
-            if (this.StartedOn != null)
+            double now = this.MatchTimer.Elapsed.TotalSeconds;
+            if (now < 0)
             {
-                double now = this.StartedOn.Elapsed.TotalSeconds;
-                if (this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat && now > (this.LevelData.Seconds + 5)) //Small threashold
+                return;
+            }
+
+            if (this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat && now > (this.LevelData.Seconds + 5)) //Small threashold
+            {
+                return;
+            }
+
+            if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player) && !player.Forfiet && player.FinishTime == null)
+            {
+                player.FinishTime = now;
+
+                this.Clients.SendPacket(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+
+                ulong expEarned = ExpUtils.GetExpEarnedForFinishing(now);
+
+                List<object[]> expArray = new List<object[]>();
+                if (this.LevelData.Mode == LevelMode.Race)
                 {
-                    return;
+                    expArray.Add(new object[] { "Level completed", expEarned });
+                }
+                else if (this.LevelData.Mode == LevelMode.Deathmatch)
+                {
+                    expArray.Add(new object[] { "Fighting spirit", expEarned });
+                }
+                else if (this.LevelData.Mode == LevelMode.HatAttack)
+                {
+                    expArray.Add(new object[] { "Hat owner", expEarned });
+                }
+                else if (this.LevelData.Mode == LevelMode.CoinFiend)
+                {
+                    expArray.Add(new object[] { "Coin meizer", expEarned });
+                }
+                else if (this.LevelData.Mode == LevelMode.DamageDash)
+                {
+                    expArray.Add(new object[] { "Damage dealer", expEarned });
+                }
+                else if (this.LevelData.Mode == LevelMode.KingOfTheHat)
+                {
+                    expArray.Add(new object[] { "Hat holder", expEarned });
                 }
 
-                if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player) && !player.Forfiet && player.FinishTime == null)
+                int place = this.Players.Count;
+                foreach (MatchPlayer other in this.Players.Values)
                 {
-                    player.FinishTime = now;
-
-                    this.Clients.SendPacket(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
-
-                    ulong expEarned = ExpUtils.GetExpEarnedForFinishing(now);
-
-                    List<object[]> expArray = new List<object[]>();
-                    if (this.LevelData.Mode == LevelMode.Race)
+                    if (other != player)
                     {
-                        expArray.Add(new object[] { "Level completed", expEarned });
-                    }
-                    else if (this.LevelData.Mode == LevelMode.Deathmatch)
-                    {
-                        expArray.Add(new object[] { "Fighting spirit", expEarned });
-                    }
-                    else if (this.LevelData.Mode == LevelMode.HatAttack)
-                    {
-                        expArray.Add(new object[] { "Hat owner", expEarned });
-                    }
-                    else if (this.LevelData.Mode == LevelMode.CoinFiend)
-                    {
-                        expArray.Add(new object[] { "Coin meizer", expEarned });
-                    }
-                    else if (this.LevelData.Mode == LevelMode.DamageDash)
-                    {
-                        expArray.Add(new object[] { "Damage dealer", expEarned });
-                    }
-                    else if (this.LevelData.Mode == LevelMode.KingOfTheHat)
-                    {
-                        expArray.Add(new object[] { "Hat holder", expEarned });
-                    }
-
-                    int place = this.Players.Count;
-                    foreach(MatchPlayer other in this.Players.Values)
-                    {
-                        if (other != player)
+                        bool defeated = false;
+                        switch (this.LevelData.Mode)
                         {
-                            bool defeated = false;
-                            switch(this.LevelData.Mode)
+                            case LevelMode.Race:
+                            case LevelMode.HatAttack:
+                            case LevelMode.KingOfTheHat:
+                                defeated = other.Forfiet || other.FinishTime == null;
+                                break;
+                            case LevelMode.Deathmatch:
+                                defeated = other.Forfiet || other.FinishTime != null;
+                                break;
+                            case LevelMode.CoinFiend:
+                                defeated = other.Forfiet || player.Coins > other.Coins;
+                                break;
+                            case LevelMode.DamageDash:
+                                defeated = other.Forfiet || player.Dash > other.Dash;
+                                break;
+                        }
+
+                        if (defeated)
+                        {
+                            place--;
+
+                            ulong playerExp = (ulong)Math.Round(ExpUtils.GetExpForDefeatingPlayer(other.UserData.Rank) * ExpUtils.GetPlaytimeMultiplayer(other.FinishTime ?? now) * ExpUtils.GetKeyPressMultiplayer(other.KeyPresses));
+
+                            if (other.IPAddress == player.IPAddress)
                             {
-                                case LevelMode.Race:
-                                case LevelMode.HatAttack:
-                                case LevelMode.KingOfTheHat:
-                                    defeated = other.Forfiet || other.FinishTime == null;
-                                    break;
-                                case LevelMode.Deathmatch:
-                                    defeated = other.Forfiet || other.FinishTime != null;
-                                    break;
-                                case LevelMode.CoinFiend:
-                                    defeated = other.Forfiet || player.Coins > other.Coins;
-                                    break;
-                                case LevelMode.DamageDash:
-                                    defeated = other.Forfiet || player.Dash > other.Dash;
-                                    break;
+                                playerExp /= 2;
                             }
 
-                            if (defeated)
-                            {
-                                place--;
-
-                                ulong playerExp = (ulong)Math.Round(ExpUtils.GetExpForDefeatingPlayer(other.UserData.Rank) * ExpUtils.GetPlaytimeMultiplayer(other.FinishTime ?? now) * ExpUtils.GetKeyPressMultiplayer(other.KeyPresses));
-
-                                if (other.IPAddress == player.IPAddress)
-                                {
-                                    playerExp /= 2;
-                                }
-
-                                expEarned += playerExp;
-                                expArray.Add(new object[] { "Defeated " + other.UserData.Username, playerExp });
-                            }
+                            expEarned += playerExp;
+                            expArray.Add(new object[] { "Defeated " + other.UserData.Username, playerExp });
                         }
                     }
-
-                    ulong baseExp = expEarned;
-                    if (place == 1)
-                    {
-                        MatchPrize prize = Interlocked.Exchange(ref this.Prize, null);
-                        if (prize != null)
-                        {
-                            bool partExp = false;
-
-                            if (prize.Category == "hat")
-                            {
-                                if (player.UserData.HasHat((Hat)prize.Id))
-                                {
-                                    partExp = true;
-                                }
-                                else
-                                {
-                                    player.UserData.GiveHat((Hat)prize.Id);
-                                }
-                            }
-                            else if (prize.Category == "head")
-                            {
-                                if (player.UserData.HasHead((Part)prize.Id))
-                                {
-                                    partExp = true;
-                                }
-                                else
-                                {
-                                    player.UserData.GiveHead((Part)prize.Id);
-                                }
-                            }
-                            else if (prize.Category == "body")
-                            {
-                                if (player.UserData.HasBody((Part)prize.Id))
-                                {
-                                    partExp = true;
-                                }
-                                else
-                                {
-                                    player.UserData.GiveBody((Part)prize.Id);
-                                }
-                            }
-                            else if (prize.Category == "feet")
-                            {
-                                if (player.UserData.HasFeet((Part)prize.Id))
-                                {
-                                    partExp = true;
-                                }
-                                else
-                                {
-                                    player.UserData.GiveFeet((Part)prize.Id);
-                                }
-                            }
-
-                            if (!prize.RewardsExpBonus)
-                            {
-                                partExp = false;
-                            }
-
-                            if (partExp)
-                            {
-                                expEarned += (ulong)Math.Round(baseExp * 0.5);
-                                expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
-                            }
-
-                            session.SendPacket(new PrizeOutgoingMessage(prize, partExp ? "exp" : "got"));
-                        }
-                    }
-
-                    float expHatBonus = 0;
-                    foreach(MatchPlayerHat hat in player.Hats)
-                    {
-                        if (!hat.Spawned && hat.Hat == Hat.BaseballCap)
-                        {
-                            expHatBonus += expHatBonus == 0 ? 1F : 0.1F;
-                        }
-                    }
-
-                    if (expHatBonus > 0)
-                    {
-                        expEarned += (ulong)Math.Round(baseExp * expHatBonus);
-                        expArray.Add(new object[] { "Exp hat", $"EXP X {expHatBonus + 1}" });
-                    }
-
-                    if (this.Type == MatchListingType.LevelOfTheDay)
-                    {
-                        expEarned += (ulong)Math.Round(baseExp * 1.10F);
-                        expArray.Add(new object[] { "LOTD bonus", "EXP X 1.10" });
-                    }
-
-                    ulong bonusExpDrained = 0;
-                    if (player.UserData.BonusExp > 0)
-                    {
-                        bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
-                        if (bonusExpDrained > 0)
-                        {
-                            expEarned += bonusExpDrained;
-                            expArray.Add(new object[] { "Bonus exp", $"EXP X {(bonusExpDrained / baseExp) + 1}" });
-                            expArray.Add(new object[] { "Bonus exp left", player.UserData.BonusExp - bonusExpDrained });
-
-                            player.UserData.DrainBonusExp(bonusExpDrained);
-                        }
-                    }
-                    
-                    session.SendPackets(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray));
-
-                    player.UserData.AddExp(expEarned);
-
-                    if (this.Broadcaster)
-                    {
-                        this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} finished at place #{place}");
-                    }
-
-                    this.CheckGameState();
                 }
+
+                ulong baseExp = expEarned;
+                if (place == 1)
+                {
+                    MatchPrize prize = Interlocked.Exchange(ref this.Prize, null);
+                    if (prize != null)
+                    {
+                        bool partExp = false;
+
+                        if (prize.Category == "hat")
+                        {
+                            if (player.UserData.HasHat((Hat)prize.Id))
+                            {
+                                partExp = true;
+                            }
+                            else
+                            {
+                                player.UserData.GiveHat((Hat)prize.Id);
+                            }
+                        }
+                        else if (prize.Category == "head")
+                        {
+                            if (player.UserData.HasHead((Part)prize.Id))
+                            {
+                                partExp = true;
+                            }
+                            else
+                            {
+                                player.UserData.GiveHead((Part)prize.Id);
+                            }
+                        }
+                        else if (prize.Category == "body")
+                        {
+                            if (player.UserData.HasBody((Part)prize.Id))
+                            {
+                                partExp = true;
+                            }
+                            else
+                            {
+                                player.UserData.GiveBody((Part)prize.Id);
+                            }
+                        }
+                        else if (prize.Category == "feet")
+                        {
+                            if (player.UserData.HasFeet((Part)prize.Id))
+                            {
+                                partExp = true;
+                            }
+                            else
+                            {
+                                player.UserData.GiveFeet((Part)prize.Id);
+                            }
+                        }
+
+                        if (!prize.RewardsExpBonus)
+                        {
+                            partExp = false;
+                        }
+
+                        if (partExp)
+                        {
+                            expEarned += (ulong)Math.Round(baseExp * 0.5);
+                            expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
+                        }
+
+                        session.SendPacket(new PrizeOutgoingMessage(prize, partExp ? "exp" : "got"));
+                    }
+                }
+
+                float expHatBonus = 0;
+                foreach (MatchPlayerHat hat in player.Hats)
+                {
+                    if (!hat.Spawned && hat.Hat == Hat.BaseballCap)
+                    {
+                        expHatBonus += expHatBonus == 0 ? 1F : 0.1F;
+                    }
+                }
+
+                if (expHatBonus > 0)
+                {
+                    expEarned += (ulong)Math.Round(baseExp * expHatBonus);
+                    expArray.Add(new object[] { "Exp hat", $"EXP X {expHatBonus + 1}" });
+                }
+
+                if (this.Type == MatchListingType.LevelOfTheDay)
+                {
+                    expEarned += (ulong)Math.Round(baseExp * 1.10F);
+                    expArray.Add(new object[] { "LOTD bonus", "EXP X 1.10" });
+                }
+
+                ulong bonusExpDrained = 0;
+                if (player.UserData.BonusExp > 0)
+                {
+                    bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
+                    if (bonusExpDrained > 0)
+                    {
+                        expEarned += bonusExpDrained;
+                        expArray.Add(new object[] { "Bonus exp", $"EXP X {(bonusExpDrained / baseExp) + 1}" });
+                        expArray.Add(new object[] { "Bonus exp left", player.UserData.BonusExp - bonusExpDrained });
+
+                        player.UserData.DrainBonusExp(bonusExpDrained);
+                    }
+                }
+
+                session.SendPackets(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray));
+
+                player.UserData.AddExp(expEarned);
+
+                if (this.Broadcaster)
+                {
+                    this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} finished at place #{place}");
+                }
+
+                this.CheckGameState();
             }
         }
         

@@ -11,11 +11,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
     {
         public void Handle(ClientSession session, IncomingMessage message)
         {
-            MultiplayerMatch match = session.MultiplayerMatchSession?.Match;
-            if (match != null)
+            MatchPlayer matchPlayer = session.MultiplayerMatchSession?.MatchPlayer;
+            if (matchPlayer != null)
             {
-                MatchPlayer matchPlayer = session.MultiplayerMatchSession.MatchPlayer;
-
                 UpdateStatus status = (UpdateStatus)message.ReadUInt();
                 if (status.HasFlag(UpdateStatus.X))
                 {
@@ -107,7 +105,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     matchPlayer.Coins = message.ReadUInt();
                 }
 
-                match.SendUpdateIfRequired(session, matchPlayer);
+                matchPlayer.Match.SendUpdateIfRequired(session, matchPlayer);
             }
         }
     }

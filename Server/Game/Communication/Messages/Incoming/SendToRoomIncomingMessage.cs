@@ -37,10 +37,10 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     break;
                 case "game":
                     {
-                        MultiplayerMatch match = session.MultiplayerMatchSession?.Match;
-                        if (match.Name == message.RoomName)
+                        MatchPlayer matchPlayer = session.MultiplayerMatchSession?.MatchPlayer;
+                        if (matchPlayer != null && matchPlayer.Match.Name == message.RoomName)
                         {
-                            match.HandleData(session, message.Data, message.SendToSelf);
+                            matchPlayer.Match.HandleData(session, message.Data, message.SendToSelf);
                         }
                     }
                     break;

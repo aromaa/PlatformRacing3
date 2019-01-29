@@ -15,7 +15,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                 return;
             }
 
-            session.MultiplayerMatchSession?.Match.LoseHat(session, message.X, message.Y, message.VelX, message.VelY);
+            session.MultiplayerMatchSession?.MatchPlayer?.Match.LoseHat(session, message.X, message.Y, message.VelX, message.VelY);
         }
     }
 }

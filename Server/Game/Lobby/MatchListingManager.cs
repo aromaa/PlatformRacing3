@@ -62,7 +62,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                         {
                             return listing;
                         }
-                        else if (listing.SpotsLeft > 0) //Can we do quick join?
+                        else if (type == MatchListingType.Normal && listing.SpotsLeft > 0) //Can we do quick join?
                         {
                             //As we use packets some players might not join
                             //So keep track of the current spots and decrease as we send packets to avoid sending too many players
@@ -168,7 +168,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             foreach(MatchListing listing in this.MatchListings.Values)
             {
-                if (listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(session))
+                if (listing.Type == MatchListingType.Normal && listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(session))
                 {
                     session.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
                     break;

@@ -21,7 +21,7 @@ namespace Platform_Racing_3_Common.User
         public override bool IsGuest => true;
 
         public override uint Id => 0u;
-        public override string Username { get; }
+        public override string Username { get; protected set; }
 
         public override Color NameColor
         {
