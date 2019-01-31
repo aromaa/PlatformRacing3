@@ -77,6 +77,9 @@ namespace Platform_Racing_3_Common.Level
         [JsonProperty("medalsRequired")]
         public uint MedalsRequired { get; internal set; }
 
+        [JsonProperty("campaignSeason")]
+        public string CampaignSeason { get; internal set; }
+
         public bool HasPrize { get; }
 
         public List<(string prizeType, uint prizeId)> Prizes { get; }
@@ -132,6 +135,7 @@ namespace Platform_Racing_3_Common.Level
                 this.GoldTime = (uint)(int)reader["gold_time"];
 
                 this.MedalsRequired = (uint)(int)reader["medals_required"];
+                this.CampaignSeason = (string)reader["campaign_season"];
             }
 
             this.HasPrize = (bool)reader["has_prize"];
@@ -212,6 +216,7 @@ namespace Platform_Racing_3_Common.Level
             writer.WriteElementString("gold", this.GoldTime.ToString());
 
             writer.WriteElementString("medals_required", this.MedalsRequired.ToString());
+            writer.WriteElementString("campaign_sesion", this.CampaignSeason);
         }
     }
 }
