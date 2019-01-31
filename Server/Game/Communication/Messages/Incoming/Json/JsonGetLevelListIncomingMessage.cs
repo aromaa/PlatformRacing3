@@ -18,5 +18,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 
         [JsonProperty("count", Required = Required.Always)]
         internal uint Count { get; set; }
+
+        [JsonProperty("data")]
+        internal string Data { get; set; }
     }
 }

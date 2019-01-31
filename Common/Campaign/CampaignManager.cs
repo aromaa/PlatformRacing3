@@ -19,24 +19,24 @@ namespace Platform_Racing_3_Common.Campaign
         /// <summary>
         /// Jiggmin
         /// </summary>
-        internal static List<CampaignPrize> DefaultPrizes { get; private set; } = new List<CampaignPrize>();
-        internal static Dictionary<uint, Dictionary<CampaignMedal, uint>> DefaultCampaignTimes { get; private set; } = new Dictionary<uint, Dictionary<CampaignMedal, uint>>();
+        internal static Dictionary<string, List<CampaignPrize>> DefaultPrizes { get; private set; } = new Dictionary<string, List<CampaignPrize>>();
+        internal static Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)> DefaultCampaignTimes { get; private set; } = new Dictionary<uint, (string, Dictionary<CampaignMedal, uint>)>();
 
-        private Dictionary<uint, Dictionary<CampaignMedal, uint>> _CampaignTimes;
-        private List<CampaignPrize> _Prizes;
+        private Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)> _CampaignTimes;
+        private Dictionary<string, List<CampaignPrize>> _Prizes;
 
         public CampaignManager()
         {
-            this._CampaignTimes = new Dictionary<uint, Dictionary<CampaignMedal, uint>>();
-            this._Prizes = new List<CampaignPrize>();
+            this._CampaignTimes = new Dictionary<uint, (string, Dictionary<CampaignMedal, uint>)>();
+            this._Prizes = new Dictionary<string, List<CampaignPrize>>();
         }
 
         public async Task LoadCampaignTimesAsync()
         {
-            Dictionary<uint, Dictionary<CampaignMedal, uint>>  times = new Dictionary<uint, Dictionary<CampaignMedal, uint>>();
+            Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)>  times = new Dictionary<uint, (string, Dictionary<CampaignMedal, uint>)>();
             using (DatabaseConnection dbConnection = new DatabaseConnection())
             {
-                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT level_id, bronze_time, silver_time, gold_time FROM base.campaigns");
+                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT level_id, bronze_time, silver_time, gold_time, season FROM base.campaigns");
                 while (reader?.Read() ?? false)
                 {
                     Dictionary<CampaignMedal, uint> level = new Dictionary<CampaignMedal, uint>()
@@ -46,7 +46,7 @@ namespace Platform_Racing_3_Common.Campaign
                         { CampaignMedal.Gold, (uint)(int)reader["gold_time"] * 1000 },
                     };
 
-                    times.Add((uint)(int)reader["level_id"], level);
+                    times.Add((uint)(int)reader["level_id"], ((string)reader["season"], level));
                 }
             }
 
@@ -56,13 +56,19 @@ namespace Platform_Racing_3_Common.Campaign
 
         public async Task LoadPrizesAsync()
         {
-            List<CampaignPrize> prizes = new List<CampaignPrize>();
+            Dictionary<string, List<CampaignPrize>> prizes = new Dictionary<string, List<CampaignPrize>>();
             using (DatabaseConnection dbConnection = new DatabaseConnection())
             {
-                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT id, type, medals_required FROM base.campaigns_prizes ORDER BY medals_required");
+                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT id, type, medals_required, season FROM base.campaigns_prizes ORDER BY medals_required");
                 while (reader?.Read() ?? false)
                 {
-                    prizes.Add(new CampaignPrize(reader));
+                    string season = (string)reader["season"];
+                    if (!prizes.TryGetValue(season, out List<CampaignPrize> prizeList))
+                    {
+                        prizes[season] = prizeList = new List<CampaignPrize>();
+                    }
+
+                    prizeList.Add(new CampaignPrize(reader));
                 }
             }
 
@@ -138,6 +144,6 @@ namespace Platform_Racing_3_Common.Campaign
             return null;
         }
 
-        public IReadOnlyList<CampaignPrize> Prizes => this._Prizes.AsReadOnly();
+        public IReadOnlyDictionary<string, List<CampaignPrize>> Prizes => (IReadOnlyDictionary<string, List<CampaignPrize>>)this._Prizes;
     }
 }

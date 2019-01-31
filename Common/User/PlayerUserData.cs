@@ -173,7 +173,7 @@ namespace Platform_Racing_3_Common.User
 
         private void CheckCampaignTime(uint levelId, int finishTime)
         {
-            if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out Dictionary<CampaignMedal, uint> level))
+            if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out (string Season, Dictionary<CampaignMedal, uint> Medals) level))
             {
                 if (this.CampaignLevelRecords.TryGetValue(levelId, out CampaignLevelRecord record_))
                 {
@@ -197,71 +197,74 @@ namespace Platform_Racing_3_Common.User
                 CampaignMedal medal = CampaignMedal.None;
                 if (finishTime > 0) //Only give medals for finished times
                 {
-                    if (level[CampaignMedal.Gold] > finishTime)
+                    if (level.Medals[CampaignMedal.Gold] > finishTime)
                     {
                         medal = CampaignMedal.Gold;
                     }
-                    else if (level[CampaignMedal.Silver] > finishTime)
+                    else if (level.Medals[CampaignMedal.Silver] > finishTime)
                     {
                         medal = CampaignMedal.Silver;
                     }
-                    else if (level[CampaignMedal.Bronze] > finishTime)
+                    else if (level.Medals[CampaignMedal.Bronze] > finishTime)
                     {
                         medal = CampaignMedal.Bronze;
                     }
                 }
 
-                this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, medal);
+                this._CampaignLevelRecords[levelId] = new CampaignLevelRecord(finishTime, level.Season, medal);
             }
         }
 
         private void CheckCampaignPrizes()
         {
-            uint goldMedalsCount = this.CampaignGoldMedals;
-            foreach (CampaignPrize prize in CampaignManager.DefaultPrizes)
+            foreach (KeyValuePair<string, List<CampaignPrize>> prizes in CampaignManager.DefaultPrizes)
             {
-                if (prize.Type == CampaignPrizeType.Hat)
+                uint goldMedalsCount = this.GetCampaignGoldMedals(prizes.Key);
+                foreach (CampaignPrize prize in prizes.Value)
                 {
-                    if (goldMedalsCount >= prize.MedalsRequired)
+                    if (prize.Type == CampaignPrizeType.Hat)
                     {
-                        this._Hats.Add((Hat)prize.Id);
+                        if (goldMedalsCount >= prize.MedalsRequired)
+                        {
+                            this._Hats.Add((Hat)prize.Id);
+                        }
+                        else
+                        {
+                            this._Hats.Remove((Hat)prize.Id);
+                        }
                     }
-                    else
+                    else if (prize.Type == CampaignPrizeType.Head)
                     {
-                        this._Hats.Remove((Hat)prize.Id);
+                        if (goldMedalsCount >= prize.MedalsRequired)
+                        {
+                            this._Heads.Add((Part)prize.Id);
+                        }
+                        else
+                        {
+                            this._Heads.Remove((Part)prize.Id);
+                        }
                     }
-                }
-                else if (prize.Type == CampaignPrizeType.Head)
-                {
-                    if (goldMedalsCount >= prize.MedalsRequired)
+                    else if (prize.Type == CampaignPrizeType.Body)
                     {
-                        this._Heads.Add((Part)prize.Id);
+                        if (goldMedalsCount >= prize.MedalsRequired)
+                        {
+                            this._Bodys.Add((Part)prize.Id);
+                        }
+                        else
+                        {
+                            this._Bodys.Remove((Part)prize.Id);
+                        }
                     }
-                    else
+                    else if (prize.Type == CampaignPrizeType.Feet)
                     {
-                        this._Heads.Remove((Part)prize.Id);
-                    }
-                }
-                else if (prize.Type == CampaignPrizeType.Body)
-                {
-                    if (goldMedalsCount >= prize.MedalsRequired)
-                    {
-                        this._Bodys.Add((Part)prize.Id);
-                    }
-                    else
-                    {
-                        this._Bodys.Remove((Part)prize.Id);
-                    }
-                }
-                else if (prize.Type == CampaignPrizeType.Feet)
-                {
-                    if (goldMedalsCount >= prize.MedalsRequired)
-                    {
-                        this._Feets.Add((Part)prize.Id);
-                    }
-                    else
-                    {
-                        this._Feets.Remove((Part)prize.Id);
+                        if (goldMedalsCount >= prize.MedalsRequired)
+                        {
+                            this._Feets.Add((Part)prize.Id);
+                        }
+                        else
+                        {
+                            this._Feets.Remove((Part)prize.Id);
+                        }
                     }
                 }
             }
@@ -484,7 +487,7 @@ namespace Platform_Racing_3_Common.User
             this._Feets.IntersectWith(feets);
         }
 
-        public uint CampaignGoldMedals => (uint)this._CampaignLevelRecords.Values.Count((m) => m.Medal == CampaignMedal.Gold);
+        public uint GetCampaignGoldMedals(string season) => (uint)this._CampaignLevelRecords.Values.Count((m) => m.Medal == CampaignMedal.Gold && m.Season == season);
 
         public HashEntry[] ToRedis()
         {

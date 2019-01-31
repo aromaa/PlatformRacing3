@@ -16,7 +16,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
             {
                 case "campaign":
                     {
-                        (uint results, IReadOnlyCollection<LevelData> levels) = LevelManager.GetCampaignLevels(message.Start, message.Count).Result;
+                        (uint results, IReadOnlyCollection<LevelData> levels) = LevelManager.GetCampaignLevels(message.Data, message.Start, message.Count).Result;
 
                         session.SendPacket(new LevelListOutgoingMessage(message.RequestId, results, levels));
                     }

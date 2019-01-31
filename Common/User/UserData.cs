@@ -108,7 +108,7 @@ namespace Platform_Racing_3_Common.User
         /// Jiggy
         /// </summary>
         [JsonProperty("prizes")]
-        public IReadOnlyList<CampaignPrize> Prizes => CampaignManager.DefaultPrizes;
+        public IReadOnlyDictionary<string, List<CampaignPrize>> Prizes => CampaignManager.DefaultPrizes;
 
         public virtual void SetServer(ServerDetails server)
         {
