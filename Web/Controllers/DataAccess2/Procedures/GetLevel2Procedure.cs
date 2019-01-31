@@ -13,7 +13,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 {
     public class GetLevel2Procedure : IProcedure
     {
-        public async Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml)
+        public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {
             XElement data = xml.Element("Params");
             if (data != null)

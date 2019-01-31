@@ -10,6 +10,6 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 {
     public interface IProcedure
     {
-        Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml);
+        Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml);
     }
 }

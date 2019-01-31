@@ -20,7 +20,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 {
     public class SaveCampaignRun3Procedure : IProcedure
     {
-        public async Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml)
+        public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {
             uint userId = httpContext.IsAuthenicatedPr3User();
             if (userId > 0)
@@ -55,7 +55,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                             return new DataAccessErrorResponse("Invalid username");
                         }
 
-                        await CampaignManager.SaveCampaignRun(userId, levelId, levelVersion, recordRun, finishTime);
+                        await CampaignManager.SaveCampaignRunAsync(userId, levelId, levelVersion, recordRun, finishTime);
 
                         return new DataAccessSaveCampaignRun3Response();
                     }

@@ -23,7 +23,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 
         private const uint SETTINGS_MAX_LENGTH = 20000;
 
-        public async Task<IDataAccessDataResponse> GetResponse(HttpContext httpContext, XDocument xml)
+        public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {
             uint userId = httpContext.IsAuthenicatedPr3User();
             if (userId > 0)

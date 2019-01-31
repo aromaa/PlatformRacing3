@@ -48,6 +48,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
             { "GetLockedLevel", new GetLockedLevelProcedure() },
             { "SaveCampaignRun3", new SaveCampaignRun3Procedure() },
             { "GetMyFriendsFastestRuns", new GetMyFriendsFastestRunsProcedure() },
+            { "GetCampaignRun3", new GetCampaignRun3Procedure() },
         };
 
         [HttpPost]
@@ -69,7 +70,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
 
                             try
                             {
-                                IDataAccessDataResponse response = await procedure.GetResponse(this.HttpContext, xml);
+                                IDataAccessDataResponse response = await procedure.GetResponseAsync(this.HttpContext, xml);
                                 response.DataRequestId = dataRequestID;
                                 return response;
                             }
