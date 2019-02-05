@@ -925,7 +925,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
                         }
 
-                        session.SendPacket(new PrizeOutgoingMessage(prize, partExp ? "exp" : "got"));
+                        session.SendPacket(new PrizeOutgoingMessage(prize, partExp ? "exp" : "won"));
                     }
                 }
 
