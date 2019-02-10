@@ -380,15 +380,15 @@ namespace Platform_Racing_3_Server.Game.Match
                         {
                             change *= 2;
                         }
-                    }
 
-                    if (this.Type == MatchListingType.Tournament)
-                    {
-                        change *= 2;
-                    }
-                    else if (this.Type == MatchListingType.LevelOfTheDay)
-                    {
-                        change *= 1.25;
+                        if (this.Type == MatchListingType.Tournament)
+                        {
+                            change *= 2;
+                        }
+                        else if (this.Type == MatchListingType.LevelOfTheDay)
+                        {
+                            change *= 1.25;
+                        }
                     }
 
                     if (change > random.NextDouble() * 100)
@@ -921,7 +921,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
                         if (partExp)
                         {
-                            expEarned += (ulong)Math.Round(baseExp * 0.5);
+                            expEarned += (ulong)Math.Round(baseExp * 0.5F);
                             expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
                         }
 
@@ -946,8 +946,8 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (this.Type == MatchListingType.LevelOfTheDay)
                 {
-                    expEarned += (ulong)Math.Round(baseExp * 1.10F);
-                    expArray.Add(new object[] { "LOTD bonus", "EXP X 1.10" });
+                    expEarned += (ulong)Math.Round(baseExp * 0.25F);
+                    expArray.Add(new object[] { "LOTD bonus", "EXP X 1.25" });
                 }
 
                 ulong bonusExpDrained = 0;
