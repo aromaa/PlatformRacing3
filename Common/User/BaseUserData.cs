@@ -160,6 +160,26 @@ namespace Platform_Racing_3_Common.User
             this._Feets.Add(part);
         }
 
+        public override void RemoveHat(Hat hat, bool temporary = false)
+        {
+            this._Hats.Remove(hat);
+        }
+
+        public override void RemoveHead(Part part, bool temporary = false)
+        {
+            this._Heads.Remove(part);
+        }
+
+        public override void RemoveBody(Part part, bool temporary = false)
+        {
+            this._Bodys.Remove(part);
+        }
+
+        public override void RemoveFeet(Part part, bool temporary = false)
+        {
+            this._Feets.Remove(part);
+        }
+
         public override void AddFriend(uint id) => this._Friends.Add(id);
         public override void RemoveFriend(uint id) => this._Friends.Remove(id);
 

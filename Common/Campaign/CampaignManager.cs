@@ -9,6 +9,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Platform_Racing_3_Common.User;
+using Platform_Racing_3_Common.Customization;
 
 namespace Platform_Racing_3_Common.Campaign
 {
@@ -89,6 +91,60 @@ namespace Platform_Racing_3_Common.Campaign
         public static Task<string> GetRawRunAsync(uint levelId, uint userId)
         {
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT recorded_run FROM base.campaigns_runs WHERE user_id = {userId} AND level_id = {levelId} ORDER BY SIGN(finish_time) DESC, finish_time ASC LIMIT 1").ContinueWith(CampaignManager.ParseSqlRawRun));
+        }
+
+        public static void AwardCampaignPrizes(UserData userData, string season, uint medalsCount)
+        {
+            if (CampaignManager.DefaultPrizes.TryGetValue(season, out List<CampaignPrize> prizes))
+            {
+                foreach (CampaignPrize prize in prizes)
+                {
+                    if (prize.Type == CampaignPrizeType.Hat)
+                    {
+                        if (medalsCount >= prize.MedalsRequired)
+                        {
+                            userData.GiveHat((Hat)prize.Id, temporary: true);
+                        }
+                        else
+                        {
+                            userData.RemoveHat((Hat)prize.Id, temporary: true);
+                        }
+                    }
+                    else if (prize.Type == CampaignPrizeType.Head)
+                    {
+                        if (medalsCount >= prize.MedalsRequired)
+                        {
+                            userData.GiveHead((Part)prize.Id, temporary: true);
+                        }
+                        else
+                        {
+                            userData.RemoveHead((Part)prize.Id, temporary: true);
+                        }
+                    }
+                    else if (prize.Type == CampaignPrizeType.Body)
+                    {
+                        if (medalsCount >= prize.MedalsRequired)
+                        {
+                            userData.GiveBody((Part)prize.Id, temporary: true);
+                        }
+                        else
+                        {
+                            userData.RemoveBody((Part)prize.Id, temporary: true);
+                        }
+                    }
+                    else if (prize.Type == CampaignPrizeType.Feet)
+                    {
+                        if (medalsCount >= prize.MedalsRequired)
+                        {
+                            userData.GiveFeet((Part)prize.Id, temporary: true);
+                        }
+                        else
+                        {
+                            userData.RemoveFeet((Part)prize.Id, temporary: true);
+                        }
+                    }
+                }
+            }
         }
 
         private static IReadOnlyDictionary<uint, (int Time, CampaignRun Run)> ParseSqlFriendsRuns(Task<DbDataReader> task)

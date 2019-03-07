@@ -303,6 +303,8 @@ namespace Platform_Racing_3_Common.User
 
         public static Task<IReadOnlyCollection<PlayerUserData>> SearchUsers(string name) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, array_remove(array_agg(DISTINCT f.friend_user_id), NULL) AS friends, array_remove(array_agg(DISTINCT i.ignored_user_id), NULL) AS ignored, array_agg(ARRAY[c.level_id, c.finish_time]) AS campaign_runs FROM base.users u LEFT JOIN base.friends f ON u.id = f.user_id LEFT JOIN base.ignored i ON u.id = i.user_id LEFT JOIN base.campaigns_runs c ON c.user_id = u.id WHERE u.username ILIKE '%' || {name} || '%' GROUP BY u.id").ContinueWith(UserManager.ParseSqlMultipleUserData));
 
+        public static Task<IReadOnlyDictionary<uint, int>> GetCampaignRuns(uint userId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT array_agg(ARRAY[level_id, finish_time]) AS campaign_runs FROM base.campaigns_runs WHERE user_id = {userId}").ContinueWith(UserManager.ParseSqlCampaignRuns));
+
         public static Task GiveHat(uint userId, Hat hat) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET hats = base.UNIQ(base.SORT(ARRAY_APPEND(hats, {(uint)hat}::int))) WHERE id = {userId} RETURNING id, hats").ContinueWith(UserManager.ParseSqlAddHat));
         public static Task GiveHead(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET heads = base.UNIQ(base.SORT(ARRAY_APPEND(heads, {(uint)part}::int))) WHERE id = {userId} RETURNING id, heads").ContinueWith(UserManager.ParseSqlAddHead));
         public static Task GiveBody(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bodys = base.UNIQ(base.SORT(ARRAY_APPEND(bodys, {(uint)part}::int))) WHERE id = {userId} RETURNING id, bodys").ContinueWith(UserManager.ParseSqlAddBody));
@@ -405,7 +407,40 @@ namespace Platform_Racing_3_Common.User
 
             return users;
         }
-        
+
+        private static IReadOnlyDictionary<uint, int> ParseSqlCampaignRuns(Task<DbDataReader> task)
+        {
+            IDictionary<uint, int> runs = new Dictionary<uint, int>();
+
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                while (reader?.Read() ?? false)
+                {
+                    object campaignRuns = reader["campaign_runs"]; //Might be null
+                    if (campaignRuns is int[,] campaignRuns_)
+                    {
+                        for (int i = 0; i < campaignRuns_.Length / campaignRuns_.Rank; i++)
+                        {
+                            uint levelId = (uint)campaignRuns_[i, 0];
+                            if (levelId > 0)
+                            {
+                                int finishTime = campaignRuns_[i, 1];
+
+                                runs[levelId] = finishTime;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to load campaign runs from sql", task.Exception);
+            }
+
+            return (IReadOnlyDictionary<uint, int>)runs;
+        }
+
         private static uint ParseSqlMyFriendsCount(Task<DbDataReader> task)
         {
             if (task.IsCompletedSuccessfully)

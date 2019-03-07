@@ -61,5 +61,15 @@ namespace Platform_Racing_3_Common.User
 
         public override IReadOnlyCollection<string> Permissions => GuestUserData.EmptyPermissionList; //Guests dont have rights! Boo those alien noobs!
         public override bool HasPermissions(string permission) => false;
+
+        public override void CheckCampaignPrizes()
+        {
+
+        }
+
+        public override void CheckCampaignPrizes(string season, uint medalsCount)
+        {
+            CampaignManager.AwardCampaignPrizes(this, season ?? "reborn", medalsCount);
+        }
     }
 }

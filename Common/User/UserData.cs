@@ -189,6 +189,17 @@ namespace Platform_Racing_3_Common.User
             this.GiveFeet(part, temporary);
         }
 
+        public abstract void RemoveHat(Hat hat, bool temporary = false);
+        public abstract void RemoveHead(Part part, bool temporary = false);
+        public abstract void RemoveBody(Part part, bool temporary = false);
+        public abstract void RemoveFeet(Part part, bool temporary = false);
+        public virtual void RemoveSet(Part part, bool temporary = false)
+        {
+            this.RemoveHead(part, temporary);
+            this.RemoveBody(part, temporary);
+            this.RemoveFeet(part, temporary);
+        }
+
         public virtual void AddExp(ulong exp)
         {
             if (exp == 0 || this.TotalExp == ulong.MaxValue)
@@ -249,6 +260,9 @@ namespace Platform_Racing_3_Common.User
 
         public abstract void AddIgnored(uint id);
         public abstract void RemoveIgnored(uint id);
+
+        public virtual void CheckCampaignPrizes() => this.CheckCampaignPrizes(null, 0);
+        public abstract void CheckCampaignPrizes(string season, uint medalsCount);
 
         public virtual bool HasPermissions(string permission) => this.Permissions.Contains(permission);
 

@@ -66,7 +66,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "report_pm", new ReportPmIncomingMessage() },
                 { "koth", new KothIncomingMessage() },
 				{ "dash", new DashIncomingMessage() },
-                { "join_tournament", new JoinTournamentIncomingMessage() }
+                { "join_tournament", new JoinTournamentIncomingMessage() },
+                { "win_hat", new WinHatIncomingMessage() },
             };
         }
 

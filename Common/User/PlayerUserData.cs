@@ -171,7 +171,7 @@ namespace Platform_Racing_3_Common.User
             this.SetStats(speed, accel, jump);
         }
 
-        private void CheckCampaignTime(uint levelId, int finishTime)
+        public void CheckCampaignTime(uint levelId, int finishTime)
         {
             if (CampaignManager.DefaultCampaignTimes.TryGetValue(levelId, out (string Season, Dictionary<CampaignMedal, uint> Medals) level))
             {
@@ -215,59 +215,17 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private void CheckCampaignPrizes()
+        public override void CheckCampaignPrizes()
         {
-            foreach (KeyValuePair<string, List<CampaignPrize>> prizes in CampaignManager.DefaultPrizes)
+            foreach (string season in CampaignManager.DefaultPrizes.Keys)
             {
-                uint goldMedalsCount = this.GetCampaignGoldMedals(prizes.Key);
-                foreach (CampaignPrize prize in prizes.Value)
-                {
-                    if (prize.Type == CampaignPrizeType.Hat)
-                    {
-                        if (goldMedalsCount >= prize.MedalsRequired)
-                        {
-                            this._Hats.Add((Hat)prize.Id);
-                        }
-                        else
-                        {
-                            this._Hats.Remove((Hat)prize.Id);
-                        }
-                    }
-                    else if (prize.Type == CampaignPrizeType.Head)
-                    {
-                        if (goldMedalsCount >= prize.MedalsRequired)
-                        {
-                            this._Heads.Add((Part)prize.Id);
-                        }
-                        else
-                        {
-                            this._Heads.Remove((Part)prize.Id);
-                        }
-                    }
-                    else if (prize.Type == CampaignPrizeType.Body)
-                    {
-                        if (goldMedalsCount >= prize.MedalsRequired)
-                        {
-                            this._Bodys.Add((Part)prize.Id);
-                        }
-                        else
-                        {
-                            this._Bodys.Remove((Part)prize.Id);
-                        }
-                    }
-                    else if (prize.Type == CampaignPrizeType.Feet)
-                    {
-                        if (goldMedalsCount >= prize.MedalsRequired)
-                        {
-                            this._Feets.Add((Part)prize.Id);
-                        }
-                        else
-                        {
-                            this._Feets.Remove((Part)prize.Id);
-                        }
-                    }
-                }
+                CampaignManager.AwardCampaignPrizes(this, season, this.GetCampaignGoldMedals(season));
             }
+        }
+
+        public override void CheckCampaignPrizes(string season, uint medalsCount)
+        {
+            this.CheckCampaignPrizes();
         }
 
         private void RemoveRestrictedParts()

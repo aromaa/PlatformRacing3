@@ -13,6 +13,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
     {
         public void Handle(ClientSession session, JsonPacket message)
         {
+            if (!session.IsLoggedIn)
+            {
+                return;
+            }
+
             MatchListing matchListing = PlatformRacing3Server.MatchListingManager.GetTournament(session);
             if (matchListing != null)
             {
