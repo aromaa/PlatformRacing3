@@ -69,6 +69,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
 
         private void WriteLength()
         {
+            if (this.Data.Count > ushort.MaxValue)
+            {
+                throw new ServerMessageTooBigException();
+            }
+
             int count = this.Data.Count - 2; //Don't include the length bytes
 
             this.Data[0] = (byte)(count >> 8);
