@@ -14,6 +14,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Platform_Racing_3_Common.Redis;
+using StackExchange.Redis;
 
 namespace Platform_Racing_3_Server.Game.Chat
 {
@@ -166,6 +168,8 @@ namespace Platform_Racing_3_Server.Game.Chat
                     this.Clients.SendPacket(packet, session);
                 }
             }
+
+            _ = RedisConnection.GetDatabase().PublishAsync("Pr3ChatHardcored", $"{session.UserData.Username}: {message}", CommandFlags.FireAndForget);
         }
 
         //Even tho the client has some funcitonality for this, its not properly supported, have some funcitonality for it tho
