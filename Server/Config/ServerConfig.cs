@@ -12,6 +12,12 @@ namespace Platform_Racing_3_Server.Config
         [JsonProperty("server_id", Required = Required.Always)]
         internal uint ServerId { get; set; }
 
+        [JsonProperty("discord_webhook_id")]
+        internal ulong DiscordWebhookId { get; set; }
+
+        [JsonProperty("discord_webhook_token")]
+        internal string DiscordWebhookToken { get; set; }
+
         [JsonProperty("database_host", Required = Required.Always)]
         public string DatabaseHost { get; set; }
         [JsonProperty("database_port", Required = Required.Always)]

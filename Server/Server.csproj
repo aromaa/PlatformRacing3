@@ -15,6 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Discord.Net" Version="2.0.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
 
@@ -31,12 +32,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>settings.json</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="settings.json">
       <Generator>SettingsSingleFileGenerator</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <LastGenOutput>settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
 

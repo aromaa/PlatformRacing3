@@ -169,7 +169,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                 }
             }
 
-            _ = RedisConnection.GetDatabase().PublishAsync("Pr3ChatHardcored", $"{session.UserData.Username}: {message}", CommandFlags.FireAndForget);
+            PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: message, username: session.UserData.Username);
         }
 
         //Even tho the client has some funcitonality for this, its not properly supported, have some funcitonality for it tho

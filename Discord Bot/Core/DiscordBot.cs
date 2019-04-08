@@ -32,7 +32,6 @@ namespace Discord_Bot.Core
 
             this.Client = new DiscordSocketClient();
             this.Client.MessageReceived += this.HandleIncomingMessage;
-            this.Client.Ready += this.Ready;
         }
 
         internal async Task LoadCommandsAsync()
@@ -79,17 +78,6 @@ namespace Discord_Bot.Core
 
                 await this.CommandService.ExecuteAsync(context, commandIndex, this.Services);
             }
-        }
-
-        private async Task Ready()
-        {
-            SocketGuild gopr3 = this.Client.GetGuild(280854365118398464);
-            SocketTextChannel pr3chat = gopr3.GetTextChannel(335820494291075082);
-
-            await RedisConnection.GetConnectionMultiplexer().GetSubscriber().SubscribeAsync("Pr3ChatHardcored", (channel, value) =>
-            {
-                _ = pr3chat.SendMessageAsync(value);
-            }, CommandFlags.FireAndForget);
         }
     }
 }
