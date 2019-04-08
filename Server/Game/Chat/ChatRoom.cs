@@ -140,11 +140,11 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private void SendChatMessage(ClientSession session, string message, bool sendToSelf = true)
         {
-            if (message.StartsWith("/"))
+            if (message.StartsWith('/'))
             {
                 string[] args = message.Substring(1).Split(' ');
 
-                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan().Slice(1, args.Length - 1)))
+                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(start: 1, length: args.Length - 1)))
                 {
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }
@@ -167,9 +167,9 @@ namespace Platform_Racing_3_Server.Game.Chat
                 {
                     this.Clients.SendPacket(packet, session);
                 }
-            }
 
-            PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: message, username: session.UserData.Username);
+                PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: message, username: session.UserData.Username);
+            }
         }
 
         //Even tho the client has some funcitonality for this, its not properly supported, have some funcitonality for it tho
