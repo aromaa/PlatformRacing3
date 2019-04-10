@@ -74,10 +74,10 @@ namespace Platform_Racing_3_Server.Game.Chat
             this.Leave(session, ChatRoonLeaveReason.Disconnected);
         }
 
-        internal ChatRoomJoinStatus Join(ClientSession session)
+        internal ChatRoomJoinStatus Join(ClientSession session, uint chatId = 0)
         {
             //First send the room vars
-            session.SendPacket(new RoomVarsOutgoingMessage(this.Name, this.GetVars("creator", "note")));
+            session.SendPacket(new RoomVarsOutgoingMessage(chatId, this.Name, this.GetVars("creator", "note")));
 
             if (this.BannedClients.Any((i) => i.Matches(session.UserData.Id, session.SocketId, session.IPAddres)))
             {

@@ -24,7 +24,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
             {
                 case "chat":
                     {
-                        PlatformRacing3Server.ChatRoomManager.JoinOrCreate(session, message.RoomName, message.Pass, message.Note, out ChatRoomJoinStatus status);
+                        PlatformRacing3Server.ChatRoomManager.JoinOrCreate(session, message.RoomName, message.Pass, message.Note, out ChatRoomJoinStatus status, message.ChatId);
                     }
                     break;
                 case "match_listing":

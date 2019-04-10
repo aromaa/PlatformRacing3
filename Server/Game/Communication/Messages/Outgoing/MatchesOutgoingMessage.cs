@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
     internal class MatchesOutgoingMessage : JsonOutgoingMessage
     {
-        internal MatchesOutgoingMessage(IReadOnlyCollection<MatchListing> matchListings) : base(new JsonMatchesOutgoingMessage(matchListings))
+        internal MatchesOutgoingMessage(uint lobbyId, IReadOnlyCollection<MatchListing> matchListings) : base(new JsonMatchesOutgoingMessage(lobbyId, matchListings))
         {
         }
     }

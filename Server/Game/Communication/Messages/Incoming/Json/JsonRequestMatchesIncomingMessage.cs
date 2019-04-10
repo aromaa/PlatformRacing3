@@ -9,5 +9,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
     {
         [JsonProperty("num")]
         public uint Num { get; set; }
+
+        [JsonProperty("lobbyId")]
+        public uint LobbyId { get; set; }
     }
 }

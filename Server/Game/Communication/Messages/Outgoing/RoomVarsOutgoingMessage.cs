@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
     internal class RoomVarsOutgoingMessage : JsonOutgoingMessage
     {
-        internal RoomVarsOutgoingMessage(string roomName, IReadOnlyDictionary<string, object> vars) : base(new JsonRoomVarsOutgoingMessage(roomName, vars))
+        internal RoomVarsOutgoingMessage(uint chatId, string roomName, IReadOnlyDictionary<string, object> vars) : base(new JsonRoomVarsOutgoingMessage(chatId, roomName, vars))
         {
         }
     }

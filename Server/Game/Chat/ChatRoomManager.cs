@@ -25,7 +25,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         internal bool TryGet(string name, out ChatRoom chatRoom) => this.ChatRooms.TryGetValue(name, out chatRoom);
 
-        internal ChatRoom JoinOrCreate(ClientSession session, string name, string pass, string note, out ChatRoomJoinStatus status)
+        internal ChatRoom JoinOrCreate(ClientSession session, string name, string pass, string note, out ChatRoomJoinStatus status, uint chatId = 0)
         {
             //Complexity added by concurrency
 
@@ -57,7 +57,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                 else
                 {
                     //Password functionality is not properly implemented in the client but keep this anyway
-                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) ? chat.Join(session) : ChatRoomJoinStatus.InvalidPassword;
+                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) ? chat.Join(session, chatId) : ChatRoomJoinStatus.InvalidPassword;
                 }
 
                 //If we failed to join to the room return and dont try again
