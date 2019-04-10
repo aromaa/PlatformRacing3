@@ -126,6 +126,8 @@ namespace Platform_Racing_3_Common.User
             else
             {
                 this.Status = "Offline";
+
+                this.LastOnline = DateTimeOffset.Now;
             }
         }
 
