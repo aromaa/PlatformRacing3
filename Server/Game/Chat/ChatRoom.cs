@@ -172,7 +172,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
                 if (this.Name == "chat-Home")
                 {
-                    PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: $"`{message.Replace("`", @"`\``")}`", username: session.UserData.Username);
+                    PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: $"`{message.Replace('`', '\'')}`", username: session.UserData.Username);
                 }
             }
         }
