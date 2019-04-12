@@ -21,7 +21,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 {
     internal class ChatRoom
     {
-        private const uint MAX_RECENT_MESSAGES = 20;
+        private const uint MAX_RECENT_MESSAGES = 25;
 
         internal ChatRoomType Type { get; }
 
@@ -168,7 +168,10 @@ namespace Platform_Racing_3_Server.Game.Chat
                     this.Clients.SendPacket(packet, session);
                 }
 
-                PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: message, username: session.UserData.Username);
+                if (this.Name == "chat-Home")
+                {
+                    PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: $"`{message}`", username: session.UserData.Username);
+                }
             }
         }
 
