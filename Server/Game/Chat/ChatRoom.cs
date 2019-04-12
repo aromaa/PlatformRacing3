@@ -140,6 +140,8 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private void SendChatMessage(ClientSession session, string message, bool sendToSelf = true)
         {
+            message = message.Trim();
+
             if (message.StartsWith('/'))
             {
                 string[] args = message.Substring(1).Split(' ');
@@ -149,7 +151,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }
             }
-            else
+            else if (message.Length > 0)
             {
                 ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
@@ -170,7 +172,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
                 if (this.Name == "chat-Home")
                 {
-                    PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: $"`{message}`", username: session.UserData.Username);
+                    PlatformRacing3Server.DiscordChatWebhook?.SendMessageAsync(text: $"`{message.Replace("`", @"`\``")}`", username: session.UserData.Username);
                 }
             }
         }
