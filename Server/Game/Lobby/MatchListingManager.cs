@@ -143,14 +143,16 @@ namespace Platform_Racing_3_Server.Game.Lobby
             if (listing == null)
             {
                 IReadOnlyCollection<LevelData> levels = LevelManager.GetCampaignLevels().GetAwaiter().GetResult().Levels;
-
-                LevelData random = levels.ElementAt(new Random().Next(0, levels.Count));
-
-                listing = new MatchListing(MatchListingType.LevelOfTheDay, null, random, MatchListingType.LevelOfTheDay.GetLobbyId(this.GetNextMatchListingId()), 0, uint.MaxValue, 4, false);
-
-                if (!this.MatchListings.TryAdd(listing.Name, listing))
+                if (levels.Count > 0)
                 {
-                    return null;
+                    LevelData random = levels.ElementAt(new Random().Next(0, levels.Count));
+
+                    listing = new MatchListing(MatchListingType.LevelOfTheDay, null, random, MatchListingType.LevelOfTheDay.GetLobbyId(this.GetNextMatchListingId()), 0, uint.MaxValue, 4, false);
+
+                    if (!this.MatchListings.TryAdd(listing.Name, listing))
+                    {
+                        return null;
+                    }
                 }
             }
 
