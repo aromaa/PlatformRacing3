@@ -57,31 +57,6 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
                     if (this.MatchListings.TryAdd(listing.Name, listing))
                     {
-                        //Don't do quick join for one player matches, host only obviously
-                        if (maxMembers == 1)
-                        {
-                            return listing;
-                        }
-                        else if (type == MatchListingType.Normal && listing.SpotsLeft > 0) //Can we do quick join?
-                        {
-                            //As we use packets some players might not join
-                            //So keep track of the current spots and decrease as we send packets to avoid sending too many players
-                            //Also other players might join while the packet has not yet arrieved to the client
-                            uint spotsLeft = listing.SpotsLeft;
-                            foreach (ClientSession other in this.QuickJoinClients.Values)
-                            {
-                                if (spotsLeft > 0) //Can we fill it up even more
-                                {
-                                    if (listing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
-                                    {
-                                        other.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
-
-                                        spotsLeft--;
-                                    }
-                                }
-                            }
-                        }
-
                         return listing;
                     }
                     else
@@ -105,6 +80,21 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     status = matchListing.Join(session);
                     if (status == MatchListingJoinStatus.Success)
                     {
+                        //Do quick join here bcs the client is a big mess
+                        uint spotsLeft = matchListing.SpotsLeft;
+                        foreach (ClientSession other in this.QuickJoinClients.Values)
+                        {
+                            if (spotsLeft > 0) //Can we fill it up even more
+                            {
+                                if (matchListing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
+                                {
+                                    other.SendPacket(new QuickJoinSuccessOutgoingMessage(matchListing));
+
+                                    spotsLeft--;
+                                }
+                            }
+                        }
+
                         return matchListing;
                     }
                 }

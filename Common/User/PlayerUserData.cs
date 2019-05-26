@@ -425,24 +425,36 @@ namespace Platform_Racing_3_Common.User
         {
             this._Hats.UnionWith(hats);
             this._Hats.IntersectWith(hats);
+
+            this.RemoveRestrictedParts();
+            this.CheckCampaignPrizes();
         }
 
         internal void SetHeads(IEnumerable<Part> heads)
         {
             this._Heads.UnionWith(heads);
             this._Heads.IntersectWith(heads);
+
+            this.RemoveRestrictedParts();
+            this.CheckCampaignPrizes();
         }
 
         internal void SetBodys(IEnumerable<Part> bodys)
         {
             this._Bodys.UnionWith(bodys);
             this._Bodys.IntersectWith(bodys);
+
+            this.RemoveRestrictedParts();
+            this.CheckCampaignPrizes();
         }
 
         internal void SetFeets(IEnumerable<Part> feets)
         {
             this._Feets.UnionWith(feets);
             this._Feets.IntersectWith(feets);
+
+            this.RemoveRestrictedParts();
+            this.CheckCampaignPrizes();
         }
 
         public uint GetCampaignGoldMedals(string season) => (uint)this._CampaignLevelRecords.Values.Count((m) => m.Medal == CampaignMedal.Gold && m.Season == season);
