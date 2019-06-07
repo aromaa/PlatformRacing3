@@ -47,7 +47,8 @@ namespace Platform_Racing_3_Server.Game.Match
         private uint _Life;
         private bool _Hurt;
         private uint _Coins;
-        internal uint Dash;
+        private uint _Dash;
+        private string _Team;
 
         internal double? FinishTime { get; set; }
         internal bool Forfiet { get; set; }
@@ -346,6 +347,33 @@ namespace Platform_Racing_3_Server.Game.Match
                     this._Coins = value;
 
                     //this.ToUpdate |= UpdateStatus.Coins;
+                }
+            }
+        }
+        internal uint Dash
+        {
+            get => this._Dash;
+            set
+            {
+                if (this._Dash != value)
+                {
+                    this._Dash = value;
+
+                    //this.ToUpdate |= UpdateStatus.Dash;
+                }
+            }
+        }
+
+        internal string Team
+        {
+            get => this._Team;
+            set
+            {
+                if (this._Team != value)
+                {
+                    this._Team = value;
+
+                    this.ToUpdate |= UpdateStatus.Team;
                 }
             }
         }

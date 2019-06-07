@@ -105,6 +105,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     matchPlayer.Coins = message.ReadUInt();
                 }
 
+                if (status.HasFlag(UpdateStatus.Team))
+                {
+                    matchPlayer.Team = message.ReadString();
+                }
+
                 matchPlayer.Match.SendUpdateIfRequired(session, matchPlayer);
             }
         }

@@ -110,6 +110,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
                 message.WriteUInt(matchPlayer.Coins);
             }
 
+            if (status.HasFlag(UpdateStatus.Team))
+            {
+                message.WriteString(matchPlayer.Team);
+            }
+
             this.Bytes = message.GetBytes();
         }
 

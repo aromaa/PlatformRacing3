@@ -26,5 +26,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums
         Life = 1 << 16,
         Hurt = 1 << 17,
         Coins = 1 << 18,
+        Dash = 1 << 19, //??
+        Team = 1 << 20,
     }
 }
