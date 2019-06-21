@@ -1102,14 +1102,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void LoseHat(MatchPlayer player, double x, double y, float velX = 0, float velY = 0)
         {
-            if (!player.Forfiet && player.FinishTime == null)
+            MatchPlayerHat hat = player.RemoveFirstHat();
+            if (hat != null)
             {
-                MatchPlayerHat hat = player.RemoveFirstHat();
-                if (hat != null)
-                {
-                    this.DropHat(hat, x, y, velX, velY);
-                    this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
-                }
+                this.DropHat(hat, x, y, velX, velY);
+                this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
             }
         }
 
