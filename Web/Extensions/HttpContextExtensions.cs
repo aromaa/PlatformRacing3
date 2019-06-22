@@ -21,43 +21,26 @@ namespace Platform_Racing_3_Web.Extensions
         private const string AUTHENICATION_TYPE = "Login";
         private const string AUTHENICATION_IDENTITY = "PlatformRacing3Identity";
 
-        private const string HARDCORED_DOMAIN_BCS_IM_BAD = "pr3hub.com";
-
-        private const string PRELOADER_AIR_APP = "app:/Platform Racing 3 Preloader.swf";
-        private const string CLIENT_AIR_APP = "app:/Platform Racing 3 Client.swf";
+        private static readonly ISet<string> ALLOWED_DOMAINS = new HashSet<string>()
+        {
+            "http://pr3hub.com",
+            "https://pr3hub.com",
+            "http://jiggmin2.com",
+            "https://jiggmin2.com",
+            "app:/Platform Racing 3 Preloader.swf",
+            "app:/Platform Racing 3 Client.swf"
+        };
 
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
         {
-            if (httpContext.Request.Headers.TryGetValue("Referer", out StringValues referer))
+            if (httpContext.Request.Headers.TryGetValue("Referer", out StringValues referer) && !HttpContextExtensions.IsAllowed(referer))
             {
-                string refererHost = referer;
-                if (!refererHost.StartsWith("http://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD) && !refererHost.StartsWith("https://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD))
-                {
-                    int indexOf = refererHost.IndexOf("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD);
-                    if (indexOf == -1 || (refererHost.Length >= indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length + 1 && refererHost[indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length] == '.'))
-                    {
-                        string unescapedUrl = Uri.UnescapeDataString(referer);
-                        if (!unescapedUrl.StartsWith(HttpContextExtensions.PRELOADER_AIR_APP) && !unescapedUrl.StartsWith(HttpContextExtensions.CLIENT_AIR_APP))
-                        {
-                            return 0u; //Block possible bad request
-                        }
-                    }
-                }
+                return 0u; //Block possible bad request
             }
 
-            if (httpContext.Request.Headers.TryGetValue("Origin", out StringValues origin))
+            if (httpContext.Request.Headers.TryGetValue("Origin", out StringValues origin) && !HttpContextExtensions.IsAllowed(origin))
             {
-                //TODO: FIX THIS WTF
-
-                string originHost = origin;
-                if (!originHost.StartsWith("http://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD) && !originHost.StartsWith("https://" + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD))
-                {
-                    int indexOf = originHost.IndexOf("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD);
-                    if (indexOf == -1 || (originHost.Length >= indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length + 1 && originHost[indexOf + ("." + HttpContextExtensions.HARDCORED_DOMAIN_BCS_IM_BAD).Length] == '.'))
-                    {
-                        return 0u; //Block possible bad request
-                    }
-                }
+                return 0u; //Block possible bad request
             }
 
             ClaimsPrincipal claimsPrincipal = httpContext.User;
@@ -74,6 +57,24 @@ namespace Platform_Racing_3_Web.Extensions
             }
 
             return 0u;
+        }
+
+        private static bool IsAllowed(string domain)
+        {
+            if (HttpContextExtensions.ALLOWED_DOMAINS.Contains(domain))
+            {
+                return true;
+            }
+
+            foreach(string allowedDomain in HttpContextExtensions.ALLOWED_DOMAINS)
+            {
+                if (domain.StartsWith(allowedDomain))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         internal static Task AuthenicatePr3UserAsync(this HttpContext httpContext, uint userId)
