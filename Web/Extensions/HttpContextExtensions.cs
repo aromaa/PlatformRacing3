@@ -28,7 +28,9 @@ namespace Platform_Racing_3_Web.Extensions
             "http://jiggmin2.com",
             "https://jiggmin2.com",
             "app:/Platform Racing 3 Preloader.swf",
-            "app:/Platform Racing 3 Client.swf"
+            "app:/Platform Racing 3 Client.swf",
+            "app:/Platform%20Racing%203%20Preloader.swf",
+            "app:/Platform%20Racing%203%20Client.swf",
         };
 
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
