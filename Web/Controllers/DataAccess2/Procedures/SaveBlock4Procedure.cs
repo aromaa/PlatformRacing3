@@ -44,18 +44,19 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                         return new DataAccessErrorResponse($"Block comment can't be longer than {SaveBlock4Procedure.DESCRIPTION_MAX_LENGTH} chars long!");
                     }
 
-                    string imageData = (string)data.Element("p_image_data") ?? throw new DataAccessProcedureMissingData();
+                    string category = (string)data.Element("p_category") ?? throw new DataAccessProcedureMissingData();
+                    if (category.Length > SaveBlock4Procedure.CATEGORY_MAX_LENGTH)
+                    {
+                        return new DataAccessErrorResponse($"Block category can't be longer than {SaveBlock4Procedure.CATEGORY_MAX_LENGTH} chars long!");
+                    }
+
                     string settings = (string)data.Element("p_settings") ?? throw new DataAccessProcedureMissingData();
                     if (settings.Length > SaveBlock4Procedure.SETTINGS_MAX_LENGTH)
                     {
                         return new DataAccessErrorResponse($"Block settings is too big!");
                     }
 
-                    string category = (string)data.Element("p_category") ?? throw new DataAccessProcedureMissingData();
-                    if (category.Length > SaveBlock4Procedure.CATEGORY_MAX_LENGTH)
-                    {
-                        return new DataAccessErrorResponse($"Block category can't be longer than {SaveBlock4Procedure.CATEGORY_MAX_LENGTH} chars long!");
-                    }
+                    string imageData = (string)data.Element("p_image_data") ?? throw new DataAccessProcedureMissingData();
 
                     bool success = await BlockManager.SaveBlockAsync(userId, title, category, description, imageData, settings);
                     if (success)

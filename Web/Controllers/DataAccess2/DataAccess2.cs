@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures;
+using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps;
 using Platform_Racing_3_Web.Responses;
 using Platform_Racing_3_Web.Responses.Procedures;
 using System;
@@ -49,6 +50,12 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
             { "SaveCampaignRun3", new SaveCampaignRun3Procedure() },
             { "GetMyFriendsFastestRuns", new GetMyFriendsFastestRunsProcedure() },
             { "GetCampaignRun3", new GetCampaignRun3Procedure() },
+            { "GetMyStampCategorys", new GetMyStampCategoriesProcedure() },
+            { "CountMyStamps", new CountMyStampsProcedure() },
+            { "GetMyStamps", new GetMyStampsProcedure() },
+            { "SaveStamp", new SaveStampProcedure() },
+            { "GetManyStamps", new GetManyStampsProcedure() },
+            { "DeleteStamp", new DeleteStampProcedure() },
         };
 
         [HttpPost]
@@ -78,7 +85,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                             {
                                 return new DataAccessErrorResponse(dataRequestID, "Invalid request, procedure was missing required data");
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 DataAccess2.Logger.Error("Failed to execute procedure", ex);
 
