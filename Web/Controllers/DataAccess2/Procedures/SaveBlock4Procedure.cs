@@ -52,7 +52,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     }
 
                     string category = (string)data.Element("p_category") ?? throw new DataAccessProcedureMissingData();
-                    if (description.Length > SaveBlock4Procedure.CATEGORY_MAX_LENGTH)
+                    if (category.Length > SaveBlock4Procedure.CATEGORY_MAX_LENGTH)
                     {
                         return new DataAccessErrorResponse($"Block category can't be longer than {SaveBlock4Procedure.CATEGORY_MAX_LENGTH} chars long!");
                     }
