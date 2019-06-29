@@ -16,8 +16,8 @@ namespace Platform_Racing_3_Web.Controllers
     [Route("forgotpassword")]
     public class ForgotPasswordController : Controller
     {
-        [HttpGet]
-        public async Task<string> GetAsync([FromQuery] string email)
+        [HttpPost]
+        public async Task<string> PostAsync([FromForm] string email)
         {
             PlayerUserData player = await UserManager.TryGetUserDataByEmailAsync(email);
             if (player != null)

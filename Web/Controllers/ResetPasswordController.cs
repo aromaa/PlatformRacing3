@@ -13,8 +13,8 @@ namespace Platform_Racing_3_Web.Controllers
     [Route("resetpassword")]
     public class ResetPasswordController : Controller
     {
-        [HttpGet]
-        public async Task<string> GetAsync([FromQuery] string email, [FromQuery] string token, [FromQuery] string password)
+        [HttpPost]
+        public async Task<string> PostAsync([FromForm] string email, [FromForm] string token, [FromForm] string password)
         {
             //Password check
             if (string.IsNullOrWhiteSpace(password))
