@@ -15,5 +15,10 @@
 
   "redis_use_ssh": false,
   "redis_ssh_key": "",
-  "redis_ssh_user": ""
+  "redis_ssh_user": "",
+
+  "smtp_host": "",
+  "smtp_port": 0,
+  "smtp_user": "",
+  "smtp_pass": ""
 }

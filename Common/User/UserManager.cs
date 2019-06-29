@@ -311,6 +311,14 @@ namespace Platform_Racing_3_Common.User
         public static Task GiveFeet(uint userId, Part part) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET feets = base.UNIQ(base.SORT(ARRAY_APPEND(feets, {(uint)part}::int))) WHERE id = {userId} RETURNING id, feets").ContinueWith(UserManager.ParseSqlAddFeet));
         public static Task GiveSet(uint userId, Part part) => Task.WhenAll(UserManager.GiveHead(userId, part), UserManager.GiveBody(userId, part), UserManager.GiveFeet(userId, part)); //TODO: More optimized version
 
+        public static Task<bool> TryCreateForgotPasswordToken(uint userId, string token, IPAddress ip) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users_password_reset(token, user_id, user_ip) VALUES({token}, {userId}, {ip}) RETURNING true").ContinueWith(UserManager.ParseSqlInsertPasswordReset));
+
+        public static Task<bool> CanSendPasswordToken(uint userId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(*) AS count FROM base.users_password_reset WHERE user_id = {userId} AND requested >= NOW() - '30 minutes'::interval").ContinueWith(UserManager.ParseSqlCanSendPasswordToken));
+
+        public static Task<uint> TryGetForgotPasswordToken(string token) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT user_id FROM base.users_password_reset WHERE token = {token} AND used IS NULL AND requested >= NOW() - '2 days'::interval").ContinueWith(UserManager.ParseSqlGetPasswordToken));
+
+        public static Task<bool> TryConsumePasswordToken(string token, string password, IPAddress ip) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH updateToken AS(UPDATE base.users_password_reset SET used = NOW(), used_ip = {ip} WHERE token = {token} AND used IS NULL AND requested >= NOW() - '2 days'::interval RETURNING user_id) UPDATE base.users SET password = {PasswordUtils.HashPassword(password)} WHERE id = (SELECT user_id FROM updateToken) RETURNING true").ContinueWith(UserManager.ParseSqlConsumePasswordToken));
+
         private static PlayerUserData ParseRedisUserData(Task<RedisValue[]> task)
         {
             if (task.IsCompletedSuccessfully)
@@ -589,6 +597,84 @@ namespace Platform_Racing_3_Common.User
             {
                 UserManager.Logger.Error($"Failed to add user feet to sql", task.Exception);
             }
+        }
+        
+        private static bool ParseSqlInsertPasswordReset(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                if (reader?.Read() ?? false)
+                {
+                    return true;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to insert password reset token to sql", task.Exception);
+            }
+
+            return false;
+        }
+
+        private static bool ParseSqlCanSendPasswordToken(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                if (reader?.Read() ?? false)
+                {
+                    long count = (long)reader["count"];
+
+                    return count == 0;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to check if password reset token can be send again from sql", task.Exception);
+
+                return false;
+            }
+
+            return true;
+        }
+
+        private static uint ParseSqlGetPasswordToken(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                if (reader?.Read() ?? false)
+                {
+                    uint userId = (uint)(int)reader["user_id"];
+
+                    return userId;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to get password token from sql", task.Exception);
+            }
+
+            return 0;
+        }
+
+        private static bool ParseSqlConsumePasswordToken(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                if (reader?.Read() ?? false)
+                {
+                    return true;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to consume password reset token from sql", task.Exception);
+            }
+
+            return false;
         }
     }
 }

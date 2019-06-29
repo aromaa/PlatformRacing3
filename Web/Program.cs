@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
@@ -20,7 +22,11 @@ namespace Platform_Racing_3_Web
 {
     internal class Program
     {
+        internal static WebConfig Config { get; private set; }
+
         internal static ServerManager ServerManager { get; } = new ServerManager();
+
+        internal static SmtpClient SmtpClient { get; private set; }
 
         private static void Main(string[] args)
         {
@@ -33,12 +39,20 @@ namespace Platform_Racing_3_Web
                 Console.WriteLine($"Failed to setup logging! {ex.ToString()}");
             }
 
-            WebConfig config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));
+            Program.Config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));
 
-            DatabaseConnection.Init(config);
-            RedisConnection.Init(config);
+            DatabaseConnection.Init(Program.Config);
+            RedisConnection.Init(Program.Config);
 
             _ = Program.ServerManager.LoadServersAsync(); //Load it async, continue other code
+
+            Program.SmtpClient = new SmtpClient(Program.Config.SmtpHost, Program.Config.SmtpPort)
+            {
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                EnableSsl = true,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(Program.Config.SmtpUser, Program.Config.SmtpPass)
+            };
 
             WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().Run();
         }

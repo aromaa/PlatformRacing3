@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Config
 {
-    public class WebConfig : IDatabaseConfig, IRedisConfig
+    public class WebConfig : IDatabaseConfig, IRedisConfig, IEmailConfig
     {
         [JsonProperty("database_host", Required = Required.Always)]
         public string DatabaseHost { get; set; }
@@ -39,5 +39,15 @@ namespace Platform_Racing_3_Web.Config
         public string RedisSshKey { get; set; }
         [JsonProperty("redis_ssh_user")]
         public string RedisSshUser { get; set; }
+        
+        [JsonProperty("smtp_host", Required = Required.Always)]
+        public string SmtpHost { get; set; }
+        [JsonProperty("smtp_port", Required = Required.Always)]
+        public ushort SmtpPort { get; set; }
+
+        [JsonProperty("smtp_user", Required = Required.Always)]
+        public string SmtpUser { get; set; }
+        [JsonProperty("smtp_pass", Required = Required.Always)]
+        public string SmtpPass { get; set; }
     }
 }
