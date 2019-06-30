@@ -44,11 +44,11 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private ConcurrentQueue<ChatOutgoingMessage> RecentMessages;
 
-        internal ChatRoom(ChatRoomType type, string name, string pass, string note, params ClientSession[] clientSessions) : this(type, 0, name, pass, note, clientSessions)
+        internal ChatRoom(ChatRoomType type, string name, string pass, string note) : this(type, 0, name, pass, note)
         {
         }
 
-        internal ChatRoom(ChatRoomType type, uint creatorUserId, string name, string pass, string note, params ClientSession[] clientSessions)
+        internal ChatRoom(ChatRoomType type, uint creatorUserId, string name, string pass, string note)
         {
             this.Clients = new ClientSessionCollection(this.OnDisconnect);
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
@@ -60,11 +60,6 @@ namespace Platform_Racing_3_Server.Game.Chat
             this.Name = name;
             this.Pass = pass;
             this.Note = note;
-
-            foreach(ClientSession session in clientSessions)
-            {
-                this.Join(session);
-            }
         }
 
         internal ICollection<ClientSession> Members => this.Clients.Values;
