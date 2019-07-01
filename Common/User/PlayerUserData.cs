@@ -22,6 +22,8 @@ namespace Platform_Racing_3_Common.User
         private static readonly Hat[] RestrictedHats = new Hat[] { Hat.Cowboy, Hat.Crown };
         private static readonly Part[] RestrictedParts = new Part[] { Part.Invisible, Part.MEME };
 
+        private const uint DAILY_LUCK = 5;
+
         public override bool IsGuest => false;
 
         public override uint Id { get; }
@@ -33,9 +35,22 @@ namespace Platform_Racing_3_Common.User
 
         protected HashSet<string> _Permissions;
 
+        protected IDictionary<DateTime, uint> DailyRadiatingLuck;
+
+        public override uint RadiatingLuck
+        {
+            get => this.DailyRadiatingLuck.TryGetValue(DateTime.Today, out uint consumed) ? checked(PlayerUserData.DAILY_LUCK - consumed) : PlayerUserData.DAILY_LUCK;
+            protected set
+            {
+                //Nothing yet
+            }
+        }
+
         private PlayerUserData()
         {
             this._Permissions = new HashSet<string>();
+
+            this.DailyRadiatingLuck = new Dictionary<DateTime, uint>();
         }
 
         public PlayerUserData(DbDataReader reader) : this()
@@ -110,6 +125,15 @@ namespace Platform_Racing_3_Common.User
             uint speed = (uint)(int)reader["speed"];
             uint accel = (uint)(int)reader["accel"];
             uint jump = (uint)(int)reader["jump"];
+
+            object dailyLuck = reader["daily_luck"];
+            if (dailyLuck is object[] dailyLuck_)
+            {
+                foreach(object[] day in dailyLuck_)
+                {
+                    this.DailyRadiatingLuck[(DateTime)day[0]] = (uint)(int)day[1];
+                }
+            }
 
             this.SetStats(speed, accel, jump);
         }
@@ -504,6 +528,11 @@ namespace Platform_Racing_3_Common.User
                 new HashEntry("friends", string.Join(',', this._Friends)),
                 new HashEntry("ignored", string.Join(',', this._Ignored)),
             };
+        }
+
+        internal void SetDailyLuckConsumed(DateTime date, uint consumed)
+        {
+            this.DailyRadiatingLuck[date] = consumed;
         }
     }
 }

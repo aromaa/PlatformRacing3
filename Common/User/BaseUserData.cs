@@ -52,6 +52,8 @@ namespace Platform_Racing_3_Common.User
         protected HashSet<uint> _Friends;
         protected HashSet<uint> _Ignored;
 
+        public override uint RadiatingLuck { get; protected set; }
+
         public BaseUserData()
         {
             this.Status = "Offline";

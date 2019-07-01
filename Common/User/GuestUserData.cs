@@ -52,6 +52,15 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
+        public override uint RadiatingLuck
+        {
+            get => 0u;
+            protected set
+            {
+                //Do nothing
+            }
+        }
+
         public GuestUserData(uint guestId) : base()
         {
             this.Username = "Guest_" + guestId;

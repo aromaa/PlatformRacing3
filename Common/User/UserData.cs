@@ -92,6 +92,8 @@ namespace Platform_Racing_3_Common.User
         [JsonProperty("expBonus")]
         private uint __ExpBonus__UNUSED__ { get; } = 0;
 
+        public abstract uint RadiatingLuck { get; protected set; }
+
         [JsonProperty("campaign")]
         public abstract IReadOnlyDictionary<uint, CampaignLevelRecord> CampaignLevelRecords { get; }
 
@@ -255,6 +257,18 @@ namespace Platform_Racing_3_Common.User
             {
                 this.BonusExp = 0;
             }
+        }
+
+        public virtual bool DainLuckRadiation()
+        {
+            if (this.RadiatingLuck > 0)
+            {
+                this.RadiatingLuck--;
+
+                return true;
+            }
+
+            return false;
         }
 
         public abstract void AddFriend(uint id);

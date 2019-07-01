@@ -28,12 +28,58 @@ using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
 using log4net;
 using System.Reflection;
+using Platform_Racing_3_Common.User;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
     internal class MultiplayerMatch
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        private static readonly IReadOnlyList<Part> WINNABLE_PARTS = new Part[]
+        {
+            Part.Brain,
+            Part.Cactus,
+            Part.Cthulhu,
+            Part.Dino,
+            Part.Eye,
+            Part.Hare,
+            Part.Monster,
+            Part.Mushroom,
+            Part.Panda,
+            Part.Platypus,
+            Part.Robot,
+            Part.Skeleton,
+            Part.Spartan,
+            Part.Tiki,
+            Part.Tortoise,
+            Part.Penguin,
+            Part.Dragon,
+            Part.Meteor,
+            Part.Donkey,
+            Part.Sword,
+            Part.Snowman,
+        };
+
+        private static readonly IReadOnlyList<Hat> WINNABLE_HATS = new Hat[]
+        {
+            Hat.Propeller,
+            Hat.Santa,
+            Hat.PedroTheSnail,
+            Hat.Top,
+            Hat.Party,
+            Hat.Pirate,
+            Hat.Nurse,
+            Hat.Bouncy,
+            Hat.Shark,
+            Hat.Happy,
+            Hat.Police,
+            Hat.Ushanka,
+            Hat.Toque,
+            Hat.Fez,
+            Hat.Witch,
+            Hat.Halo,
+        };
 
         internal MatchListingType Type { get; }
         internal string Name { get; }
@@ -373,90 +419,136 @@ namespace Platform_Racing_3_Server.Game.Match
                 int diffIpsCount = this.Players.Values.Select((p) => p.IPAddress).Distinct().Count();
                 if (diffIpsCount >= 2)
                 {
-                    double change = diffIpsCount * 5;
+                    double chance = diffIpsCount * 5;
                     if (diffIpsCount >= 4)
                     {
                         if (random.Next(40 / diffIpsCount) == 0)
                         {
-                            change *= 2;
+                            chance *= 2;
                         }
 
                         if (this.Type == MatchListingType.Tournament)
                         {
-                            change *= 2;
+                            chance *= 2;
                         }
                         else if (this.Type == MatchListingType.LevelOfTheDay)
                         {
-                            change *= 1.25;
+                            chance *= 1.25;
                         }
                     }
 
-                    if (change > random.NextDouble() * 100)
+                    ISet<uint> radiatingLuck = new HashSet<uint>();
+                    foreach(MatchPlayer player in this.Players.Values)
                     {
-                        Part specialPartId = Part.None;
-                        if (random.Next(2) == 0)
+                        if (player.UserData.DainLuckRadiation())
                         {
-                            DateTimeOffset now = DateTimeOffset.UtcNow;
-                            if (now >= new DateTimeOffset(now.Year, 10, 24, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year, 11, 7, 0, 0, 0, TimeSpan.Zero)) //Halloween
+                            radiatingLuck.Add(player.UserData.Id);
+
+                            this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"{player.UserData.Username} is radiating with luck!");
+                        }
+                    }
+
+                    if (radiatingLuck.Count > 0)
+                    {
+                        chance *= radiatingLuck.Count + 1;
+
+                        UserManager.ConsumeLuck(radiatingLuck.ToArray());
+                    }
+
+                    if (chance > random.NextDouble() * 100)
+                    {
+                        CheckPartDrops();
+
+                        void CheckPartDrops()
+                        {
+                            if (CheckEventPartDrop())
                             {
-                                specialPartId = Part.Ghost;
+                                return;
                             }
-                            else if (now >= new DateTimeOffset(now.Year, 11, 17, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year, 12, 1, 0, 0, 0, TimeSpan.Zero)) //Thanksgiving
+
+                            if (CheckSpecialPartDrop())
                             {
-                                specialPartId = Part.Turkey;
+                                return;
                             }
-                            else if (now >= new DateTimeOffset(now.Year, 12, 1, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year + 1, 1, 1, 0, 0, 0, TimeSpan.Zero)) //Christmas
+
+                            if (CheckNormalPartDrop())
                             {
-                                specialPartId = Part.Reindeer;
+                                return;
                             }
                         }
 
-                        if (specialPartId != Part.None)
+                        bool CheckEventPartDrop()
                         {
-                            uint headsCount = 0;
-                            uint bodysCount = 0;
-                            uint feetsCount = 0;
-                            foreach(MatchPlayer player in this.Players.Values)
+                            Part specialPartId = Part.None;
+                            if (random.Next(2) == 0) //50% chance to get special part
                             {
-                                if (player.UserData.HasHead(specialPartId))
+                                DateTimeOffset now = DateTimeOffset.UtcNow;
+                                if (now >= new DateTimeOffset(now.Year, 10, 24, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year, 11, 7, 0, 0, 0, TimeSpan.Zero)) //Halloween
                                 {
-                                    headsCount++;
+                                    specialPartId = Part.Ghost;
                                 }
-                                
-                                if (player.UserData.HasBody(specialPartId))
+                                else if (now >= new DateTimeOffset(now.Year, 11, 17, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year, 12, 1, 0, 0, 0, TimeSpan.Zero)) //Thanksgiving
                                 {
-                                    bodysCount++;
+                                    specialPartId = Part.Turkey;
                                 }
-
-                                if (player.UserData.HasFeet(specialPartId))
+                                else if (now >= new DateTimeOffset(now.Year, 12, 1, 0, 0, 0, TimeSpan.Zero) && now < new DateTimeOffset(now.Year + 1, 1, 1, 0, 0, 0, TimeSpan.Zero)) //Christmas
                                 {
-                                    feetsCount++;
+                                    specialPartId = Part.Reindeer;
                                 }
                             }
 
-                            if (this.Players.Count != headsCount || this.Players.Count != bodysCount ||  this.Players.Count != feetsCount)
+                            if (specialPartId != Part.None)
                             {
-                                HashSet<string> possiblities = new HashSet<string>();
-                                if (this.Players.Count != headsCount)
+                                uint headsCount = 0;
+                                uint bodysCount = 0;
+                                uint feetsCount = 0;
+
+                                foreach (MatchPlayer player in this.Players.Values)
                                 {
-                                    possiblities.Add("head");
+                                    if (player.UserData.HasHead(specialPartId))
+                                    {
+                                        headsCount++;
+                                    }
+
+                                    if (player.UserData.HasBody(specialPartId))
+                                    {
+                                        bodysCount++;
+                                    }
+
+                                    if (player.UserData.HasFeet(specialPartId))
+                                    {
+                                        feetsCount++;
+                                    }
                                 }
 
-                                if (this.Players.Count != bodysCount)
+                                if (this.Players.Count != headsCount || this.Players.Count != bodysCount || this.Players.Count != feetsCount)
                                 {
-                                    possiblities.Add("body");
-                                }
+                                    ISet<string> possiblities = new HashSet<string>();
+                                    if (this.Players.Count != headsCount)
+                                    {
+                                        possiblities.Add("head");
+                                    }
 
-                                if (this.Players.Count != feetsCount)
-                                {
-                                    possiblities.Add("feet");
-                                }
+                                    if (this.Players.Count != bodysCount)
+                                    {
+                                        possiblities.Add("body");
+                                    }
 
-                                this.Prize = new MatchPrize(possiblities.OrderBy((p) => random.NextDouble()).First(), (uint)specialPartId);
+                                    if (this.Players.Count != feetsCount)
+                                    {
+                                        possiblities.Add("feet");
+                                    }
+
+                                    this.Prize = new MatchPrize(possiblities.OrderBy((p) => random.NextDouble()).First(), (uint)specialPartId);
+
+                                    return true;
+                                }
                             }
+
+                            return false;
                         }
 
-                        if (this.Prize == null)
+                        bool CheckSpecialPartDrop()
                         {
                             if (random.Next(3333) == 0)
                             {
@@ -467,76 +559,157 @@ namespace Platform_Racing_3_Server.Game.Match
                                     Hat.Cowboy,
                                     Hat.Crown
                                 }.OrderBy((h) => random.NextDouble()).First());
+
+                                return true;
                             }
+
+                            return false;
                         }
 
-                        if (this.Prize == null) //No special part was choosen, fallback to default
+                        bool CheckNormalPartDrop()
                         {
                             double prizeTypeChance = random.NextDouble() * 100;
                             if (prizeTypeChance >= 0 && prizeTypeChance <= 89) //Parts
                             {
-                                Part part = new Part[]
-                                {
-                                    Part.Brain,
-                                    Part.Cactus,
-                                    Part.Cthulhu,
-                                    Part.Dino,
-                                    Part.Eye,
-                                    Part.Hare,
-                                    Part.Monster,
-                                    Part.Mushroom,
-                                    Part.Panda,
-                                    Part.Platypus,
-                                    Part.Robot,
-                                    Part.Skeleton,
-                                    Part.Spartan,
-                                    Part.Tiki,
-                                    Part.Tortoise,
-                                    Part.Penguin,
-                                    Part.Dragon,
-                                    Part.Meteor,
-                                    Part.Donkey,
-                                    Part.Sword,
-                                    Part.Snowman,
-                                }.OrderBy((p) => random.NextDouble()).First();
+                                IEnumerable<Part> parts = MultiplayerMatch.WINNABLE_PARTS.OrderBy((p) => random.NextDouble());
 
-                                if (prizeTypeChance > 40 && prizeTypeChance <= 67) //Body
+                                //Try to figure out parts that some player is missing
+                                if (prizeTypeChance > 40 && prizeTypeChance <= 67 && CheckBodyPartDrop(parts, radiatingLuck.Count > 0))
                                 {
-                                    this.Prize = new MatchPrize("body", (uint)part);
+                                    return true;
                                 }
-                                else if (prizeTypeChance > 67 && prizeTypeChance <= 89) //Head
+                                else if (prizeTypeChance > 67 && prizeTypeChance <= 89 && CheckHeadPartDrop(parts, radiatingLuck.Count > 0))
                                 {
-                                    this.Prize = new MatchPrize("head", (uint)part);
+                                    return true;
                                 }
-                                else //Feet
+                                else if (CheckFeetPartDrop(parts, radiatingLuck.Count > 0))
                                 {
-                                    this.Prize = new MatchPrize("feet", (uint)part);
+                                    return true;
+                                }
+                                else
+                                {
+                                    //Just give any random part, even if they have it
+                                    if (prizeTypeChance > 40 && prizeTypeChance <= 67)
+                                    {
+                                        CheckBodyPartDrop(parts);
+
+                                        return true;
+                                    }
+                                    else if (prizeTypeChance > 67 && prizeTypeChance <= 89)
+                                    {
+                                        CheckHeadPartDrop(parts);
+
+                                        return true;
+                                    }
+                                    else
+                                    {
+                                        CheckFeetPartDrop(parts);
+
+                                        return true;
+                                    }
                                 }
                             }
                             else if (prizeTypeChance > 89 && prizeTypeChance <= 100) //Hat
                             {
-                                Hat hat = new Hat[]
-                                {
-                                    Hat.Propeller,
-                                    Hat.Santa,
-                                    Hat.PedroTheSnail,
-                                    Hat.Top,
-                                    Hat.Party,
-                                    Hat.Pirate,
-                                    Hat.Nurse,
-                                    Hat.Bouncy,
-                                    Hat.Shark,
-                                    Hat.Happy,
-                                    Hat.Police,
-                                    Hat.Ushanka,
-                                    Hat.Toque,
-                                    Hat.Fez,
-                                    Hat.Witch,
-                                    Hat.Halo,
-                                }.OrderBy((h) => random.NextDouble()).First();
+                                IEnumerable<Hat> hats = MultiplayerMatch.WINNABLE_HATS.OrderBy((h) => random.NextDouble());
 
-                                this.Prize = new MatchPrize("hat", (uint)hat);
+                                if (radiatingLuck.Count > 0 && this.Players.Count >= 16)
+                                {
+                                    CheckHatDrop(hats, true);
+                                }
+                                else if (radiatingLuck.Count > 0 && this.Players.Count >= 12)
+                                {
+                                    CheckHatDrop(hats, random.Next(2) == 0);
+                                }
+                                else if (radiatingLuck.Count > 0 && this.Players.Count >= 8)
+                                {
+                                    CheckHatDrop(hats, random.Next(4) == 0);
+                                }
+                                else if (radiatingLuck.Count > 0 && this.Players.Count >= 4)
+                                {
+                                    CheckHatDrop(hats, random.Next(8) == 0);
+                                }
+                                else
+                                {
+                                    CheckHatDrop(hats);
+                                }
+
+                                return true;
                             }
+
+                            bool CheckBodyPartDrop(IEnumerable<Part> selectFrom, bool luck = false)
+                            {
+                                if (luck)
+                                {
+                                    selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Bodys)));
+                                }
+
+                                Part part = selectFrom.FirstOrDefault();
+                                if (part != Part.None)
+                                {
+                                    this.Prize = new MatchPrize("body", (uint)part);
+
+                                    return true;
+                                }
+
+                                return false;
+                            }
+
+                            bool CheckHeadPartDrop(IEnumerable<Part> selectFrom, bool luck = false)
+                            {
+                                if (luck)
+                                {
+                                    selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Heads)));
+                                }
+
+                                Part part = selectFrom.FirstOrDefault();
+                                if (part != Part.None)
+                                {
+                                    this.Prize = new MatchPrize("head", (uint)part);
+
+                                    return true;
+                                }
+
+                                return false;
+                            }
+
+                            bool CheckFeetPartDrop(IEnumerable<Part> selectFrom, bool luck = false)
+                            {
+                                if (luck)
+                                {
+                                    selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Feets)));
+                                }
+
+                                Part part = selectFrom.FirstOrDefault();
+                                if (part != Part.None)
+                                {
+                                    this.Prize = new MatchPrize("feet", (uint)part);
+
+                                    return true;
+                                }
+
+                                return false;
+                            }
+
+                            bool CheckHatDrop(IEnumerable<Hat> selectFrom, bool luck = false)
+                            {
+                                if (luck)
+                                {
+                                    selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Hats)));
+                                }
+
+                                Hat hat = selectFrom.FirstOrDefault();
+                                if (hat != Hat.None)
+                                {
+                                    this.Prize = new MatchPrize("hat", (uint)hat);
+
+                                    return true;
+                                }
+
+                                return false;
+                            }
+
+                            return false;
                         }
                     }
                 }
@@ -552,6 +725,37 @@ namespace Platform_Racing_3_Server.Game.Match
             this.Clients.SendPackets(new EventsOutgoingMessage(events), new BeginMatchOutgoingMessage());
 
             LevelManager.AddPlaysAsync(this.LevelData.Id, (uint)this.Players.Count); //Lets do the most important thing now!
+        }
+
+        private ISet<T> ContainsInAll<T>(IEnumerable<IReadOnlyCollection<T>> parts)
+        {
+            IDictionary<T, uint> counts = new Dictionary<T, uint>();
+
+            uint count = 0;
+            foreach (IReadOnlyCollection<T> partCollision in parts)
+            {
+                count++;
+
+                foreach (T part in partCollision)
+                {
+                    counts.TryGetValue(part, out uint total);
+
+                    counts[part] = ++total;
+                }
+            }
+
+            ISet<T> result = new HashSet<T>();
+            foreach(KeyValuePair<T, uint> part in counts)
+            {
+                if (part.Value == count)
+                {
+                    result.Add(part.Key);
+
+                    Console.WriteLine("Ignored: " + part.Key);
+                }
+            }
+
+            return result;
         }
 
         private async Task DrawLevelAsync()
