@@ -14,7 +14,7 @@ namespace Platform_Racing_3_Server.Game.Chat
         internal ChatRoomManager()
         {
             this.ChatRooms = new ConcurrentDictionary<string, ChatRoom>();
-            this.TryCreate(ChatRoomType.System, 1, "chat-Home", "", "NOOBS", out _); //User id 1 is isokissa3
+            this.TryCreate(ChatRoomType.System, 1, "chat-Home", "", "Join our offical Discord server! https://discord.gg/xYTvAGP", out _); //User id 1 is isokissa3
         }
 
         internal ICollection<ChatRoom> Rooms => this.ChatRooms.Values;

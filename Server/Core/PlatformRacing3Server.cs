@@ -51,6 +51,7 @@ namespace Platform_Racing_3_Server.Core
         public static NetworkManager NetworkManager { get; private set; }
 
         public static DiscordWebhookClient DiscordChatWebhook { get; private set; }
+        public static DiscordWebhookClient DiscordNotificationsWebhook { get; private set; }
 
         public static Timer StatusTimer { get; private set; }
 
@@ -82,9 +83,14 @@ namespace Platform_Racing_3_Server.Core
                 PlatformRacing3Server.NetworkManager = new NetworkManager();
                 PlatformRacing3Server.NetworkManager.AddListener(new NetworkListenerTCP(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), 100), true);
 
-                if (PlatformRacing3Server.ServerConfig.DiscordWebhookId != 0)
+                if (PlatformRacing3Server.ServerConfig.DiscordChatWebhookId != 0)
                 {
-                    PlatformRacing3Server.DiscordChatWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordWebhookId, PlatformRacing3Server.ServerConfig.DiscordWebhookToken);
+                    PlatformRacing3Server.DiscordChatWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordChatWebhookId, PlatformRacing3Server.ServerConfig.DiscordChatWebhookToken);
+                }
+
+                if (PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId != 0)
+                {
+                    PlatformRacing3Server.DiscordNotificationsWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId, PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookToken);
                 }
 
                 PlatformRacing3Server.StatusTimer = new Timer(this.UpdateStatus, null, 1000, 1000);

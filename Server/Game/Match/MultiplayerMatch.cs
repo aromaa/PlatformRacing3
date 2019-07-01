@@ -1118,15 +1118,25 @@ namespace Platform_Racing_3_Server.Game.Match
                             }
                         }
 
-                        if (!prize.RewardsExpBonus)
+                        if (prize.RewardsExpBonus)
                         {
-                            partExp = false;
-                        }
+                            if (partExp)
+                            {
+                                expEarned += (ulong)Math.Round(baseExp * 0.5F);
+                                expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
 
-                        if (partExp)
-                        {
-                            expEarned += (ulong)Math.Round(baseExp * 0.5F);
-                            expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
+                                if (!session.UserData.IsGuest)
+                                {
+                                    PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}, for bonus exp! Can't beat me to it, huh! :sunglasses:", username: session.UserData.Username);
+                                }
+                            }
+                            else
+                            {
+                                if (!session.UserData.IsGuest)
+                                {
+                                    PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}! Rocking that swag! :sunglasses:", username: session.UserData.Username);
+                                }
+                            }
                         }
 
                         session.SendPacket(new PrizeOutgoingMessage(prize, partExp ? "exp" : "won"));
@@ -1170,7 +1180,14 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 session.SendPackets(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray));
 
+                uint oldRank = session.UserData.Rank;
+
                 player.UserData.AddExp(expEarned);
+
+                if (!session.UserData.IsGuest && session.UserData.Rank != oldRank)
+                {
+                    PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just got level up from {oldRank} -> {session.UserData.Rank}! Eat dust noobs! :sunglasses:", username: session.UserData.Username);
+                }
 
                 if (this.Broadcaster)
                 {
