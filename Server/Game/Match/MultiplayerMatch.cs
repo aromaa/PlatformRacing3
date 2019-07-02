@@ -1118,24 +1118,21 @@ namespace Platform_Racing_3_Server.Game.Match
                             }
                         }
 
-                        if (prize.RewardsExpBonus)
+                        if (prize.RewardsExpBonus && partExp)
                         {
-                            if (partExp)
-                            {
-                                expEarned += (ulong)Math.Round(baseExp * 0.5F);
-                                expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
+                            expEarned += (ulong)Math.Round(baseExp * 0.5F);
+                            expArray.Add(new object[] { "Prize bonus", "EXP X 1.5" });
 
-                                if (!session.UserData.IsGuest)
-                                {
-                                    PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}, for bonus exp! Can't beat me to it, huh! :sunglasses:", username: session.UserData.Username);
-                                }
-                            }
-                            else
+                            if (!session.UserData.IsGuest)
                             {
-                                if (!session.UserData.IsGuest)
-                                {
-                                    PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}! Rocking that swag! :sunglasses:", username: session.UserData.Username);
-                                }
+                                PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}, for bonus exp! Can't beat me to it, huh! :sunglasses:", username: session.UserData.Username);
+                            }
+                        }
+                        else if (!partExp)
+                        {
+                            if (!session.UserData.IsGuest)
+                            {
+                                PlatformRacing3Server.DiscordNotificationsWebhook?.SendMessageAsync(text: $"Just won {prize}! Rocking that swag! :sunglasses:", username: session.UserData.Username);
                             }
                         }
 
