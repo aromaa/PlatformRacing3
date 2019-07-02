@@ -23,14 +23,20 @@ namespace Platform_Racing_3_Web.Extensions
 
         private static readonly ISet<string> ALLOWED_DOMAINS = new HashSet<string>()
         {
+            //The actual site
             "http://pr3hub.com",
             "https://pr3hub.com",
-            "http://jiggmin2.com",
-            "https://jiggmin2.com",
+
+            //The Flash apps
             "app:/Platform Racing 3 Preloader.swf",
             "app:/Platform Racing 3 Client.swf",
             "app:/Platform%20Racing%203%20Preloader.swf",
             "app:/Platform%20Racing%203%20Client.swf",
+
+            //Third party sites
+            "http://jiggmin2.com",
+            "https://jiggmin2.com",
+            "https://discordapp.com",
         };
 
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)

@@ -49,5 +49,10 @@ namespace Platform_Racing_3_Web.Config
         public string SmtpUser { get; set; }
         [JsonProperty("smtp_pass", Required = Required.Always)]
         public string SmtpPass { get; set; }
+
+        [JsonProperty("discord_client_id", Required = Required.Always)]
+        public string DiscordClientId { get; set; }
+        [JsonProperty("discord_client_secret", Required = Required.Always)]
+        public string DiscordClientSecret { get; set; }
     }
 }

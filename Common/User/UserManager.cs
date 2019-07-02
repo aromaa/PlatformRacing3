@@ -321,6 +321,12 @@ namespace Platform_Racing_3_Common.User
 
         public static Task ConsumeLuck(params uint[] userIds) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users_daily_luck(user_id, uses) SELECT users, 1 FROM UNNEST({userIds}) users ON CONFLICT(user_id, date) DO UPDATE SET uses = users_daily_luck.uses + excluded.uses RETURNING user_id, date, uses").ContinueWith(UserManager.ParseSqlDrainLuck));
 
+        public static Task<bool> TryInsertDiscordLinkage(uint userId, ulong discordId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users_discord_link(user_id, discord_id) VALUES({userId}, {discordId}) RETURNING true").ContinueWith(UserManager.ParseSqlInsertDiscordLink));
+
+        public static Task<uint> HasDiscordLinkage(uint userId, ulong discordId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT user_id FROM base.users_discord_link WHERE user_id = {userId} OR discord_id = {discordId} LIMIT 1").ContinueWith(UserManager.ParseSqlGetDiscordLink));
+
+        public static Task<uint> HasDiscordLinkage(ulong discordId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT user_id FROM base.users_discord_link WHERE discord_id = {discordId} LIMIT 1").ContinueWith(UserManager.ParseSqlGetDiscordLink));
+
         private static PlayerUserData ParseRedisUserData(Task<RedisValue[]> task)
         {
             if (task.IsCompletedSuccessfully)
@@ -697,6 +703,44 @@ namespace Platform_Racing_3_Common.User
             {
                 UserManager.Logger.Error($"Failed to drawin luck from sql", task.Exception);
             }
+        }
+
+        private static bool ParseSqlInsertDiscordLink(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                while (reader?.Read() ?? false)
+                {
+                    return true;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to insert discord linkage to sql", task.Exception);
+            }
+
+            return false;
+        }
+
+        private static uint ParseSqlGetDiscordLink(Task<DbDataReader> task)
+        {
+            if (task.IsCompletedSuccessfully)
+            {
+                DbDataReader reader = task.Result;
+                while (reader?.Read() ?? false)
+                {
+                    uint userId = (uint)(int)reader["user_id"];
+
+                    return userId;
+                }
+            }
+            else if (task.IsFaulted)
+            {
+                UserManager.Logger.Error($"Failed to get discord linkage from sql", task.Exception);
+            }
+
+            return  0;
         }
     }
 }

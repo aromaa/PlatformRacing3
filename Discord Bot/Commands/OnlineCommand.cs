@@ -26,7 +26,10 @@ namespace Discord_Bot.Commands
 
             foreach (ServerDetails server in this.ServerManager.GetServers())
             {
-                stringBuilder.AppendLine($"{server.Name}: {server.Status}");
+                stringBuilder.Append(server.Name);
+                stringBuilder.Append(": ");
+                stringBuilder.Append(server.Status);
+                stringBuilder.AppendLine();
             }
 
             return this.ReplyAsync(stringBuilder.ToString());
