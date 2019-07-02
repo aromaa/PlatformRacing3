@@ -1066,7 +1066,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 }
 
                 ulong baseExp = expEarned;
-                if ((!this.Prize?.RewardsExpBonus ?? false) || place == 1)
+                if (this.Prize != null && (!this.Prize.RewardsExpBonus || place == 1))
                 {
                     MatchPrize prize = this.Prize.RewardsExpBonus ? Interlocked.Exchange(ref this.Prize, null) : this.Prize;
                     if (prize != null)
