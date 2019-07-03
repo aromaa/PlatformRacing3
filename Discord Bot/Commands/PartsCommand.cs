@@ -11,7 +11,7 @@ namespace Discord_Bot.Commands
 {
     public class MyPartsCommand : ModuleBase<SocketCommandContext>
     {
-        [Command("myparts")]
+        [Command("pr3parts")]
         [Summary("PARTS! PARTS! WHICH ONE AM I MISSING!?")]
         public Task GetOnlinePlayersCount()
         {

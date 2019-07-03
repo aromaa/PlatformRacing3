@@ -48,7 +48,8 @@ namespace Platform_Racing_3_Web
             RedisConnection.Init(Program.Config);
 
             Task loadServersTask = Program.ServerManager.LoadServersAsync();
-            Task loadCampaignTask = Program.CampaignManager.LoadCampaignTimesAsync();
+            Task loadCampaignTimesTask = Program.CampaignManager.LoadCampaignTimesAsync();
+            Task loadCampaignPrizesTask = Program.CampaignManager.LoadPrizesAsync();
 
             Program.SmtpClient = new SmtpClient(Program.Config.SmtpHost, Program.Config.SmtpPort)
             {
@@ -58,7 +59,7 @@ namespace Platform_Racing_3_Web
                 Credentials = new NetworkCredential(Program.Config.SmtpUser, Program.Config.SmtpPass)
             };
 
-            Task.WaitAll(loadServersTask, loadCampaignTask);
+            Task.WaitAll(loadServersTask, loadCampaignTimesTask, loadCampaignPrizesTask);
 
             WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().Run();
         }

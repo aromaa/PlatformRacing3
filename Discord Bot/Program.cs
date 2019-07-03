@@ -10,6 +10,7 @@ using System.IO;
 using Discord_Bot.Config;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
+using Platform_Racing_3_Common.Campaign;
 
 namespace Discord_Bot
 {
@@ -21,6 +22,10 @@ namespace Discord_Bot
 
             DatabaseConnection.Init(config);
             RedisConnection.Init(config);
+
+            CampaignManager campaignManager = new CampaignManager();
+
+            Task.WaitAll(campaignManager.LoadCampaignTimesAsync(), campaignManager.LoadPrizesAsync());
 
             DiscordBot bot = new DiscordBot(config);
 
