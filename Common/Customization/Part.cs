@@ -45,5 +45,8 @@ namespace Platform_Racing_3_Common.Customization
         Snowman = 36,
         Angel = 37,
         Devil = 38,
+        Shark = 39,
+        Bee = 40,
+        Zebra = 41
     }
 }

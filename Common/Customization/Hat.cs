@@ -31,5 +31,10 @@ namespace Platform_Racing_3_Common.Customization
         Fez = 23,
         Witch = 24,
         Halo = 25,
+        CarboardBox2 = 26,
+        PetRock = 27,
+        BunnyEars = 28,
+        BullHorns = 29,
+        Beret = 30
     }
 }
