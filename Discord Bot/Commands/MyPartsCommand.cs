@@ -42,11 +42,11 @@ namespace Discord_Bot.Commands
 
                     if (userData.HasHat(hat))
                     {
-                        hats.Append(":white_check_mark:");
+                        hats.Append("✓");
                     }
                     else
                     {
-                        hats.Append(":x:");
+                        hats.Append("✕");
                     }
 
                     hats.AppendLine();
@@ -67,29 +67,29 @@ namespace Discord_Bot.Commands
 
                     if (userData.HasHead(part))
                     {
-                        heads.Append(":white_check_mark:");
+                        heads.Append("✓");
                     }
                     else
                     {
-                        heads.Append(":x:");
+                        heads.Append("✕");
                     }
 
                     if (userData.HasBody(part))
                     {
-                        bodies.Append(":white_check_mark:");
+                        bodies.Append("✓");
                     }
                     else
                     {
-                        bodies.Append(":x:");
+                        bodies.Append("✕");
                     }
 
                     if (userData.HasFeet(part))
                     {
-                        feets.Append(":white_check_mark:");
+                        feets.Append("✓");
                     }
                     else
                     {
-                        feets.Append(":x:");
+                        feets.Append("✕");
                     }
 
                     BreakAll();
