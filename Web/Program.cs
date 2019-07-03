@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Server;
@@ -25,6 +26,8 @@ namespace Platform_Racing_3_Web
         internal static WebConfig Config { get; private set; }
 
         internal static ServerManager ServerManager { get; } = new ServerManager();
+
+        internal static CampaignManager CampaignManager { get; } = new CampaignManager();
 
         internal static SmtpClient SmtpClient { get; private set; }
 
@@ -44,7 +47,8 @@ namespace Platform_Racing_3_Web
             DatabaseConnection.Init(Program.Config);
             RedisConnection.Init(Program.Config);
 
-            _ = Program.ServerManager.LoadServersAsync(); //Load it async, continue other code
+            Task loadServersTask = Program.ServerManager.LoadServersAsync();
+            Task loadCampaignTask = Program.CampaignManager.LoadCampaignTimesAsync();
 
             Program.SmtpClient = new SmtpClient(Program.Config.SmtpHost, Program.Config.SmtpPort)
             {
@@ -53,6 +57,8 @@ namespace Platform_Racing_3_Web
                 UseDefaultCredentials = false,
                 Credentials = new NetworkCredential(Program.Config.SmtpUser, Program.Config.SmtpPass)
             };
+
+            Task.WaitAll(loadServersTask, loadCampaignTask);
 
             WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().Run();
         }
