@@ -750,8 +750,6 @@ namespace Platform_Racing_3_Server.Game.Match
                 if (part.Value == count)
                 {
                     result.Add(part.Key);
-
-                    Console.WriteLine("Ignored: " + part.Key);
                 }
             }
 
