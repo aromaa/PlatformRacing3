@@ -28,7 +28,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
             }
             else
             {
-                executor.SendMessage("Usage: /kick [user] [message]");
+                executor.SendMessage("Usage: /alert [user] [message]");
             }
         }
     }

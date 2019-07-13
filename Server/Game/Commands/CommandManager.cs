@@ -34,6 +34,8 @@ namespace Platform_Racing_3_Server.Game.Commands
                 { "tournament", new TournamentCommand() },
                 { "broadcaster", new BroadcasterCommand() },
                 { "givebonusexp", new GiveBonusExpCommand() },
+                { "life", new LifeCommand() },
+                { "item", new ItemCommand() }
             };
         }
 

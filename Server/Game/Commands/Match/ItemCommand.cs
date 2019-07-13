@@ -8,37 +8,23 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.Match
 {
-    internal class TeleportCommand : ICommand
+    internal class ItemCommand : ICommand
     {
-        public string Permission => "command.teleport.use";
+        public string Permission => "command.item.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            if (args.Length < 2 || args.Length > 3)
+            if (args.Length < 1 || args.Length > 2)
             {
-                executor.SendMessage("Usage: /teleport [x] [y] <target>");
-
-                return;
-            }
-
-            if (!double.TryParse(args[0], out double x))
-            {
-                executor.SendMessage("The x must be double");
-
-                return;
-            }
-
-            if (!double.TryParse(args[1], out double y))
-            {
-                executor.SendMessage("The y must be double");
+                executor.SendMessage("Usage: /item [item] <target>");
 
                 return;
             }
 
             MultiplayerMatchSession matchSession;
-            if (args.Length >= 3)
+            if (args.Length >= 2)
             {
-                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[2]);
+                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[1]);
                 if (target == null)
                 {
                     executor.SendMessage("The target was not found");
@@ -61,9 +47,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
 
             if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
             {
-                //40 is for block size in pixels
-                matchSession.MatchPlayer.X += x * 40;
-                matchSession.MatchPlayer.Y -= y * 40;
+                matchSession.MatchPlayer.Item = args[0];
 
                 matchSession.Match.SendPacket(matchSession.MatchPlayer.GetUpdatePacket());
             }
