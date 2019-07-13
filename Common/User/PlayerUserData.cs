@@ -39,11 +39,8 @@ namespace Platform_Racing_3_Common.User
 
         public override uint RadiatingLuck
         {
-            get => this.DailyRadiatingLuck.TryGetValue(DateTime.Today, out uint consumed) ? checked(PlayerUserData.DAILY_LUCK - consumed) : PlayerUserData.DAILY_LUCK;
-            protected set
-            {
-                //Nothing yet
-            }
+            get => this.DailyRadiatingLuck.TryGetValue(DateTime.Today, out uint consumed) ? (consumed >= PlayerUserData.DAILY_LUCK ? 0 : PlayerUserData.DAILY_LUCK - consumed) : PlayerUserData.DAILY_LUCK;
+            protected set => this.DailyRadiatingLuck[DateTime.Today] = PlayerUserData.DAILY_LUCK - value;
         }
 
         private PlayerUserData()
