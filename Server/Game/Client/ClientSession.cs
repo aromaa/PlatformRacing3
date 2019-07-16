@@ -84,6 +84,8 @@ namespace Platform_Racing_3_Server.Game.Client
 
         internal bool HasPermissions(string permission) => this.UserData?.HasPermissions(permission) ?? false;
 
+        public uint PermissionRank => (this.UserData as PlayerUserData)?.PermissionRank ?? 0;
+
         internal event NetworkEvents.OnDisconnect OnDisconnect
         {
             add => this.Connection.OnDisconnect += value;

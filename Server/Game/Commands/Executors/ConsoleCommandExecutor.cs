@@ -11,6 +11,8 @@ namespace Platform_Racing_3_Server.Game.Commands.Executors
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        public uint PermissionRank => uint.MaxValue;
+
         public void SendMessage(string message)
         {
             ConsoleCommandExecutor.Logger.Info(message);
