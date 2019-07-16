@@ -463,6 +463,14 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 if (this._Clients.TryGetClientSession(socketId, out ClientSession target))
                 {
+                    if (target.HasPermission(Permissions.ACCESS_KICK_IMMUNITY_MATCH_LISTING))
+                    {
+                        if (!(session.UserData is PlayerUserData sessionPlayerUserData) || (target.UserData is PlayerUserData targetPlayerUserData && targetPlayerUserData.PermissionRank > sessionPlayerUserData.PermissionRank))
+                        {
+                            return;
+                        }
+                    }
+
                     this.Leave(target, MatchListingLeaveReason.Kicked);
                 }
             }
@@ -474,6 +482,14 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 if (this._Clients.TryGetClientSession(socketId, out ClientSession target))
                 {
+                    if (target.HasPermission(Permissions.ACCESS_KICK_IMMUNITY_MATCH_LISTING))
+                    {
+                        if (!(session.UserData is PlayerUserData sessionPlayerUserData) || (target.UserData is PlayerUserData targetPlayerUserData && targetPlayerUserData.PermissionRank > sessionPlayerUserData.PermissionRank))
+                        {
+                            return;
+                        }
+                    }
+
                     if (target.IsGuest)
                     {
                         this.BannedClients.Add(new GuestIdentifier(target.SocketId, target.IPAddres));

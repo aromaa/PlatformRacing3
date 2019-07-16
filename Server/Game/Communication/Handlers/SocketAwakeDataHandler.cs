@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
     internal class SocketAwakeDataHandler : IDataHandler<INetworkConnectionGame>
     {
         private const string PRIVACY_POLICY_REQUEST = "<policy-file-request/>\0";
-        private static readonly byte[] PrivacyPoliceResponse = Encoding.UTF8.GetBytes("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"*\" /></cross-domain-policy>");
+        private static readonly byte[] PrivacyPoliceResponse = Encoding.UTF8.GetBytes("<cross-domain-policy><allow-access-from domain=\"pr3hub.com\" to-ports=\"*\"/><allow-access-from domain=\"jiggmin2.com\" to-ports=\"*\"/></cross-domain-policy>");
 
         internal static SocketAwakeDataHandler Instance { get; } = new SocketAwakeDataHandler();
 
