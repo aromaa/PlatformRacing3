@@ -91,7 +91,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY b.last_updated DESCOFFSET {start} LIMIT {count}";
+                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
             }
             else
             {

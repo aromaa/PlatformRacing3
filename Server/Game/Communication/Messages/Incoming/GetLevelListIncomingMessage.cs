@@ -42,6 +42,13 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                         session.SendPacket(new LevelListOutgoingMessage(message.RequestId, results, levels));
                     }
                     break;
+                case "liked":
+                    {
+                        (uint results, IReadOnlyCollection<LevelData> levels) = LevelManager.GetMyLikedLevels(message.Start, message.Count, session.UserData).Result;
+
+                        session.SendPacket(new LevelListOutgoingMessage(message.RequestId, results, levels));
+                    }
+                    break;
             }
         }
     }
