@@ -86,15 +86,15 @@ namespace Platform_Racing_3_Common.User
             }
             
             object campaignRuns = reader["campaign_runs"]; //Might be null
-            if (campaignRuns is int[,] campaignRuns_)
+            if (campaignRuns is object[][] campaignRuns_)
             {
-                for(int i = 0; i < campaignRuns_.Length / campaignRuns_.Rank; i++)
+                foreach(object[] run in campaignRuns_)
                 {
-                    uint levelId = (uint)campaignRuns_[i, 0];
+                    uint levelId = Convert.ToUInt32(run[0]);
                     if (levelId > 0)
                     {
-                        int finishTime = campaignRuns_[i, 1];
-                        
+                        int finishTime = Convert.ToInt32(run[1]);
+
                         this.CheckCampaignTime(levelId, finishTime);
                     }
                 }
