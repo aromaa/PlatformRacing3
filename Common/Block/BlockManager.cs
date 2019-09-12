@@ -20,17 +20,17 @@ namespace Platform_Racing_3_Common.Block
                 throw new ArgumentException(nameof(blockId));
             }
 
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON(t.id) t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.id = {blockId} ORDER BY t.id, b.version DESC LIMIT 1").ContinueWith(BlockManager.ParseSqlGetBlock));
+            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.id = {blockId} LIMIT 1").ContinueWith(BlockManager.ParseSqlGetBlock));
         }
 
         public static Task<BlockData> GetBlockAsync(uint userId, string title, string category)
         {
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON(t.id) t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.title ILIKE {title} AND t.category ILIKE {category} ORDER BY t.id, b.version DESC LIMIT 1").ContinueWith(BlockManager.ParseSqlGetBlock));
+            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.title ILIKE {title} AND t.category ILIKE {category} LIMIT 1").ContinueWith(BlockManager.ParseSqlGetBlock));
         }
 
         public static Task<List<BlockData>> GetBlocksAsync(params uint[] blockIds)
         {
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON(t.id) t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.id = ANY({blockIds}) ORDER BY t.id, b.version DESC LIMIT {blockIds.Length}").ContinueWith(BlockManager.ParseSqlGetBlocks));
+            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.id = ANY({blockIds}) LIMIT {blockIds.Length}").ContinueWith(BlockManager.ParseSqlGetBlocks));
         }
 
         public static Task<uint> CountMyBlocksAsync(uint userId, string category)
@@ -83,15 +83,15 @@ namespace Platform_Racing_3_Common.Block
             FormattableString query;
             if (category == "default-all-blocks")
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.author_user_id = {userId} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
             }
             else if (category == "default-all-blocks-without-category")
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.blocks_titles t JOIN base.blocks b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY b.last_updated DESCOFFSET {start} LIMIT {count}";
             }
             else
             {
