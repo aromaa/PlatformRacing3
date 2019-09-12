@@ -215,8 +215,6 @@ namespace Platform_Racing_3_Common.Level
             {
                 throw new ArgumentException(nameof(mode));
             }
-            
-            query.Append("ORDER BY t.id, l.version DESC) AS l ");
 
             if (sort == "date")
             {
@@ -224,7 +222,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (sort == "alphabetical")
             {
-                query.Append("ORDER BY l.title ");
+                query.Append("ORDER BY t.title ");
             }
             else if (sort == "rating")
             {
