@@ -143,11 +143,11 @@ namespace Platform_Racing_3_Common.Level
             {
                 this.Prizes = new List<(string, uint)>();
 
-                string[,] prizes = (string[,])reader["prizes"];
-                for (int i = 0; i < prizes.Length / prizes.Rank; i++)
+                object[][] prizes = (object[][])reader["prizes"];
+                for (int i = 0; i < prizes.Length; i++)
                 {
-                    string prizeType = prizes[i, 0].ToLower();
-                    uint prizeId = uint.Parse(prizes[i, 1]);
+                    string prizeType = ((string)prizes[i][0]).ToLower();
+                    uint prizeId = Convert.ToUInt32(prizes[i][1]);
 
                     this.Prizes.Add((prizeType, prizeId));
                 }
