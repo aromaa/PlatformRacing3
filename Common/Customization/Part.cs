@@ -48,6 +48,8 @@ namespace Platform_Racing_3_Common.Customization
         Shark = 39,
         Bee = 40,
         Zebra = 41,
-        Flower = 42
+        Steve = 42,
+        Rat = 43,
+        Flower = 44
     }
 }
