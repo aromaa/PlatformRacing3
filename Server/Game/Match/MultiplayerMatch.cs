@@ -59,6 +59,7 @@ namespace Platform_Racing_3_Server.Game.Match
             Part.Donkey,
             Part.Sword,
             Part.Snowman,
+            Part.Flower,
         };
 
         private static readonly IReadOnlyList<Hat> WINNABLE_HATS = new Hat[]
