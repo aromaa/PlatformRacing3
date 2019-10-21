@@ -93,11 +93,11 @@ namespace Platform_Racing_3_Common.Level
 
             if (authorId != default)
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.levels_titles WHERE id = {levelId} AND author_user_id = {authorId} RETURNING id, title, author_user_id) INSERT INTO base.levels_deleted(id, title, author_user_id) SELECT id, title, author_user_id FROM deleted RETURNING ID").ContinueWith(LevelManager.ParseSqlDeleteLevel));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.levels_titles t WHERE id = {levelId} AND NOT EXISTS(SELECT NULL FROM base.campaigns c WHERE c.level_id = t.id) AND author_user_id = {authorId} RETURNING id, title, author_user_id) INSERT INTO base.levels_deleted(id, title, author_user_id) SELECT id, title, author_user_id FROM deleted RETURNING ID").ContinueWith(LevelManager.ParseSqlDeleteLevel));
             }
             else
             {
-                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.levels_titles WHERE id = {levelId} RETURNING id, title, author_user_id) INSERT INTO base.levels_deleted(id, title, author_user_id) SELECT id, title, author_user_id FROM deleted RETURNING ID").ContinueWith(LevelManager.ParseSqlDeleteLevel));
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH deleted AS (DELETE FROM base.levels_titles t WHERE id = {levelId} AND NOT EXISTS(SELECT NULL FROM base.campaigns c WHERE c.level_id = t.id) RETURNING id, title, author_user_id) INSERT INTO base.levels_deleted(id, title, author_user_id) SELECT id, title, author_user_id FROM deleted RETURNING ID").ContinueWith(LevelManager.ParseSqlDeleteLevel));
             }
         }
 
