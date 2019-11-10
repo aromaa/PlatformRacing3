@@ -14,6 +14,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -39,8 +40,6 @@ namespace Platform_Racing_3_Server.Game.Client
         private Dictionary<string, HashSet<uint>> TrackingUsersInRoom;
         private Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>> TrackingUserData;
 
-        private Lazy<object[]> VarsObject;
-
         internal ClientSession(INetworkConnectionGame connection)
         {
             this.ClientStatus = ClientStatus.None;
@@ -54,8 +53,6 @@ namespace Platform_Racing_3_Server.Game.Client
 
             this.TrackingUsersInRoom = new Dictionary<string, HashSet<uint>>();
             this.TrackingUserData = new Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>>();
-
-            this.VarsObject = new Lazy<object[]>(this.SetupVarsObject);
         }
 
         private void OnDisconnect0(INetworkConnection networkConnection)
@@ -202,8 +199,16 @@ namespace Platform_Racing_3_Server.Game.Client
             this.SendPacket(new AlertOutgoingMessage(message));
         }
 
-        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
-        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
+        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
+        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
+        {
+            Dictionary<string, object> userVars = new Dictionary<string, object>();
+
+            JsonUtils.GetVars(this.UserData, vars, userVars);
+            JsonUtils.GetVars(this, vars, userVars);
+
+            return userVars;
+        }
 
         public bool HasPermission(string permission) => this.UserData?.HasPermissions(permission) ?? false;
     }

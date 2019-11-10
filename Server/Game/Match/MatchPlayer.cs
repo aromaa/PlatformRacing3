@@ -7,6 +7,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Net;
 using System.Text;
 
@@ -59,8 +60,6 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal UpdateStatus ToUpdate { get; private set; }
 
-        private Lazy<object[]> VarsObject;
-
         internal MatchPlayer(MultiplayerMatch match, UserData userData, uint socketId, IPAddress ipAddress)
         {
             this.Match = match;
@@ -76,11 +75,7 @@ namespace Platform_Racing_3_Server.Game.Match
             this._Hats = new Queue<MatchPlayerHat>();
 
             this.ToUpdate = UpdateStatus.None;
-
-            this.VarsObject = new Lazy<object[]>(this.BuildVarsObject);
         }
-
-        private object[] BuildVarsObject() => new object[] { this.UserData, this };
 
         internal IReadOnlyCollection<MatchPlayerHat> Hats => this._Hats;
 
@@ -397,7 +392,15 @@ namespace Platform_Racing_3_Server.Game.Match
             }
         }
 
-        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
-        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
+        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
+        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
+        {
+            Dictionary<string, object> userVars = new Dictionary<string, object>();
+
+            JsonUtils.GetVars(this.UserData, vars, userVars);
+            JsonUtils.GetVars(this, vars, userVars);
+
+            return userVars;
+        }
     }
 }
