@@ -41,7 +41,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             if (session.LobbySession.MatchListing == null)
             {
                 LevelData level = await LevelManager.GetLevelDataAsync(levelId, version);
-                if (level != null && level.Publish || (!session.IsGuest && level.AuthorUserId == session.UserData.Id) || session.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS))
+                if (level != null && (level.Publish || (!session.IsGuest && level.AuthorUserId == session.UserData.Id) || session.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS)))
                 {
                     if (maxMembers < 1)
                     {
