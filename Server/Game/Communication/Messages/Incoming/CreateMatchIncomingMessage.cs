@@ -6,6 +6,8 @@ using Platform_Racing_3_Server.Game.Lobby;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
+using Platform_Racing_3_Common.Level;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
@@ -18,13 +20,29 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                 return;
             }
 
-            MatchListing listing = PlatformRacing3Server.MatchListingManager.TryCreateMatchAsync(session, message.LevelId, message.Version, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal).Result;
-            if (listing == null)
-            {
-                session.SendPacket(new MatchFailedOutgoingMessage());
-            }
+            _ = CreateMatch();
 
-            session.HostTournament = false;
+            async Task CreateMatch()
+            {
+                MatchListing listing;
+                if (message.Version == 0)
+                {
+                    LevelData level = await LevelManager.GetLevelDataAsync(message.LevelId);
+
+                    listing = PlatformRacing3Server.MatchListingManager.TryCreateMatch(session, level, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
+                }
+                else
+                {
+                    listing = await PlatformRacing3Server.MatchListingManager.TryCreateMatchAsync(session, message.LevelId, message.Version, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
+                }
+
+                if (listing == null)
+                {
+                    session.SendPacket(new MatchFailedOutgoingMessage());
+                }
+
+                session.HostTournament = false;
+            }
         }
     }
 }

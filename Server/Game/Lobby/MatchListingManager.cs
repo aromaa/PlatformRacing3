@@ -31,16 +31,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private uint GetNextMatchListingId() => (uint)Interlocked.Increment(ref this.NextMatchListingId);
 
-        internal Task<MatchListing> TryCreateMatchAsync(ClientSession session, LevelData levelData, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
-        {
-            return this.TryCreateMatchAsync(session, levelData.Id, levelData.Version, minRank, maxRank, maxMembers, onlyFriends, type);
-        }
-
-        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
+        internal MatchListing TryCreateMatch(ClientSession session, LevelData level, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
         {
             if (session.LobbySession.MatchListing == null)
             {
-                LevelData level = await LevelManager.GetLevelDataAsync(levelId, version);
                 if (level != null && (level.Publish || (!session.IsGuest && level.AuthorUserId == session.UserData.Id) || session.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS)))
                 {
                     if (maxMembers < 1)
@@ -67,6 +61,13 @@ namespace Platform_Racing_3_Server.Game.Lobby
             }
 
             return null;
+        }
+
+        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
+        {
+            LevelData level = await LevelManager.GetLevelDataAsync(levelId, version);
+
+            return this.TryCreateMatch(session, level, minRank, maxRank, maxMembers, onlyFriends, type);
         }
 
         internal MatchListing Join(ClientSession session, string roomName, out MatchListingJoinStatus status)
