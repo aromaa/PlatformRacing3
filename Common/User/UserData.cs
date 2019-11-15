@@ -261,6 +261,11 @@ namespace Platform_Racing_3_Common.User
 
         public virtual bool DainLuckRadiation()
         {
+            if (this.Rank < 5)
+            {
+                return false;
+            }
+
             if (this.RadiatingLuck > 0)
             {
                 this.RadiatingLuck--;
