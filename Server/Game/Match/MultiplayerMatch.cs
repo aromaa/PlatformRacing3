@@ -462,12 +462,12 @@ namespace Platform_Racing_3_Server.Game.Match
 
                         void CheckPartDrops()
                         {
-                            if (CheckEventPartDrop())
+                            if (CheckSpecialPartDrop())
                             {
                                 return;
                             }
 
-                            if (CheckSpecialPartDrop())
+                            if (CheckEventPartDrop())
                             {
                                 return;
                             }
@@ -556,10 +556,16 @@ namespace Platform_Racing_3_Server.Game.Match
                                 this.Prize = new MatchPrize("hat", (uint)new Hat[]
                                 {
                                     Hat.None,
-                                    Hat.BaseballCap,
                                     Hat.Cowboy,
                                     Hat.Crown
                                 }.OrderBy((h) => random.NextDouble()).First());
+
+                                return true;
+                            }
+
+                            if (random.Next(333 / radiatingLuck.Count + 1) == 0)
+                            {
+                                this.Prize = new MatchPrize("hat", (uint)Hat.BaseballCap);
 
                                 return true;
                             }
