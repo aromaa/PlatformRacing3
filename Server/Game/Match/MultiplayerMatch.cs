@@ -563,7 +563,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 return true;
                             }
 
-                            if (random.Next(333 / radiatingLuck.Count + 1) == 0)
+                            if (random.Next(333 / (radiatingLuck.Count + 1)) == 0)
                             {
                                 this.Prize = new MatchPrize("hat", (uint)Hat.BaseballCap);
 
