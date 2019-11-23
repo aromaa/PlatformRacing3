@@ -69,6 +69,7 @@ namespace Platform_Racing_3_Server.Game.Match
             Hat.PedroTheSnail,
             Hat.Top,
             Hat.Party,
+            Hat.Parasol,
             Hat.Pirate,
             Hat.Nurse,
             Hat.Bouncy,
