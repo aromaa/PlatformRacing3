@@ -27,7 +27,7 @@ namespace Platform_Racing_3_Server.Game.Client
 
         private void CheckForTimedoutConnections(object state)
         {
-            foreach(ClientSession session in this.ClientsBySocketId.Values)
+            foreach(ClientSession session in this.ClientsBySocketId.Sessions)
             {
                 if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
                 {
@@ -56,15 +56,15 @@ namespace Platform_Racing_3_Server.Game.Client
                 });
             }
 
-            this.ClientsBySocketId.Add(session);
+            this.ClientsBySocketId.TryAdd(session);
         }
 
-        internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetClientSession(socketId, out session);
+        internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetValue(socketId, out session);
         internal bool TryGetClientSessionByUserId(uint userId, out ClientSession session) => this.ClientsByUserId.TryGetValue(userId, out session);
 
         internal ClientSession GetClientSessionByUsername(string username) => this.ClientsByUserId.Values.FirstOrDefault((c) => c.UserData?.Username.ToUpperInvariant() == username.ToUpperInvariant());
 
-        internal ICollection<ClientSession> GetLoggedInUsers() => this.ClientsBySocketId.Values;
+        internal ICollection<ClientSession> GetLoggedInUsers() => this.ClientsBySocketId.Sessions;
         internal uint Count => this.ClientsBySocketId.Count;
     }
 }

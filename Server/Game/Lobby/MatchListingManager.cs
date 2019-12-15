@@ -55,7 +55,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     }
                     else
                     {
-                        listing.Leave(session, MatchListingLeaveReason.FailedJoin);
+                        listing.Leave(session);
                     }
                 }
             }
@@ -70,29 +70,32 @@ namespace Platform_Racing_3_Server.Game.Lobby
             return this.TryCreateMatch(session, level, minRank, maxRank, maxMembers, onlyFriends, type);
         }
 
-        internal MatchListing Join(ClientSession session, string roomName, out MatchListingJoinStatus status)
+        internal MatchListing Join(ClientSession session, string roomName, out bool status)
         {
-            status = MatchListingJoinStatus.Failed;
+            status = false;
             
             if (this.MatchListings.TryGetValue(roomName, out MatchListing matchListing))
             {
                 if (session.LobbySession.MatchListing == null)
                 {
                     status = matchListing.Join(session);
-                    if (status == MatchListingJoinStatus.Success)
+                    if (status)
                     {
                         //Do quick join here bcs the client is a big mess
-                        uint spotsLeft = matchListing.SpotsLeft;
-                        foreach (ClientSession other in this.QuickJoinClients.Values)
+                        foreach (ClientSession other in this.QuickJoinClients.Sessions)
                         {
-                            if (spotsLeft > 0) //Can we fill it up even more
+                            if (matchListing.CanJoin(other) == MatchListingJoinStatus.Success)
                             {
-                                if (matchListing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
+                                if (!this.QuickJoinClients.TryRemove(session))
                                 {
-                                    other.SendPacket(new QuickJoinSuccessOutgoingMessage(matchListing));
-
-                                    spotsLeft--;
+                                    continue;
                                 }
+
+                                other.SendPacket(new QuickJoinSuccessOutgoingMessage(matchListing));
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
 
@@ -101,7 +104,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 }
                 else if (session.LobbySession.MatchListing == matchListing)
                 {
-                    status = MatchListingJoinStatus.Success;
+                    status = true;
 
                     return matchListing;
                 }
@@ -114,7 +117,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
         {
             if (this.MatchListings.TryGetValue(roomName, out MatchListing matchListing) && session.LobbySession.MatchListing == matchListing)
             {
-                matchListing.Leave(session, MatchListingLeaveReason.Quit);
+                matchListing.Leave(session);
             }
         }
 
@@ -157,11 +160,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void StartQuickJoin(ClientSession session)
         {
-            this.QuickJoinClients.Add(session);
+            this.QuickJoinClients.TryAdd(session);
 
             foreach(MatchListing listing in this.MatchListings.Values)
             {
-                if (listing.Type == MatchListingType.Normal && listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(session))
+                if (listing.Type == MatchListingType.Normal && listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.TryRemove(session))
                 {
                     session.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
                     break;
@@ -171,7 +174,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void StopQuickJoin(ClientSession session)
         {
-            this.QuickJoinClients.Remove(session);
+            this.QuickJoinClients.TryRemove(session);
         }
     }
 }

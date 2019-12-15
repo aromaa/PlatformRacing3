@@ -1,4 +1,6 @@
-﻿using Platform_Racing_3_Server.Game.Client;
+﻿using Net.Collections;
+using Net.Connections;
+using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server_API.Net;
 using System;
@@ -9,104 +11,51 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Collections
 {
-    internal class ClientSessionCollection
+    internal class ClientSessionCollection : ClientCollectionMetadatable<ClientSession>
     {
-        private ConcurrentDictionary<uint, ClientSession> Clients;
+        private ConcurrentDictionary<uint, ClientSession> _Sessions;
 
-        private Action<ClientSession> OnDisconnectCallback;
-        private Action OnDisconnectAction;
+        private Action<ClientSession> RemoveCallback;
 
-        internal ClientSessionCollection()
+        internal ClientSessionCollection() : this(null)
         {
-            this.Clients = new ConcurrentDictionary<uint, ClientSession>();
         }
 
         internal ClientSessionCollection(Action<ClientSession> callback)
         {
-            this.Clients = new ConcurrentDictionary<uint, ClientSession>();
+            this._Sessions = new ConcurrentDictionary<uint, ClientSession>();
 
-            this.OnDisconnectCallback = callback;
+            this.RemoveCallback = callback;
         }
 
-        public ClientSessionCollection(Action onDisconnect)
-        {
-            this.OnDisconnectAction = onDisconnect;
-        }
+        internal bool TryAdd(ClientSession session) => this.TryAdd(session.Connection, session);
 
-        internal uint Count => (uint)this.Clients.Count;
-        internal ICollection<ClientSession> Values => this.Clients.Values;
+        internal bool TryRemove(ClientSession session) => this.TryRemove(session.Connection);
 
-        public bool Add(ClientSession session)
+        protected override void OnAdded(SocketConnection connection, ClientSession metadata)
         {
-            if (this.Clients.TryAdd(session.SocketId, session))
+            if (!this._Sessions.TryAdd(connection.Id, metadata))
             {
-                session.OnDisconnect += this.OnDisconnect;
-                if (session.Disconnected)
-                {
-                    this.Remove(session);
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void OnDisconnect(INetworkConnection networkConnection)
-        {
-            if (this.Remove(networkConnection.SocketId, out ClientSession session))
-            {
-                this.OnDisconnectCallback?.Invoke(session);
+                throw new InvalidOperationException();
             }
         }
 
-        public bool Remove(ClientSession session)
+        protected override void OnRemoved(SocketConnection connection)
         {
-            session.OnDisconnect -= this.OnDisconnect;
-
-            return this.Clients.TryRemove(session.SocketId, out _);
-        }
-
-        public bool Remove(uint socketId, out ClientSession session)
-        {
-            if (this.Clients.TryRemove(socketId, out session))
+            if (this._Sessions.TryRemove(connection.Id, out ClientSession session))
             {
-                session.OnDisconnect -= this.OnDisconnect;
-
-                return true;
+                this.RemoveCallback?.Invoke(session);
             }
-
-            return false;
-        }
-
-        public bool Contains(uint socketId) => this.Clients.ContainsKey(socketId);
-        public bool Contains(ClientSession session) => this.Clients.ContainsKey(session.SocketId);
-        public bool TryGetClientSession(uint socketId, out ClientSession session) => this.Clients.TryGetValue(socketId, out session);
-
-        public void SendPacket(IMessageOutgoing packet)
-        {
-            foreach(ClientSession session in this.Clients.Values)
+            else
             {
-                session.SendPacket(packet);
+                throw new InvalidOperationException();
             }
         }
 
-        public void SendPacket(IMessageOutgoing packet, params ClientSession[] ignore)
-        {
-            foreach (ClientSession session in this.Clients.Values.Except(ignore))
-            {
-                session.SendPacket(packet);
-            }
-        }
+        public bool Contains(ClientSession session) => this.Contains(session.Connection);
 
-        public void SendPackets(params IMessageOutgoing[] packets)
-        {
-            foreach (ClientSession session in this.Clients.Values)
-            {
-                session.SendPackets(packets);
-            }
-        }
+        public bool TryGetValue(uint id, out ClientSession session) => this._Sessions.TryGetValue(id, out session);
+
+        public ICollection<ClientSession> Sessions => this._Sessions.Values;
     }
 }

@@ -9,7 +9,6 @@ using Platform_Racing_3_Server.Core;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json.Converters;
-using Platform_Racing_3_Server.Net;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
@@ -28,7 +27,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
         public void Handle(ClientSession session, IncomingMessage message)
         {
             JsonPacket packet = JsonConvert.DeserializeObject<JsonPacket>(message.ReadStringUnsafe(), JsonIncomingMessage.JsonSerializerSettings);
-            if (PlatformRacing3Server.NetworkManager.PacketManager.GetIncomingJSONPacket(packet.Type, out IMessageIncomingJson handler))
+            if (PlatformRacing3Server.PacketManager.GetIncomingJSONPacket(packet.Type, out IMessageIncomingJson handler))
             {
                 handler.Handle(session, packet);
             }

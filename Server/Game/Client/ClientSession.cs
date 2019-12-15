@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Net.Connections;
+using Newtonsoft.Json;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.User;
@@ -7,7 +8,6 @@ using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server.Net;
 using Platform_Racing_3_Server_API.Game.Commands;
 using Platform_Racing_3_Server_API.Net;
 using System;
@@ -23,7 +23,7 @@ namespace Platform_Racing_3_Server.Game.Client
     internal class ClientSession : ICommandExecutor
     {
         private ClientStatus ClientStatus { get; set; }
-        private INetworkConnectionGame Connection { get; }
+        internal SocketConnection Connection { get; }
 
         internal UserData UserData { get; set; }
 
@@ -40,12 +40,10 @@ namespace Platform_Racing_3_Server.Game.Client
         private Dictionary<string, HashSet<uint>> TrackingUsersInRoom;
         private Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>> TrackingUserData;
 
-        internal ClientSession(INetworkConnectionGame connection)
+        internal ClientSession(SocketConnection connection)
         {
             this.ClientStatus = ClientStatus.None;
             this.Connection = connection;
-
-            this.OnDisconnect += this.OnDisconnect0;
 
             this.LastPing = Stopwatch.StartNew();
 
@@ -53,12 +51,20 @@ namespace Platform_Racing_3_Server.Game.Client
 
             this.TrackingUsersInRoom = new Dictionary<string, HashSet<uint>>();
             this.TrackingUserData = new Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>>();
+
+            this.TryRegisterDisconnectEvent(this.OnDisconnect0);
         }
 
-        private void OnDisconnect0(INetworkConnection networkConnection)
-        {
-            this.OnDisconnect -= this.OnDisconnect0;
+        internal bool TryRegisterDisconnectEvent(SocketConnection.SocketDisconnect value) => this.Connection.TryRegisterDisconnectEvent(value);
 
+        internal event SocketConnection.SocketDisconnect DisconnectEvent
+        {
+            add => this.Connection.DisconnectEvent += value;
+            remove => this.Connection.DisconnectEvent -= value;
+        }
+
+        private void OnDisconnect0(SocketConnection connection)
+        {
             if (this.UserData != null)
             {
                 this.UserData.SetServer(null); //Race condition
@@ -73,8 +79,8 @@ namespace Platform_Racing_3_Server.Game.Client
 
         internal bool Disconnected => this.Connection.Disconnected;
         [JsonProperty("socketID")]
-        internal uint SocketId => this.Connection.SocketId;
-        internal IPAddress IPAddres => this.Connection.RemoteAddress;
+        internal uint SocketId => this.Connection.Id;
+        internal IPAddress IPAddres => this.Connection.IPAddress;
 
         internal bool IsLoggedIn => this.ClientStatus == ClientStatus.LoggedIn;
         internal bool IsGuest => this.UserData?.IsGuest ?? true;
@@ -83,20 +89,13 @@ namespace Platform_Racing_3_Server.Game.Client
 
         public uint PermissionRank => (this.UserData as PlayerUserData)?.PermissionRank ?? 0;
 
-        internal event NetworkEvents.OnDisconnect OnDisconnect
-        {
-            add => this.Connection.OnDisconnect += value;
-            remove => this.Connection.OnDisconnect -= value;
-        }
-
         private LobbySession SetupLobbySession => new LobbySession(this);
         private object[] SetupVarsObject() => new object[] { this, this.UserData };
 
         public LobbySession LobbySession => this._LobbySession.Value;
 
-        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.SendPacket(messageOutgoing);
-        internal void SendPackets(IEnumerable<IMessageOutgoing> messagesOutgoing) => this.Connection.SendPackets(messagesOutgoing);
-        internal void SendPackets(params IMessageOutgoing[] messagesOutgoing) => this.Connection.SendPackets(messagesOutgoing);
+        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.Send(messageOutgoing);
+        internal void SendPackets(IEnumerable<IMessageOutgoing> messagesOutgoing) => this.Connection.Send(messagesOutgoing);
 
         internal void Disconnect(string reason = null) => this.Connection.Disconnect(reason);
 

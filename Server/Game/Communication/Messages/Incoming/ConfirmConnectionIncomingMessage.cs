@@ -6,7 +6,6 @@ using Platform_Racing_3_Server.Core;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using Platform_Racing_3_Server.Net;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
@@ -16,7 +15,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
         {
             if (session.UpgradeClientStatus(ClientStatus.ConnectionConfirmed))
             {
-                session.SendPackets(new VersionOutgoingMessage(PlatformRacing3Server.PROTOCOL_VERSION), new SocketIdOutgoingMessage(session.SocketId));
+                session.SendPacket(new VersionOutgoingMessage(PlatformRacing3Server.PROTOCOL_VERSION));
+                session.SendPacket(new SocketIdOutgoingMessage(session.SocketId));
             }
         }
     }

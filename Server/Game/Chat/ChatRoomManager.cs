@@ -25,7 +25,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         internal bool TryGet(string name, out ChatRoom chatRoom) => this.ChatRooms.TryGetValue(name, out chatRoom);
 
-        internal ChatRoom JoinOrCreate(ClientSession session, string name, string pass, string note, out ChatRoomJoinStatus status, uint chatId = 0)
+        internal ChatRoom JoinOrCreate(ClientSession session, string name, string pass, string note, out bool status, uint chatId = 0)
         {
             //Complexity added by concurrency
 
@@ -41,25 +41,26 @@ namespace Platform_Racing_3_Server.Game.Chat
 
                         if (!this.ChatRooms.TryAdd(name, chat))
                         {
-                            chat.Leave(session, ChatRoonLeaveReason.FailedJoin); //Leave so we dont hold reference to the chat even tho GC will take care of it
+                            chat.Leave(session); //Leave so we dont hold reference to the chat even tho GC will take care of it
 
                             continue; //Failed to add the newly created room, check for already existing room
                         }
                     }
                     else
                     {
-                        status = ChatRoomJoinStatus.Failed;
+                        status = false;
+
                         return null; //We are guest, we can not create rooms
                     }
                 }
                 else
                 {
                     //Password functionality is not properly implemented in the client but keep this anyway
-                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) ? chat.Join(session, chatId) : ChatRoomJoinStatus.InvalidPassword;
+                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) ? chat.Join(session, chatId) : false;
                 }
 
                 //If we failed to join to the room return and dont try again
-                if (status != ChatRoomJoinStatus.Success)
+                if (!status)
                 {
                     return chat;
                 }
@@ -69,7 +70,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                 }
                 else //Everything failed, leave so we dont hold reference to the chat even tho GC will take care of it and try again
                 {
-                    chat.Leave(session, ChatRoonLeaveReason.FailedJoin);
+                    chat.Leave(session);
                 }
             }
         }
@@ -78,7 +79,7 @@ namespace Platform_Racing_3_Server.Game.Chat
         {
             if (this.ChatRooms.TryGetValue(name, out ChatRoom chat))
             {
-                chat.Leave(session, ChatRoonLeaveReason.Quit);
+                chat.Leave(session);
             }
         }
 

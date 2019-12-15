@@ -50,7 +50,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         internal ChatRoom(ChatRoomType type, uint creatorUserId, string name, string pass, string note)
         {
-            this.Clients = new ClientSessionCollection(this.OnDisconnect);
+            this.Clients = new ClientSessionCollection(this.Leave0);
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
 
             this.RecentMessages = new ConcurrentQueue<ChatOutgoingMessage>();
@@ -62,56 +62,53 @@ namespace Platform_Racing_3_Server.Game.Chat
             this.Note = note;
         }
 
-        internal ICollection<ClientSession> Members => this.Clients.Values;
+        internal ICollection<ClientSession> Members => this.Clients.Sessions;
 
-        private void OnDisconnect(ClientSession session)
-        {
-            this.Leave(session, ChatRoonLeaveReason.Disconnected);
-        }
-
-        internal ChatRoomJoinStatus Join(ClientSession session, uint chatId = 0)
+        internal bool Join(ClientSession session, uint chatId = 0)
         {
             //First send the room vars
             session.SendPacket(new RoomVarsOutgoingMessage(chatId, this.Name, this.GetVars("creator", "note")));
 
             if (this.BannedClients.Any((i) => i.Matches(session.UserData.Id, session.SocketId, session.IPAddres)))
             {
-                return ChatRoomJoinStatus.Banned; //L
+                return false;
             }
 
-            if (this.Clients.Add(session))
+            if (!this.Clients.TryAdd(session))
             {
-                foreach(ClientSession other in this.Clients.Values)
-                {
-                    other.TrackUserInRoom(this.Name, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.GetVars("id"));
-                }
-
-                session.SendPackets(this.RecentMessages); //Sent recent messages
-
-                return ChatRoomJoinStatus.Success;
+                return false;
             }
-            else
+
+            foreach(ClientSession other in this.Clients.Sessions)
             {
-                return ChatRoomJoinStatus.Success;
+                other.TrackUserInRoom(this.Name, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.GetVars("id"));
             }
+
+            session.SendPackets(this.RecentMessages); //Sent recent messages
+
+            return true;
         }
 
-        internal void Leave(ClientSession session, ChatRoonLeaveReason reason)
-        {
-            if (this.Clients.Remove(session))
-            {
-                foreach(ClientSession other in this.Clients.Values)
-                {
-                    if (reason == ChatRoonLeaveReason.Kicked || other != session)
-                    {
-                        other.UntrackUserInRoom(this.Name, session.SocketId);
-                    }
-                }
+        internal void Leave(ClientSession session) => this.Clients.TryRemove(session);
 
-                if (this.Clients.Count <= 0)
+        public void Kick(ClientSession session)
+        {
+            this.Leave(session);
+        }
+
+        private void Leave0(ClientSession session)
+        {
+            foreach (ClientSession other in this.Clients.Sessions)
+            {
+                if (other != session)
                 {
-                    PlatformRacing3Server.ChatRoomManager.Die(this);
+                    other.UntrackUserInRoom(this.Name, session.SocketId);
                 }
+            }
+
+            if (this.Clients.Count <= 0)
+            {
+                PlatformRacing3Server.ChatRoomManager.Die(this);
             }
         }
 
@@ -158,11 +155,11 @@ namespace Platform_Racing_3_Server.Game.Chat
 
                 if (sendToSelf)
                 {
-                    this.Clients.SendPacket(packet);
+                    this.Clients.Send(packet);
                 }
                 else
                 {
-                    this.Clients.SendPacket(packet, session);
+                    this.Clients.Send(packet, session.Connection);
                 }
 
                 if (this.Name == "chat-Home")
@@ -186,7 +183,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                     this.BannedClients.Add(new PlayerIdentifier(target.UserData.Id));
                 }
 
-                this.Leave(target, ChatRoonLeaveReason.Kicked); //BYE BYE!
+                this.Kick(target); //BYE BYE!
             }
         }
 
