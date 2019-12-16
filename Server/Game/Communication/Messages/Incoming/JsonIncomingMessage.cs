@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using log4net;
+using Net.Communication.Incoming.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Platform_Racing_3_Server.Core;
@@ -24,9 +25,10 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
             JsonIncomingMessage.JsonSerializerSettings.Converters.Add(new JsonColorConverter());
         }
 
-        public void Handle(ClientSession session, IncomingMessage message)
+        public void Handle(ClientSession session, ref PacketReader reader)
         {
-            JsonPacket packet = JsonConvert.DeserializeObject<JsonPacket>(message.ReadStringUnsafe(), JsonIncomingMessage.JsonSerializerSettings);
+            JsonPacket packet = JsonConvert.DeserializeObject<JsonPacket>(reader.ReadFixedString(reader.Remaining), JsonIncomingMessage.JsonSerializerSettings);
+
             if (PlatformRacing3Server.PacketManager.GetIncomingJSONPacket(packet.Type, out IMessageIncomingJson handler))
             {
                 handler.Handle(session, packet);

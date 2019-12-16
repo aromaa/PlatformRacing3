@@ -42,7 +42,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
                 return;
             }
 
-            reader = reader.Slice((int)this.CurrentPacketLength);
+            reader = reader.Slice(this.CurrentPacketLength);
             reader.Consumed = true;
 
             this.Read(ref context, ref reader);
@@ -56,9 +56,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
 
             if (PlatformRacing3Server.PacketManager.GetIncomingBytePacket(header, out IMessageIncomingBytes handler))
             {
-                ReadOnlySequence<byte> sequence = reader.Sequence;
-
-                handler.Handle(this.Session, new IncomingMessage(sequence.ToArray()));
+                handler.Handle(this.Session, ref reader);
             }
 
             if (reader.Remaining > 0)

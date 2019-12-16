@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Net.Communication.Incoming.Helpers;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
 using Platform_Racing_3_Server.Game.Match;
@@ -9,105 +10,105 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
     internal class UpdateIncomingMessage : IMessageIncomingBytes
     {
-        public void Handle(ClientSession session, IncomingMessage message)
+        public void Handle(ClientSession session, ref PacketReader reader)
         {
             MatchPlayer matchPlayer = session.MultiplayerMatchSession?.MatchPlayer;
             if (matchPlayer != null)
             {
-                UpdateStatus status = (UpdateStatus)message.ReadUInt();
+                UpdateStatus status = (UpdateStatus)reader.ReadUInt32();
                 if (status.HasFlag(UpdateStatus.X))
                 {
-                    matchPlayer.X = message.ReadDouble();
+                    matchPlayer.X = reader.ReadDouble();
                 }
 
                 if (status.HasFlag(UpdateStatus.Y))
                 {
-                    matchPlayer.Y = message.ReadDouble();
+                    matchPlayer.Y = reader.ReadDouble();
                 }
 
                 if (status.HasFlag(UpdateStatus.VelX))
                 {
-                    matchPlayer.VelX = message.ReadFloat();
+                    matchPlayer.VelX = reader.ReadSingle();
                 }
 
                 if (status.HasFlag(UpdateStatus.VelY))
                 {
-                    matchPlayer.VelY = message.ReadFloat();
+                    matchPlayer.VelY = reader.ReadSingle();
                 }
 
                 if (status.HasFlag(UpdateStatus.ScaleX))
                 {
-                    matchPlayer.ScaleX = message.ReadByte();
+                    matchPlayer.ScaleX = reader.ReadByte();
                 }
 
                 if (status.HasFlag(UpdateStatus.Space))
                 {
-                    matchPlayer.Space = message.ReadBool();
+                    matchPlayer.Space = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Left))
                 {
-                    matchPlayer.Left = message.ReadBool();
+                    matchPlayer.Left = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Right))
                 {
-                    matchPlayer.Right = message.ReadBool();
+                    matchPlayer.Right = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Down))
                 {
-                    matchPlayer.Down = message.ReadBool();
+                    matchPlayer.Down = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Up))
                 {
-                    matchPlayer.Up = message.ReadBool();
+                    matchPlayer.Up = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Speed))
                 {
-                    matchPlayer.Speed = message.ReadInt();
+                    matchPlayer.Speed = reader.ReadInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Accel))
                 {
-                    matchPlayer.Accel = message.ReadInt();
+                    matchPlayer.Accel = reader.ReadInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Jump))
                 {
-                    matchPlayer.Jump = message.ReadInt();
+                    matchPlayer.Jump = reader.ReadInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Rot))
                 {
-                    matchPlayer.Rot = message.ReadInt();
+                    matchPlayer.Rot = reader.ReadInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Item))
                 {
-                    matchPlayer.Item = message.ReadString();
+                    matchPlayer.Item = reader.ReadFixedString();
                 }
 
                 if (status.HasFlag(UpdateStatus.Life))
                 {
-                    matchPlayer.Life = message.ReadUInt();
+                    matchPlayer.Life = reader.ReadUInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Hurt))
                 {
-                    matchPlayer.Hurt = message.ReadBool();
+                    matchPlayer.Hurt = reader.ReadBool();
                 }
 
                 if (status.HasFlag(UpdateStatus.Coins))
                 {
-                    matchPlayer.Coins = message.ReadUInt();
+                    matchPlayer.Coins = reader.ReadUInt32();
                 }
 
                 if (status.HasFlag(UpdateStatus.Team))
                 {
-                    matchPlayer.Team = message.ReadString();
+                    matchPlayer.Team = reader.ReadFixedString();
                 }
 
                 matchPlayer.Match.SendUpdateIfRequired(session, matchPlayer);
