@@ -8,6 +8,7 @@ using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using System;
 using System.Buffers;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
 
@@ -69,9 +70,15 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
         {
             if (data is IMessageOutgoing message)
             {
-                byte[] bytes = message.GetBytes();
+                PacketWriter.Slice length = writer.PrepareBytes(2);
 
-                writer.WriteBytes(bytes);
+                int writerLength = writer.Length;
+
+                message.Write(ref writer);
+
+                ushort size = (ushort)(writer.Length - writerLength);
+
+                BinaryPrimitives.WriteUInt16BigEndian(length.Span, size);
             }
         }
     }

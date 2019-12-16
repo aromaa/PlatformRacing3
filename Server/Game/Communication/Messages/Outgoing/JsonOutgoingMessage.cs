@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Net.Communication.Outgoing.Helpers;
+using Newtonsoft.Json;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -10,18 +11,19 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
     {
         private const ushort PACKET_HEADER = 0;
 
-        private byte[] Bytes { get; }
+        private byte[] Json;
 
         internal JsonOutgoingMessage(JsonPacket jsonPacket)
         {
-            ServerMessage message = new ServerMessage();
-            message.WriteUShort(JsonOutgoingMessage.PACKET_HEADER);
-            message.WriteBytes(Encoding.UTF8.GetBytes(this.SerializeObject(jsonPacket)));
-            this.Bytes = message.GetBytes();
+            this.Json = Encoding.UTF8.GetBytes(this.SerializeObject(jsonPacket));
         }
 
         protected virtual string SerializeObject(JsonPacket jsonPacket) => JsonConvert.SerializeObject(jsonPacket);
 
-        public byte[] GetBytes() => this.Bytes;
+        public void Write(ref PacketWriter writer)
+        {
+            writer.WriteUInt16(JsonOutgoingMessage.PACKET_HEADER);
+            writer.WriteBytes(this.Json);
+        }
     }
 }

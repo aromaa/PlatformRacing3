@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Net.Communication.Outgoing.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,15 +11,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 
         internal static PingOutgoingMessage Instance { get; } = new PingOutgoingMessage();
 
-        private byte[] Bytes { get; }
-
-        private PingOutgoingMessage()
+        public void Write(ref PacketWriter writer)
         {
-            ServerMessage message = new ServerMessage();
-            message.WriteUShort(PingOutgoingMessage.PACKET_ID);
-            this.Bytes = message.GetBytes();
+            writer.WriteUInt16(PingOutgoingMessage.PACKET_ID);
         }
-
-        public byte[] GetBytes() => this.Bytes;
     }
 }
