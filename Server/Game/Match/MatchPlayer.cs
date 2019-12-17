@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -373,23 +374,20 @@ namespace Platform_Racing_3_Server.Game.Match
             }
         }
 
-        internal UpdateOutgoingMessage GetUpdatePacket()
+        internal bool GetUpdatePacket(out UpdateOutgoingPacket packet)
         {
             if (this.ToUpdate != UpdateStatus.None)
             {
-                try
-                {
-                    return new UpdateOutgoingMessage(this);
-                }
-                finally
-                {
-                    this.ToUpdate = UpdateStatus.None;
-                }
+                packet = new UpdateOutgoingPacket(this.ToUpdate, this);
+
+                this.ToUpdate = UpdateStatus.None;
+
+                return true;
             }
-            else
-            {
-                return null;
-            }
+
+            packet = default;
+
+            return false;
         }
 
         internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());

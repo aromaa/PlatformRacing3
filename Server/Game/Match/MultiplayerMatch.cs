@@ -30,6 +30,7 @@ using log4net;
 using System.Reflection;
 using Platform_Racing_3_Common.User;
 using Net.Collections;
+using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -228,8 +229,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void SendUpdateIfRequired(ClientSession session, MatchPlayer matchPlayer)
         {
-            UpdateOutgoingMessage packet = matchPlayer.GetUpdatePacket();
-            if (packet != null)
+            if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
             {
                 this.Clients.Send(packet, session.Connection);
             }
@@ -915,11 +915,6 @@ namespace Platform_Racing_3_Server.Game.Match
                 lock (this.Players)
                 {
                     this.Players.Remove(session.SocketId);
-
-                    foreach (ClientSession other in this.Clients.Sessions)
-                    {
-                        other.UntrackUserInRoom(this.Name, session.SocketId);
-                    }
                 }
             }
             else

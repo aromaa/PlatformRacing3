@@ -1,11 +1,13 @@
-﻿using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
+﻿using Net.Communication.Outgoing.Helpers;
+using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
+using Platform_Racing_3_Server.Game.Match;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.Match
 {
-    public readonly struct UpdatePacketIncomingPacket
+    internal readonly struct UpdatePacketIncomingPacket
     {
         public readonly UpdateStatus Status;
 
@@ -17,26 +19,26 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.
 
         public readonly byte ScaleX;
 
-        public readonly bool Space;
-        public readonly bool Left;
-        public readonly bool Right;
-        public readonly bool Up;
-        public readonly bool Down;
+        internal readonly bool Space;
+        internal readonly bool Left;
+        internal readonly bool Right;
+        internal readonly bool Up;
+        internal readonly bool Down;
 
-        public readonly bool Hurt;
+        internal readonly bool Hurt;
 
-        public readonly int Speed;
-        public readonly int Accel;
-        public readonly int Jump;
+        internal readonly int Speed;
+        internal readonly int Accel;
+        internal readonly int Jump;
 
-        public readonly int Rotation;
-        public readonly uint Life;
-        public readonly uint Coins;
+        internal readonly int Rotation;
+        internal readonly uint Life;
+        internal readonly uint Coins;
 
-        public readonly string Team;
-        public readonly string Item;
+        internal readonly string Team;
+        internal readonly string Item;
 
-        public UpdatePacketIncomingPacket(UpdateStatus status, double x, double y, float velX, float velY, byte scaleX, bool space, bool left, bool right, bool up, bool down, bool hurt, int speed, int accel, int jump, int rotation, uint life, uint coins, string team, string item)
+        internal UpdatePacketIncomingPacket(UpdateStatus status, double x, double y, float velX, float velY, byte scaleX, bool space, bool left, bool right, bool up, bool down, bool hurt, int speed, int accel, int jump, int rotation, uint life, uint coins, string team, string item)
         {
             this.Status = status;
 
