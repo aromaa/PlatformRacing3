@@ -1,5 +1,6 @@
 ﻿using Net.Communication.Incoming.Handlers;
 using Net.Communication.Incoming.Helpers;
+using Net.Communication.Incoming.Packet;
 using Net.Communication.Outgoing.Handlers;
 using Net.Communication.Outgoing.Helpers;
 using Net.Communication.Pipeline;
@@ -55,10 +56,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
         {
             ushort header = reader.ReadUInt16();
 
-            if (PlatformRacing3Server.PacketManager.GetIncomingBytePacket(header, out IMessageIncomingBytes handler))
-            {
-                handler.Handle(this.Session, ref reader);
-            }
+            PlatformRacing3Server.BytePacketManager.HandleIncomingData(header, this.Session, ref context, ref reader);
 
             if (reader.Remaining > 0)
             {
@@ -76,7 +74,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
 
                 message.Write(ref writer);
 
-                ushort size = (ushort)(writer.Length - writerLength);
+                ushort size = checked((ushort)(writer.Length - writerLength));
 
                 BinaryPrimitives.WriteUInt16BigEndian(length.Span, size);
             }

@@ -7,21 +7,10 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
 {
     internal class PacketManager
     {
-        private Dictionary<ushort, IMessageIncomingBytes> IncomingPacketsBytes;
         private Dictionary<string, IMessageIncomingJson> IncomingPacketsJSON;
 
         internal PacketManager()
         {
-            this.IncomingPacketsBytes = new Dictionary<ushort, IMessageIncomingBytes>()
-            {
-                { 0, new JsonIncomingMessage() },
-                { 45, new SetEncryptionIncomingMessage() },
-                { 15, new PingIncomingMessage() },
-                { 33, new RoundtripTimeIncomingMessage() },
-                { 67, new UpdateIncomingMessage() },
-                { 14, new TryGetItemIncomingMessage() },
-            };
-
             this.IncomingPacketsJSON = new Dictionary<string, IMessageIncomingJson>()
             {
                 { "confirm_connection", new ConfirmConnectionIncomingMessage() },
@@ -69,11 +58,6 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "join_tournament", new JoinTournamentIncomingMessage() },
                 { "win_hat", new WinHatIncomingMessage() },
             };
-        }
-
-        internal bool GetIncomingBytePacket(ushort packetId, out IMessageIncomingBytes handler)
-        {
-            return this.IncomingPacketsBytes.TryGetValue(packetId, out handler);
         }
 
         internal bool GetIncomingJSONPacket(string packetId, out IMessageIncomingJson handler)
