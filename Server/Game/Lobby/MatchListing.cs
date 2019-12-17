@@ -118,7 +118,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 return MatchListingJoinStatus.Success;
             }
-            else if (this.Type == MatchListingType.Normal && this._Clients.Count > 0)
+            else if (this.Type == MatchListingType.Normal && this._Clients.Count == 0)
             {
                 return MatchListingJoinStatus.WaitingForHost;
             }
@@ -310,7 +310,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 //Mark this full and get the amount of left spots
                 int left = this._Clients.MarkFull();
-                if (this.UsersReady == left) //If its the same as users ready we can start, otherwise the Join method does this for us when the user is "ready"
+                if (this.MaxMembers - this.UsersReady == left) //If its the same as users ready we can start, otherwise the Join method does this for us when the user is "ready"
                 {
                     this.Start();
                 }

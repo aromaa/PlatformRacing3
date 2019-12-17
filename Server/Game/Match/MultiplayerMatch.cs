@@ -915,6 +915,11 @@ namespace Platform_Racing_3_Server.Game.Match
                 lock (this.Players)
                 {
                     this.Players.Remove(session.SocketId);
+
+                    foreach (ClientSession other in this.Clients.Sessions)
+                    {
+                        other.UntrackUserInRoom(this.Name, session.SocketId);
+                    }
                 }
             }
             else

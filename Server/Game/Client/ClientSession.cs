@@ -95,7 +95,6 @@ namespace Platform_Racing_3_Server.Game.Client
         public LobbySession LobbySession => this._LobbySession.Value;
 
         internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.Send(messageOutgoing);
-        internal void SendPackets(IEnumerable<IMessageOutgoing> messagesOutgoing) => this.Connection.Send(messagesOutgoing);
 
         internal void Disconnect(string reason = null) => this.Connection.Disconnect(reason);
 

@@ -85,7 +85,10 @@ namespace Platform_Racing_3_Server.Game.Chat
                 other.TrackUserInRoom(this.Name, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.GetVars("id"));
             }
 
-            session.SendPackets(this.RecentMessages); //Sent recent messages
+            foreach(ChatOutgoingMessage message in this.RecentMessages)
+            {
+                session.SendPacket(message);
+            }
 
             return true;
         }
