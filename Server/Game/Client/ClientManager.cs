@@ -1,4 +1,5 @@
-﻿using Platform_Racing_3_Server.Collections;
+﻿using Net.Collections;
+using Platform_Racing_3_Server.Collections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Platform_Racing_3_Server.Game.Client
             }
         }
 
-        private void OnDisconnect(ClientSession session)
+        private void OnDisconnect(ClientSession session, CilentCollectionRemoveReason reason)
         {
             if (!session.IsGuest)
             {

@@ -15,13 +15,13 @@ namespace Platform_Racing_3_Server.Collections
     {
         private ConcurrentDictionary<uint, ClientSession> _Sessions;
 
-        private Action<ClientSession> RemoveCallback;
+        private Action<ClientSession, CilentCollectionRemoveReason> RemoveCallback;
 
         internal ClientSessionCollection() : this(null)
         {
         }
 
-        internal ClientSessionCollection(Action<ClientSession> callback)
+        internal ClientSessionCollection(Action<ClientSession, CilentCollectionRemoveReason> callback)
         {
             this._Sessions = new ConcurrentDictionary<uint, ClientSession>();
 
@@ -40,11 +40,11 @@ namespace Platform_Racing_3_Server.Collections
             }
         }
 
-        protected override void OnRemoved(SocketConnection connection)
+        protected override void OnRemoved(SocketConnection connection, CilentCollectionRemoveReason reason)
         {
             if (this._Sessions.TryRemove(connection.Id, out ClientSession session))
             {
-                this.RemoveCallback?.Invoke(session);
+                this.RemoveCallback?.Invoke(session, reason);
             }
             else
             {

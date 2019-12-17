@@ -1,10 +1,12 @@
-﻿using Net.Connections;
+﻿using Net.Collections;
+using Net.Connections;
 using Platform_Racing_3_Server.Game.Client;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
 using System.Threading;
+using System.Transactions;
 
 namespace Platform_Racing_3_Server.Collections
 {
@@ -14,7 +16,7 @@ namespace Platform_Racing_3_Server.Collections
 
         private int Capacity;
 
-        internal ClientSessionCollectionLimited(Action<ClientSession> callback, int capacity) : base(callback)
+        internal ClientSessionCollectionLimited(Action<ClientSession, CilentCollectionRemoveReason> callback, int capacity) : base(callback)
         {
             this.Capacity = capacity;
         }
@@ -52,9 +54,11 @@ namespace Platform_Racing_3_Server.Collections
             }
         }
 
-        protected override void OnRemoved(SocketConnection connection)
+        protected override void OnRemoved(SocketConnection connection, CilentCollectionRemoveReason reason)
         {
             this.TryAddSlotBack();
+
+            base.OnRemoved(connection, reason);
         }
 
         internal void TryAddSlotBack()

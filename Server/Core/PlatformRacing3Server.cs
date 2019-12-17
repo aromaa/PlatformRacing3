@@ -14,6 +14,7 @@ using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Commands;
 using Platform_Racing_3_Server.Game.Communication.Handlers;
+using Platform_Racing_3_Server.Game.Communication.Managers;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
@@ -50,6 +51,7 @@ namespace Platform_Racing_3_Server.Core
 
         public static CampaignManager CampaignManager { get; private set; }
 
+        public static BytePacketManager BytePacketManager { get; private set; }
         public static PacketManager PacketManager { get; private set; }
         public static ClientManager ClientManager { get; private set; }
         public static SocketListenerManager SocketListenerManager { get; private set; }
@@ -83,13 +85,14 @@ namespace Platform_Racing_3_Server.Core
                 PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();
                 PlatformRacing3Server.CampaignManager.LoadPrizesAsync().Wait();
 
+                PlatformRacing3Server.BytePacketManager = new BytePacketManager();
                 PlatformRacing3Server.PacketManager = new PacketManager();
                 PlatformRacing3Server.ClientManager = new ClientManager();
                 PlatformRacing3Server.SocketListenerManager = new SocketListenerManager();
                 PlatformRacing3Server.SocketListenerManager.ConnectionManager.PreAccept += (connection) =>
                 {
-                    connection.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
-                    connection.Pipeline.AddHandlerFirst(new SplitPacketHandler(new ClientSession(connection)));
+                    connection.Pipeline.AddHandlerLast(new FlashSocketPolicyRequestHandler());
+                    connection.Pipeline.AddHandlerLast(new SplitPacketHandler(new ClientSession(connection)));
                 };
 
                 PlatformRacing3Server.SocketListenerManager.AddListener<TcpListener>(new ListenerConfig()

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text;
 using Platform_Racing_3_Common.Redis;
 using StackExchange.Redis;
+using Net.Collections;
 
 namespace Platform_Racing_3_Server.Game.Chat
 {
@@ -96,7 +97,7 @@ namespace Platform_Racing_3_Server.Game.Chat
             this.Leave(session);
         }
 
-        private void Leave0(ClientSession session)
+        private void Leave0(ClientSession session, CilentCollectionRemoveReason reason)
         {
             foreach (ClientSession other in this.Clients.Sessions)
             {

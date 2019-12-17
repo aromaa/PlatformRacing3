@@ -1,4 +1,5 @@
-﻿using Net.Connections;
+﻿using Net.Collections;
+using Net.Connections;
 using Newtonsoft.Json;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.User;
@@ -232,7 +233,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             }
         }
 
-        internal void Leave(ClientSession session) => this.Clients.Remove(session);
+        internal void Leave(ClientSession session) => this._Clients.TryRemove(session);
 
         internal void Kick(ClientSession session)
         {
@@ -241,7 +242,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             session.SendPacket(new UserLeaveRoomOutgoingMessage(this.Name, session.SocketId));
         }
 
-        private void Leave0(ClientSession session)
+        private void Leave0(ClientSession session, CilentCollectionRemoveReason reason)
         {
             session.LobbySession.MatchListing = null;
 
@@ -262,7 +263,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             if (this.Type != MatchListingType.LevelOfTheDay)
             {
-                if (this._Clients.MarkFullIf((int)this.MaxMembers))
+                if (!this._Clients.MarkFullIf((int)this.MaxMembers))
                 {
                     uint currentHost = this._HostSocketId;
                     if (this.Type == MatchListingType.Normal && currentHost == session.SocketId) //Time to pick new host
@@ -322,8 +323,10 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             MultiplayerMatch match = PlatformRacing3Server.MatchManager.CreateMultiplayerMatch(this);
 
+            Random random = new Random();
+
             StartGameOutgoingMessage startGame = new StartGameOutgoingMessage(this.Name, match.Name);
-            foreach (ClientSession session in this._Clients.Sessions)
+            foreach (ClientSession session in this._Clients.Sessions.OrderBy((s) => random.Next(int.MinValue, int.MaxValue)))
             {
                 session.LobbySession.MatchListing = null;
 
