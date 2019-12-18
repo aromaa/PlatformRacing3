@@ -101,7 +101,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers
                     matchPlayer.Life = packet.Life;
                 }
 
-                if (packet.Status.HasFlag(UpdateStatus.Jump))
+                if (packet.Status.HasFlag(UpdateStatus.Hurt))
                 {
                     matchPlayer.Hurt = packet.Hurt;
                 }
