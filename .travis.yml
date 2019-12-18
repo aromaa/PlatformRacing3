@@ -1,7 +1,13 @@
-dist: bionic
+dist: xenial
+addons:
+  snaps:
+  - name: dotnet-sdk
+    classic: true
+    channel: latest/beta
+sudo: required
 language: csharp
 mono: none
-dotnet: 2.2.101
 script:
+ - sudo snap alias dotnet-sdk.dotnet dotnet
  - dotnet restore
  - dotnet build
