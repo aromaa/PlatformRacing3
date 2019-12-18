@@ -66,12 +66,16 @@ namespace Platform_Racing_3_Server.Collections
             while (true)
             {
                 int capacity = this.Capacity;
-                if (capacity > 0)
+                if (capacity >= 0)
                 {
                     if (Interlocked.CompareExchange(ref this.Capacity, capacity + 1, capacity) == capacity)
                     {
                         break;
                     }
+                }
+                else
+                {
+                    break;
                 }
             }
         }
@@ -103,7 +107,7 @@ namespace Platform_Racing_3_Server.Collections
             while (true)
             {
                 int capacity = this.Capacity;
-                if (capacity > 0)
+                if (capacity >= 0)
                 {
                     return Interlocked.Exchange(ref this.Capacity, 0);
                 }
