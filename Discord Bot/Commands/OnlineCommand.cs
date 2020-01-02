@@ -51,7 +51,7 @@ namespace Discord_Bot.Commands
             }
             else
             {
-                await this.ReplyAsync(embed: embed.Build());
+                await this.Context.Channel.SendMessageAsync("", false, embed.Build());
             }
         }
     }
