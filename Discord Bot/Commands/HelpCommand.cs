@@ -49,7 +49,6 @@ namespace Discord_Bot.Commands
             catch (Discord.Net.HttpException)
             {
                 await this.Context.Message.ModifyAsync(m => m.Content = $"{this.Context.User.Mention} I couldn't send you my commands. To fix this issue head to **Server Settings** > **Privacy Settings** > **Allow Direct Messages from server members**.");
-
             }
         }
     }
