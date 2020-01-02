@@ -194,7 +194,7 @@ namespace Discord_Bot.Commands
                     IsInline = true
                 });
 
-                await this.ReplyAsync(embed: embed.Build());
+                await this.Context.User.SendMessageAsync("", false, embed.Build());
             }
         }
     }
