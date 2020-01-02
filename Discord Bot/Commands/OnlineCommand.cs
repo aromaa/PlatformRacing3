@@ -1,4 +1,4 @@
-﻿using Discord.Commands;
+using Discord.Commands;
 using Discord.Commands.Builders;
 using System;
 using System.Collections.Generic;
@@ -17,22 +17,32 @@ namespace Discord_Bot.Commands
             this.ServerManager = serverManager;
         }
 
-        [Command("pr3online")]
-        [Summary("Whos online? Log in")]
+        [Command("status")]
+        [Summary("Returns server status and active player count.")]
         public Task GetOnlinePlayersCount()
         {
-            StringBuilder stringBuilder = new StringBuilder(this.Context.User.Mention);
-            stringBuilder.AppendLine();
+            StringBuilder stringBuilder = new StringBuilder();
 
             foreach (ServerDetails server in this.ServerManager.GetServers())
             {
-                stringBuilder.Append(server.Name);
-                stringBuilder.Append(": ");
+                stringBuilder.Append($"**{server.Name}**");
+                stringBuilder.Append(" - ");
                 stringBuilder.Append(server.Status);
                 stringBuilder.AppendLine();
             }
 
-            return this.ReplyAsync(stringBuilder.ToString());
-;        }
+            EmbedBuilder embed = new EmbedBuilder();
+
+            embed.WithTitle("Server Status");
+            embed.WithColor(Color.Blue);
+            embed.WithAuthor(author = > { author.WithName(this.Context.User.Username + this.Context.User.Discriminator).WithIconUrl(this.Context.User.GetAvatarUrl()) });
+
+            embed.AddField(new EmbedFieldBuilder()
+            {
+                Value = stringBuilder.ToString()
+            });
+
+            await this.ReplyAsync(embed: embed.Build());
+        }
     }
 }
