@@ -17,7 +17,7 @@ namespace Discord_Bot.Commands
             this.ServerManager = serverManager;
         }
 
-        [Command("status")]
+        [Command("pr3online")]
         [Summary("Returns server status and active player count.")]
         public Task GetOnlinePlayersCount()
         {
