@@ -125,7 +125,7 @@ namespace Platform_Racing_3_Common.Level
 
             this.Plays = (uint)(int)reader["plays"];
             this.Likes = (uint)(long)reader["likes"];
-            this.Dislikes = (uint)(long)reader["dislikes"];
+            this.Dislikes = 0; // (uint)(long)reader["dislikes"];
 
             this.IsCampaign = (bool)reader["is_campaign"];
             if (this.IsCampaign)
