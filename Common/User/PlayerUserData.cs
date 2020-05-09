@@ -284,6 +284,13 @@ namespace Platform_Racing_3_Common.User
             this._Ignored = playerUserData._Ignored;
 
             //TODO: Load permissions
+            this._Permissions.Add("access_no_idle_kick");
+
+            if (this.PermissionRank >= 100)
+            {
+                this._Permissions.Add("access_bypass_chat_flood");
+                this._Permissions.Add("access_stamp_editor");
+            }
 
             this.CheckCampaignPrizes();
             this.RemoveRestrictedParts();
