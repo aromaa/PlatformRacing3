@@ -25,13 +25,17 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
         [JsonProperty("expArray")]
         internal IReadOnlyCollection<object[]> ExpArray { get; set; }
 
-        internal JsonYouFinishedOutgoingMessage(uint rank, ulong curExp, ulong maxExp, ulong totExpGain, IReadOnlyCollection<object[]> expArray)
+        [JsonProperty("place")]
+        internal int Place { get; set; }
+
+        internal JsonYouFinishedOutgoingMessage(uint rank, ulong curExp, ulong maxExp, ulong totExpGain, IReadOnlyCollection<object[]> expArray, int place)
         {
             this.Rank = rank;
             this.CurExp = curExp;
             this.MaxExp = maxExp;
             this.TotExpGain = totExpGain;
             this.ExpArray = expArray;
+            this.Place = place;
         }
     }
 }

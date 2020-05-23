@@ -1007,8 +1007,6 @@ namespace Platform_Racing_3_Server.Game.Match
             {
                 player.FinishTime = now;
 
-                this.Clients.Send(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
-
                 ulong expEarned = ExpUtils.GetExpEarnedForFinishing(now);
 
                 List<object[]> expArray = new List<object[]>();
@@ -1077,6 +1075,8 @@ namespace Platform_Racing_3_Server.Game.Match
                         }
                     }
                 }
+
+                player.FinishPlace = place;
 
                 ulong baseExp = expEarned;
                 if (this.Prize != null && (!this.Prize.RewardsExpBonus || place == 1))
@@ -1188,7 +1188,9 @@ namespace Platform_Racing_3_Server.Game.Match
                     }
                 }
 
-                session.SendPacket(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray));
+                this.Clients.Send(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+
+                session.SendPacket(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray, place));
 
                 uint oldRank = session.UserData.Rank;
 
