@@ -274,6 +274,63 @@ namespace Platform_Racing_3_Common.Level
             return Task.FromResult((0u, (IReadOnlyCollection<LevelData>)Array.Empty<LevelData>()));
         }
 
+        public static Task<IReadOnlyDictionary<uint, string>> GetDeletedLevels(uint userId)
+        {
+            return DatabaseConnection.NewAsyncConnection(c => 
+                c.ReadDataAsync($"SELECT id, title FROM base.levels_deleted WHERE author_user_id = {userId}")
+                 .ContinueWith(Parse));
+
+            IReadOnlyDictionary<uint, string> Parse(Task<DbDataReader> task)
+            {
+                Dictionary<uint, string> levels = new Dictionary<uint, string>();
+
+                if (task.IsCompletedSuccessfully)
+                {
+                    DbDataReader reader = task.Result;
+                    while (reader.Read())
+                    {
+                        uint levelId = (uint)(int)reader["id"];
+                        string title = (string)reader["title"];
+
+                        levels.Add(levelId, title);
+                    }
+                }
+                else if (task.IsFaulted)
+                {
+                    LevelManager.Logger.Error("Failed to get delete levels from sql", task.Exception);
+                }
+
+                return levels;
+            }
+        }
+
+        public static Task<bool?> RestoreLevel(uint userId, uint levelId, string rename)
+        {
+            return DatabaseConnection.NewAsyncConnection(c =>
+                c.ReadDataAsync($"WITH deleted AS(DELETE FROM base.levels_deleted WHERE id = {levelId} AND author_user_id = {userId} RETURNING id, title, author_user_id) INSERT INTO base.levels_titles(id, title, author_user_id) SELECT id, COALESCE({(object)rename ?? DBNull.Value}, title), author_user_id FROM deleted")
+                 .ContinueWith(Parse));
+
+            bool? Parse(Task<DbDataReader> task)
+            {
+                if (task.IsCompletedSuccessfully)
+                {
+                    DbDataReader reader = task.Result;
+                    if (reader.Read())
+                    {
+                        return true;
+                    }
+                }
+                else if (task.IsFaulted)
+                {
+                    LevelManager.Logger.Error("Failed to restore deleted level from sql", task.Exception);
+
+                    return null;
+                }
+
+                return false;
+            }
+        }
+
         private static bool ParseSqlDeleteLevel(Task<DbDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
