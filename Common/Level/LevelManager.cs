@@ -314,11 +314,7 @@ namespace Platform_Racing_3_Common.Level
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    DbDataReader reader = task.Result;
-                    if (reader.Read())
-                    {
-                        return true;
-                    }
+                    return true;
                 }
                 else if (task.IsFaulted)
                 {
