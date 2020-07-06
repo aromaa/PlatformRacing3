@@ -14,8 +14,8 @@ namespace Platform_Racing_3_Web.Controllers
     [Route("linkdiscord")]
     public class LinkDiscordController : Controller
     {
-        private const string DISCORD_API_TOKEN = "https://discordapp.com/api/v6/oauth2/token";
-        private const string DISCORD_API_ME = "https://discordapp.com/api/v6/users/@me";
+        private const string DISCORD_API_TOKEN = "https://discord.com/api/v6/oauth2/token";
+        private const string DISCORD_API_ME = "https://discord.com/api/v6/users/@me";
 
         [HttpGet]
         public async Task<ContentResult> GetAsync([FromQuery] string code)

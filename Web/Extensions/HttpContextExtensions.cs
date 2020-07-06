@@ -36,7 +36,7 @@ namespace Platform_Racing_3_Web.Extensions
             //Third party sites
             "http://jiggmin2.com",
             "https://jiggmin2.com",
-            "https://discordapp.com",
+            "https://discord.com",
         };
 
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
