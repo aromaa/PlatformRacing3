@@ -34,7 +34,7 @@ namespace Platform_Racing_3_Web
 
                 options.Cookie.Name = "PR3-Auth";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None; //Due to us accepting http and https
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
                 options.Cookie.SameSite = SameSiteMode.None; //None due to Chrome 71 breaking changes
                 options.Cookie.Expiration = TimeSpan.FromDays(7);
             });
@@ -52,6 +52,7 @@ namespace Platform_Racing_3_Web
             }
 
             app.UseMiddleware<CloudflareMiddleware>();
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseCors(options =>
             {
