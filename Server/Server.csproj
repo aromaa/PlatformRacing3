@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Platform_Racing_3_Server</RootNamespace>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
@@ -10,10 +10,13 @@
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.0.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Ninject" Version="3.3.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Net\Net.Collections\Net.Collections.csproj" />
+    <ProjectReference Include="..\Net\Net.Communication\Net.Communication.csproj" />
     <ProjectReference Include="..\Net\Net\Net.csproj" />
     <ProjectReference Include="..\Server API\Server API.csproj" />
     <ProjectReference Include="..\UnsafeHelpers\UnsafeHelpers.csproj" />

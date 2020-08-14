@@ -14,7 +14,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            foreach(ClientSession session in PlatformRacing3Server.ClientManager.GetLoggedInUsers())
+            foreach(ClientSession session in PlatformRacing3Server.ClientManager.LoggedInUsers)
             {
                 session.SendPacket(new AlertOutgoingMessage(string.Join(' ', args.ToArray())));
             }

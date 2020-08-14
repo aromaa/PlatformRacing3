@@ -1,5 +1,4 @@
-﻿using Net.Collections;
-using Platform_Racing_3_Server.Collections;
+﻿using Platform_Racing_3_Server.Collections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,39 +12,33 @@ namespace Platform_Racing_3_Server.Game.Client
     {
         private const uint TimeoutTime = 10;
 
-        private ClientSessionCollection ClientsBySocketId;
-        private ConcurrentDictionary<uint, ClientSession> ClientsByUserId;
+        private readonly ClientSessionCollection ClientsBySocketId;
+        private readonly ConcurrentDictionary<uint, ClientSession> ClientsByUserId;
 
         private Timer LastPingCheckTimer;
 
         internal ClientManager()
         {
-            this.ClientsBySocketId = new ClientSessionCollection(this.OnDisconnect);
+            this.ClientsBySocketId = new ClientSessionCollection(this.OnAdded, this.OnRemoved);
             this.ClientsByUserId = new ConcurrentDictionary<uint, ClientSession>();
 
             this.LastPingCheckTimer = new Timer(this.CheckForTimedoutConnections, null, 2500, 2500);
         }
 
-        private void CheckForTimedoutConnections(object state)
-        {
-            foreach(ClientSession session in this.ClientsBySocketId.Sessions)
-            {
-                if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
-                {
-                    session.Disconnect("Timeout (No ping)");
-                }
-            }
-        }
-
-        private void OnDisconnect(ClientSession session, CilentCollectionRemoveReason reason)
-        {
-            if (!session.IsGuest)
-            {
-                this.ClientsByUserId.TryRemove(session.UserData.Id, out _);
-            }
-        }
+        internal int Count => this.ClientsBySocketId.Count;
+        internal ICollection<ClientSession> LoggedInUsers => this.ClientsBySocketId.Sessions;
 
         internal void Add(ClientSession session)
+        {
+            this.ClientsBySocketId.TryAdd(session);
+        }
+
+        internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetValue(socketId, out session);
+        internal bool TryGetClientSessionByUserId(uint userId, out ClientSession session) => this.ClientsByUserId.TryGetValue(userId, out session);
+
+        internal ClientSession GetClientSessionByUsername(string username) => this.ClientsByUserId.Values.FirstOrDefault((c) => c.UserData?.Username.ToUpperInvariant() == username.ToUpperInvariant());
+
+        private void OnAdded(ClientSession session)
         {
             if (!session.IsGuest)
             {
@@ -56,16 +49,25 @@ namespace Platform_Racing_3_Server.Game.Client
                     return session;
                 });
             }
-
-            this.ClientsBySocketId.TryAdd(session);
         }
 
-        internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetValue(socketId, out session);
-        internal bool TryGetClientSessionByUserId(uint userId, out ClientSession session) => this.ClientsByUserId.TryGetValue(userId, out session);
+        private void OnRemoved(ClientSession session)
+        {
+            if (!session.IsGuest)
+            {
+                this.ClientsByUserId.TryRemove(session.UserData.Id, out _);
+            }
+        }
 
-        internal ClientSession GetClientSessionByUsername(string username) => this.ClientsByUserId.Values.FirstOrDefault((c) => c.UserData?.Username.ToUpperInvariant() == username.ToUpperInvariant());
-
-        internal ICollection<ClientSession> GetLoggedInUsers() => this.ClientsBySocketId.Sessions;
-        internal uint Count => this.ClientsBySocketId.Count;
+        private void CheckForTimedoutConnections(object state)
+        {
+            foreach (ClientSession session in this.ClientsBySocketId.Sessions)
+            {
+                if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
+                {
+                    session.Disconnect("Timeout (No ping)");
+                }
+            }
+        }
     }
 }

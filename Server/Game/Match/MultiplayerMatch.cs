@@ -29,7 +29,6 @@ using Platform_Racing_3_Server.Game.Lobby;
 using log4net;
 using System.Reflection;
 using Platform_Racing_3_Common.User;
-using Net.Collections;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
@@ -113,8 +112,8 @@ namespace Platform_Racing_3_Server.Game.Match
             this.Type = type;
 
             this._Status = MultiplayerMatchStatus.PreparingForStart;
-            this.ReservedFor = new ClientSessionCollection(this.OnReservedLeave);
-            this.Clients = new ClientSessionCollection(this.Leave0);
+            this.ReservedFor = new ClientSessionCollection(addCallback: this.OnReservedFor, removeCallback: this.OnReservedLeave);
+            this.Clients = new ClientSessionCollection(addCallback: this.OnJoinGame, removeCallback: this.Leave0);
 
             this.DrawingUsers = new HashSet<uint>();
             this.Players = new SortedDictionary<uint, MatchPlayer>();
@@ -139,30 +138,47 @@ namespace Platform_Racing_3_Server.Game.Match
                 throw new InvalidOperationException();
             }
 
-            if (!this.ReservedFor.TryAdd(session))
-            {
-                return false;
-            }
+            return this.ReservedFor.TryAdd(session);
+        }
 
+        private void OnReservedFor(ClientSession session)
+        {
             MatchPlayer matchPlayer = new MatchPlayer(this, session.UserData, session.SocketId, session.IPAddres);
-            if (!this.Players.TryAdd(session.SocketId, matchPlayer))
+
+            lock (this.Players)
             {
-                return false;
+                if (!this.Players.TryAdd(session.SocketId, matchPlayer))
+                {
+                    throw new InvalidOperationException();
+                }
             }
 
             session.MultiplayerMatchSession = new MultiplayerMatchSession(this, matchPlayer);
 
-            this.DrawingUsers.Add(session.SocketId);
-
-            return true;
+            lock (this.DrawingUsers)
+            {
+                this.DrawingUsers.Add(session.SocketId);
+            }
         }
 
-        private void OnReservedLeave(ClientSession session, CilentCollectionRemoveReason reason)
+        private void OnReservedLeave(ClientSession session)
         {
-            if (reason != CilentCollectionRemoveReason.Manual)
+            lock (this.Players)
             {
-                this.LeaveInternal(session);
+                this.Players.Remove(session.SocketId);
+
+                foreach (ClientSession other in this.Clients.Sessions)
+                {
+                    other.UntrackUserInRoom(this.Name, session.SocketId);
+                }
             }
+
+            lock (this.DrawingUsers)
+            {
+                this.DrawingUsers.Remove(session.SocketId);
+            }
+
+            this.CheckGameState();
         }
 
         internal void Lock()
@@ -191,39 +207,42 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void Join(ClientSession session)
         {
-            if (this.ReservedFor.TryRemove(session))
-            {
-                if (this.Clients.TryAdd(session))
-                {
-                    lock (this.Players)
-                    {
-                        foreach (MatchPlayer player in this.Players.Values)
-                        {
-                            session.TrackUserInRoom(this.Name, player.SocketId, player.UserData.Id, player.UserData.Username, player.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
-
-                            lock (this.DrawingUsers)
-                            {
-                                if (!this.DrawingUsers.Contains(player.SocketId))
-                                {
-                                    session.SendUserRoomData(this.Name, player.SocketId, new FinishDrawingOutgoingMessage(player.SocketId));
-                                }
-                            }
-                        }
-                    }
-
-                    Interlocked.Increment(ref this.UsersReady);
-
-                    this.CheckGameState();
-                }
-                else
-                {
-                    this.LeaveInternal(session);
-                }
-            }
-            else
+            if (!this.ReservedFor.TryRemove(session, callEvent: false))
             {
                 //Spectate
                 this.Clients.TryAdd(session);
+
+                return;
+            }
+
+            if (!this.Clients.TryAdd(session))
+            {
+                this.OnReservedLeave(session);
+
+                return;
+            }
+
+            Interlocked.Increment(ref this.UsersReady);
+
+            this.CheckGameState();
+        }
+
+        private void OnJoinGame(ClientSession session)
+        {
+            lock (this.Players)
+            {
+                foreach (MatchPlayer player in this.Players.Values)
+                {
+                    session.TrackUserInRoom(this.Name, player.SocketId, player.UserData.Id, player.UserData.Username, player.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
+
+                    lock (this.DrawingUsers)
+                    {
+                        if (!this.DrawingUsers.Contains(player.SocketId))
+                        {
+                            session.SendUserRoomData(this.Name, player.SocketId, new FinishDrawingOutgoingMessage(player.SocketId));
+                        }
+                    }
+                }
             }
         }
 
@@ -231,7 +250,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
             {
-                this.Clients.Send(packet, session.Connection);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -300,7 +319,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ended, MultiplayerMatchStatus.Ongoing) == MultiplayerMatchStatus.Ongoing)
                         {
-                            this.Clients.Send(new EndGameOutgoingMessage());
+                            this.Clients.SendAsync(new EndGameOutgoingMessage());
                         }
                     }
                     else
@@ -395,7 +414,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 //Resend hats to avoid graphical bug on client side
                 foreach (MatchPlayer player in this.Players.Values)
                 {
-                    this.Clients.Send(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                    this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
                 }
             }
 
@@ -719,13 +738,13 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (this.Prize != null)
             {
-                this.Clients.Send(new PrizeOutgoingMessage(this.Prize, "available"));
+                this.Clients.SendAsync(new PrizeOutgoingMessage(this.Prize, "available"));
             }
 
             this.MatchTimer = MatchTimer.StartNew(TimeSpan.FromMilliseconds(2664));
 
-            this.Clients.Send(new EventsOutgoingMessage(events));
-            this.Clients.Send(new BeginMatchOutgoingMessage());
+            this.Clients.SendAsync(new EventsOutgoingMessage(events));
+            this.Clients.SendAsync(new BeginMatchOutgoingMessage());
 
             LevelManager.AddPlaysAsync(this.LevelData.Id, (uint)this.Players.Count); //Lets do the most important thing now!
         }
@@ -891,10 +910,10 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             player.AddHat(this.GetNextHatId(), hat, color, spawned);
 
-            this.Clients.Send(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+            this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
         }
 
-        internal void Forfiet(ClientSession session, bool leave = false)
+        internal void Forfeit(ClientSession session, bool leave = false)
         {
             if (leave)
             {
@@ -917,40 +936,37 @@ namespace Platform_Racing_3_Server.Game.Match
                     this.Players.Remove(session.SocketId);
                 }
             }
-            else
+            else if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
             {
-                if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
+                if (this.LevelData.Mode == LevelMode.HatAttack || this.LevelData.Mode == LevelMode.KingOfTheHat)
                 {
-                    if (this.LevelData.Mode == LevelMode.HatAttack || this.LevelData.Mode == LevelMode.KingOfTheHat)
+                    while (player.Hats.Count > 0)
                     {
-                        while (player.Hats.Count > 0)
-                        {
-                            this.ForceDropHat(player, 15);
-                        }
+                        this.ForceDropHat(player, 15);
                     }
-
-                    //If player dosen't have finish time it should always be considered as forfiet
-                    if (player.FinishTime == null)
-                    {
-                        if (!player.Forfiet && this.Broadcaster)
-                        {
-                            int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
-
-                            this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfiet at place #{place}");
-                        }
-
-                        player.Forfiet = true;
-
-                        this.Clients.Send(new ForfietOutgoingMessage(session.SocketId));
-                    }
-
-                    if (leave)
-                    {
-                        player.Gone = true;
-                    }
-
-                    this.Clients.Send(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }
+
+                //If player doesn't have finish time it should always be considered as forfeit
+                if (player.FinishTime == null)
+                {
+                    if (!player.Forfiet && this.Broadcaster)
+                    {
+                        int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
+
+                        this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfeit at place #{place}");
+                    }
+
+                    player.Forfiet = true;
+
+                    this.Clients.SendAsync(new ForfietOutgoingMessage(session.SocketId));
+                }
+
+                if (leave)
+                {
+                    player.Gone = true;
+                }
+
+                this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, this.Players.Values));
             }
 
             this.CheckGameState();
@@ -973,14 +989,14 @@ namespace Platform_Racing_3_Server.Game.Match
             this.LoseHat(player, x, y, velX, velY);
         }
 
-        private void Leave0(ClientSession session, CilentCollectionRemoveReason reason)
+        private void Leave0(ClientSession session)
         {
             this.LeaveInternal(session);
         }
 
         private void LeaveInternal(ClientSession session)
         {
-            this.Forfiet(session, true);
+            this.Forfeit(session, true);
 
             foreach (ClientSession other in this.Clients.Sessions)
             {
@@ -1188,7 +1204,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     }
                 }
 
-                this.Clients.Send(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
 
                 session.SendPacket(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray, place));
 
@@ -1256,11 +1272,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (sendToSelf)
             {
-                this.Clients.Send(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.Send(packet, session.Connection);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -1281,11 +1297,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (sendToSelf)
                 {
-                    this.Clients.Send(packet);
+                    this.Clients.SendAsync(packet);
                 }
                 else
                 {
-                    this.Clients.Send(packet, session.Connection);
+                    this.Clients.SendAsync(packet, session);
                 }
             }
         }
@@ -1294,7 +1310,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
 
-            this.Clients.Send(packet);
+            this.Clients.SendAsync(packet);
         }
 
         private void SendShatterBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
@@ -1303,11 +1319,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (sendToSelf)
             {
-                this.Clients.Send(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.Send(packet, session.Connection);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -1317,11 +1333,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (sendToSelf)
             {
-                this.Clients.Send(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.Send(packet, session.Connection);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -1339,7 +1355,7 @@ namespace Platform_Racing_3_Server.Game.Match
             if (hat != null)
             {
                 this.DropHat(hat, x, y, velX, velY);
-                this.Clients.Send(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
             }
         }
 
@@ -1348,7 +1364,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (this.DroppedHats.TryAdd(hat.Id, hat))
             {
-                this.Clients.Send(new AddHatOutgoingMessage(hat, x, y, velX, velY));
+                this.Clients.SendAsync(new AddHatOutgoingMessage(hat, x, y, velX, velY));
             }
             else
             {
@@ -1366,8 +1382,8 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         player.AddHat(hat);
 
-                        this.Clients.Send(new RemoveHatOutgoingMessage(id), session.Connection);
-                        this.Clients.Send(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                        this.Clients.SendAsync(new RemoveHatOutgoingMessage(id), session);
+                        this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
                     }
                 }
             }
@@ -1381,7 +1397,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 {
                     player.Coins = coins;
 
-                    this.Clients.Send(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }
             }
         }
@@ -1394,7 +1410,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 {
                     player.Dash = dash;
 
-                    this.Clients.Send(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }
             }
         }
@@ -1428,14 +1444,14 @@ namespace Platform_Racing_3_Server.Game.Match
                     player.Koth = time;
 
                     //Coins packet does everything we want
-                    this.Clients.Send(new CoinsOutgoingMessage(new MatchPlayer[] { player }));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage(new MatchPlayer[] { player }));
                 }
             }
         }
 
         internal void SendPacket(IMessageOutgoing packet)
         {
-            this.Clients.Send(packet);
+            this.Clients.SendAsync(packet);
         }
     }
 }

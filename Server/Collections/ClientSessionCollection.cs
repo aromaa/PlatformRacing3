@@ -1,5 +1,4 @@
 ﻿using Net.Collections;
-using Net.Connections;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server_API.Net;
@@ -8,54 +7,55 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Net.Sockets;
+using Platform_Racing_3_Server.Collections.Matcher;
 
 namespace Platform_Racing_3_Server.Collections
 {
-    internal class ClientSessionCollection : ClientCollectionMetadatable<ClientSession>
+    internal class ClientSessionCollection
     {
-        private ConcurrentDictionary<uint, ClientSession> _Sessions;
+        private readonly CriticalSocketCollection<ClientSession> SessionCollection;
+        private readonly ConcurrentDictionary<uint, ClientSession> SessionsBySocketId;
 
-        private Action<ClientSession, CilentCollectionRemoveReason> RemoveCallback;
+        private readonly Action<ClientSession> AddCallback;
+        private readonly Action<ClientSession> RemoveCallback;
 
-        internal ClientSessionCollection() : this(null)
+        internal ClientSessionCollection(Action<ClientSession> addCallback = null, Action<ClientSession> removeCallback = null)
         {
+            this.SessionCollection = new CriticalSocketCollection<ClientSession>(this.OnAdded, this.OnRemoved);
+            this.SessionsBySocketId = new ConcurrentDictionary<uint, ClientSession>();
+
+            this.AddCallback = addCallback;
+            this.RemoveCallback = removeCallback;
         }
 
-        internal ClientSessionCollection(Action<ClientSession, CilentCollectionRemoveReason> callback)
-        {
-            this._Sessions = new ConcurrentDictionary<uint, ClientSession>();
+        internal int Count => this.Sessions.Count;
 
-            this.RemoveCallback = callback;
+        internal ICollection<ClientSession> Sessions => this.SessionsBySocketId.Values;
+
+        internal virtual bool TryAdd(ClientSession session) => this.SessionCollection.TryAdd(session.Connection, session, callEvent: true);
+        internal virtual bool TryRemove(ClientSession session, bool callEvent = true) => this.SessionCollection.TryRemove(session.Connection, out _, callEvent);
+
+        internal bool Contains(ClientSession session) => this.SessionCollection.Contains(session.Connection);
+
+        internal bool TryGetValue(uint id, out ClientSession session) => this.SessionsBySocketId.TryGetValue(id, out session);
+
+        internal Task SendAsync<TPacket>(in TPacket packet) => this.SessionCollection.SendAsync(packet);
+        internal Task SendAsync<TPacket>(in TPacket packet, ClientSession session) => this.SessionCollection.SendAsync(packet, new ExcludeSocketMatcher(session.Connection));
+
+        protected virtual void OnAdded(ISocket socket, ref ClientSession session)
+        {
+            this.SessionsBySocketId.TryAdd(session.SocketId, session);
+
+            this.AddCallback?.Invoke(session);
         }
 
-        internal bool TryAdd(ClientSession session) => this.TryAdd(session.Connection, session);
-
-        internal bool TryRemove(ClientSession session) => this.TryRemove(session.Connection);
-
-        protected override void OnAdded(SocketConnection connection, ClientSession metadata)
+        protected virtual void OnRemoved(ISocket socket, ref ClientSession session)
         {
-            if (!this._Sessions.TryAdd(connection.Id, metadata))
-            {
-                throw new InvalidOperationException();
-            }
+            this.SessionsBySocketId.TryRemove(session.SocketId, out _);
+
+            this.RemoveCallback?.Invoke(session);
         }
-
-        protected override void OnRemoved(SocketConnection connection, CilentCollectionRemoveReason reason)
-        {
-            if (this._Sessions.TryRemove(connection.Id, out ClientSession session))
-            {
-                this.RemoveCallback?.Invoke(session, reason);
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        public bool Contains(ClientSession session) => this.Contains(session.Connection);
-
-        public bool TryGetValue(uint id, out ClientSession session) => this._Sessions.TryGetValue(id, out session);
-
-        public ICollection<ClientSession> Sessions => this._Sessions.Values;
     }
 }

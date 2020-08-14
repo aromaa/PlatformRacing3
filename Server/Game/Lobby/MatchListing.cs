@@ -1,6 +1,4 @@
-﻿using Net.Collections;
-using Net.Connections;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Utils;
@@ -19,6 +17,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Net.Sockets;
 
 namespace Platform_Racing_3_Server.Game.Lobby
 {
@@ -76,7 +75,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal MatchListing(MatchListingType type, ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
         {
-            this._Clients = new ClientSessionCollectionLimited(this.Leave0, (int)maxMembers);
+            this._Clients = new ClientSessionCollectionLimited((int)maxMembers, this.Leave0);
             this.LobbyClients = new ClientSessionCollection();
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
 
@@ -96,14 +95,14 @@ namespace Platform_Racing_3_Server.Game.Lobby
             {
                 this._HostSocketId = creator.SocketId;
 
-                creator.TryRegisterDisconnectEvent(this.OnCreatorDisconnectEarly);
+                creator.Connection.OnDisconnected += this.OnCreatorDisconnectEarly;
             }
         }
 
         internal ICollection<ClientSession> Clients => this._Clients.Sessions;
-        internal uint ClientsCount => this._Clients.Count;
+        internal int ClientsCount => this._Clients.Count;
 
-        private void OnCreatorDisconnectEarly(SocketConnection connection)
+        private void OnCreatorDisconnectEarly(ISocket connection)
         {
             PlatformRacing3Server.MatchListingManager.Die(this); //We can pull the plug no biggie
         }
@@ -170,7 +169,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal bool Join(ClientSession session)
         {
-            session.DisconnectEvent -= this.OnCreatorDisconnectEarly;
+            session.Connection.OnDisconnected -= this.OnCreatorDisconnectEarly;
 
             MatchListingJoinStatus canJoinStatus = this.CanJoin(session);
             if (canJoinStatus != MatchListingJoinStatus.Success)
@@ -242,7 +241,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             session.SendPacket(new UserLeaveRoomOutgoingMessage(this.Name, session.SocketId));
         }
 
-        private void Leave0(ClientSession session, CilentCollectionRemoveReason reason)
+        private void Leave0(ClientSession session)
         {
             session.LobbySession.MatchListing = null;
 

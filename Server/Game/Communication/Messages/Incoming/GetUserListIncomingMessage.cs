@@ -17,7 +17,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
             {
                 case "online":
                     {
-                        session.SendPacket(new UserListOutgoingMessage(message.RequestId, PlatformRacing3Server.ClientManager.GetLoggedInUsers().Skip((int)message.Start).Take((int)message.Count).ToList().AsReadOnly(), PlatformRacing3Server.ClientManager.Count));
+                        session.SendPacket(new UserListOutgoingMessage(message.RequestId, PlatformRacing3Server.ClientManager.LoggedInUsers.Skip((int)message.Start).Take((int)message.Count).ToList().AsReadOnly(), (uint)PlatformRacing3Server.ClientManager.Count));
                     }
                     break;
             }

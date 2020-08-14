@@ -1,58 +1,33 @@
-﻿using Net.Communication.Incoming.Handlers;
-using Net.Communication.Pipeline;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
+using Net.Buffers;
+using Net.Sockets.Pipeline.Handler;
+using Net.Sockets.Pipeline.Handler.Incoming;
 
 namespace Platform_Racing_3_Server.Game.Communication.Handlers
 {
-    internal class FlashSocketPolicyRequestHandler : IIncomingObjectHandler<ReadOnlySequence<byte>>
+    internal class FlashSocketPolicyRequestHandler : IncomingBytesHandler
     {
         public static FlashSocketPolicyRequestHandler Instance { get; } = new FlashSocketPolicyRequestHandler();
 
         private static readonly ReadOnlyMemory<byte> FLASH_POLICY_REQUEST = Encoding.ASCII.GetBytes("<policy-file-request/>\0");
         private static readonly ReadOnlyMemory<byte> FLASH_POLICY_RESPONSE = Encoding.ASCII.GetBytes("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"*\" /></cross-domain-policy>\0");
 
-        public void Handle(ref SocketPipelineContext context, ref ReadOnlySequence<byte> data)
+        protected override void Decode(IPipelineHandlerContext context, ref PacketReader reader)
         {
-            if (data.Length == FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Length)
+            if (reader.SequenceEqual(FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Span))
             {
-                //Single segment can be optimized
-                if (data.IsSingleSegment)
-                {
-                    if (data.First.Span.SequenceEqual(FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Span))
-                    {
-                        context.Connection.Send(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
-                        context.Connection.Disconnect("Socket policy request (Fast path)");
+                context.Socket.SendBytesAsync(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
+                context.Socket.Disconnect("Socket policy request");
 
-                        data = data.Slice(data.End);
-
-                        return;
-                    }
-                }
-                else
-                {
-                    //Small enough, copy to stack and read them
-                    Span<byte> bytes = stackalloc byte[FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Length];
-
-                    data.CopyTo(bytes);
-
-                    if (bytes.SequenceEqual(FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Span))
-                    {
-                        context.Connection.Send(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
-                        context.Connection.Disconnect("Socket policy request (Slow path)");
-
-                        data = data.Slice(data.End);
-
-                        return;
-                    }
-                }
+                return;
             }
 
-            //Only the first data may be the policy request, remove us after thats not the case
-            context.RemoveHandler(this);
-            context.ProgressReadHandler(ref data);
+            //Only the first data may be the policy request, remove us after that's not the case
+            context.Socket.Pipeline.RemoveHandler(this);
+            context.Socket.Pipeline.Read(ref reader);
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using Net.Communication.Incoming.Handlers;
-using Net.Communication.Incoming.Helpers;
-using Net.Communication.Incoming.Packet;
-using Net.Communication.Outgoing.Handlers;
-using Net.Communication.Outgoing.Helpers;
-using Net.Communication.Pipeline;
-using Platform_Racing_3_Server.Core;
+﻿using Platform_Racing_3_Server.Core;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using System;
@@ -12,10 +6,14 @@ using System.Buffers;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.Text;
+using Net.Buffers;
+using Net.Sockets.Pipeline.Handler;
+using Net.Sockets.Pipeline.Handler.Incoming;
+using Net.Sockets.Pipeline.Handler.Outgoing;
 
 namespace Platform_Racing_3_Server.Game.Communication.Handlers
 {
-    internal class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
+    internal sealed class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
     {
         private ushort CurrentPacketLength;
 
@@ -26,37 +24,35 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
             this.Session = session;
         }
 
-        public override void Handle(ref SocketPipelineContext context, ref PacketReader reader)
+        protected override void Decode(IPipelineHandlerContext context, ref PacketReader reader)
         {
             //We haven't read the next packet length, wait for it
-            if (this.CurrentPacketLength == 0)
+            if (this.CurrentPacketLength == 0 && !reader.TryReadUInt16(out this.CurrentPacketLength))
             {
-                if (!reader.TryReadUInt16(out this.CurrentPacketLength))
-                {
-                    return;
-                }
+                reader.MarkPartial();
 
-                reader.Consumed = true;
+                return;
             }
 
             if (reader.Remaining < this.CurrentPacketLength)
             {
+                reader.MarkPartial();
+
                 return;
             }
 
-            reader = reader.Slice(this.CurrentPacketLength);
-            reader.Consumed = true;
+            PacketReader readerSliced = reader.Slice(this.CurrentPacketLength);
 
-            this.Read(ref context, ref reader);
+            this.Read(context, ref readerSliced);
 
             this.CurrentPacketLength = 0;
         }
 
-        public void Read(ref SocketPipelineContext context, ref PacketReader reader)
+        public void Read(IPipelineHandlerContext context, ref PacketReader reader)
         {
             ushort header = reader.ReadUInt16();
 
-            PlatformRacing3Server.BytePacketManager.HandleIncomingData(header, this.Session, ref context, ref reader);
+            PlatformRacing3Server.BytePacketManager.HandleIncomingData(header, this.Session, context, ref reader);
 
             if (reader.Remaining > 0)
             {
@@ -64,11 +60,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
             }
         }
 
-        public void Handle<T>(ref SocketPipelineContext context, in T data, ref PacketWriter writer)
+        public void Handle<T>(IPipelineHandlerContext context, ref PacketWriter writer, in T packet)
         {
-            if (data is IMessageOutgoing message)
+            if (packet is IMessageOutgoing message)
             {
-                PacketWriter.Slice length = writer.PrepareBytes(2);
+                PacketWriter length = writer.ReservedFixedSlice(2);
 
                 int writerLength = writer.Length;
 
@@ -76,7 +72,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
 
                 ushort size = checked((ushort)(writer.Length - writerLength));
 
-                BinaryPrimitives.WriteUInt16BigEndian(length.Span, size);
+                length.WriteUInt16(size);
             }
         }
     }

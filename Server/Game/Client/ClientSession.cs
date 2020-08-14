@@ -1,5 +1,4 @@
-﻿using Net.Connections;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.User;
@@ -17,13 +16,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Net.Sockets;
 
 namespace Platform_Racing_3_Server.Game.Client
 {
     internal class ClientSession : ICommandExecutor
     {
+        internal ISocket Connection { get; }
+
         private ClientStatus ClientStatus { get; set; }
-        internal SocketConnection Connection { get; }
 
         internal UserData UserData { get; set; }
 
@@ -40,10 +41,10 @@ namespace Platform_Racing_3_Server.Game.Client
         private Dictionary<string, HashSet<uint>> TrackingUsersInRoom;
         private Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>> TrackingUserData;
 
-        internal ClientSession(SocketConnection connection)
+        internal ClientSession(ISocket connection)
         {
-            this.ClientStatus = ClientStatus.None;
             this.Connection = connection;
+            this.ClientStatus = ClientStatus.None;
 
             this.LastPing = Stopwatch.StartNew();
 
@@ -52,18 +53,10 @@ namespace Platform_Racing_3_Server.Game.Client
             this.TrackingUsersInRoom = new Dictionary<string, HashSet<uint>>();
             this.TrackingUserData = new Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>>();
 
-            this.TryRegisterDisconnectEvent(this.OnDisconnect0);
+            this.Connection.OnDisconnected += this.OnDisconnect0;
         }
 
-        internal bool TryRegisterDisconnectEvent(SocketConnection.SocketDisconnect value) => this.Connection.TryRegisterDisconnectEvent(value);
-
-        internal event SocketConnection.SocketDisconnect DisconnectEvent
-        {
-            add => this.Connection.DisconnectEvent += value;
-            remove => this.Connection.DisconnectEvent -= value;
-        }
-
-        private void OnDisconnect0(SocketConnection connection)
+        private void OnDisconnect0(ISocket connection)
         {
             if (this.UserData != null)
             {
@@ -77,10 +70,10 @@ namespace Platform_Racing_3_Server.Game.Client
             }
         }
 
-        internal bool Disconnected => this.Connection.Disconnected;
+        internal bool Disconnected => this.Connection.Closed;
         [JsonProperty("socketID")]
-        internal uint SocketId => this.Connection.Id;
-        internal IPAddress IPAddres => this.Connection.IPAddress;
+        internal uint SocketId => (uint)this.Connection.Id.GetHashCode(); //Relying on internal details, lmao, how bad
+        internal IPAddress IPAddres => (this.Connection.RemoteEndPoint as IPEndPoint).Address;
 
         internal bool IsLoggedIn => this.ClientStatus == ClientStatus.LoggedIn;
         internal bool IsGuest => this.UserData?.IsGuest ?? true;
@@ -94,7 +87,7 @@ namespace Platform_Racing_3_Server.Game.Client
 
         public LobbySession LobbySession => this._LobbySession.Value;
 
-        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.Send(messageOutgoing);
+        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.SendAsync(messageOutgoing);
 
         internal void Disconnect(string reason = null) => this.Connection.Disconnect(reason);
 

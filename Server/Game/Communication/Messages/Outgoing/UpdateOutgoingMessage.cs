@@ -1,9 +1,9 @@
-﻿using Net.Communication.Outgoing.Helpers;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
+﻿using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
 using Platform_Racing_3_Server.Game.Match;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Net.Buffers;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
@@ -95,7 +95,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 
             if (this.MatchPlayer.ToUpdate.HasFlag(UpdateStatus.Item))
             {
-                writer.WriteFixedString(this.MatchPlayer.Item);
+                writer.WriteFixedUInt16String(this.MatchPlayer.Item);
             }
 
             if (this.MatchPlayer.ToUpdate.HasFlag(UpdateStatus.Life))
@@ -115,7 +115,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 
             if (this.MatchPlayer.ToUpdate.HasFlag(UpdateStatus.Team))
             {
-                writer.WriteFixedString(this.MatchPlayer.Team);
+                writer.WriteFixedUInt16String(this.MatchPlayer.Team);
             }
         }
     }

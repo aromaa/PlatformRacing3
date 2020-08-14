@@ -1,14 +1,13 @@
-﻿using Net.Communication.Attributes;
-using Net.Communication.Incoming.Helpers;
-using Net.Communication.Incoming.Packet;
-using Net.Communication.Incoming.Packet.Parser;
-using Platform_Racing_3_Server.Game.Communication.Managers;
+﻿using Platform_Racing_3_Server.Game.Communication.Managers;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.Match;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Net.Buffers;
+using Net.Communication.Attributes;
+using Net.Communication.Incoming.Parser;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Parsers.Match
 {
@@ -45,13 +44,13 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Parsers.
 
                 rotation: status.HasFlag(UpdateStatus.Rot) ? reader.ReadInt32() : 0,
 
-                item: status.HasFlag(UpdateStatus.Item) ? reader.ReadFixedString() : null,
+                item: status.HasFlag(UpdateStatus.Item) ? reader.ReadFixedUInt16String() : null,
 
                 life: status.HasFlag(UpdateStatus.Life) ? reader.ReadUInt32() : 0,
                 hurt: status.HasFlag(UpdateStatus.Hurt) ? reader.ReadBool() : false,
 
                 coins: status.HasFlag(UpdateStatus.Coins) ? reader.ReadUInt32() : 0,
-                team: status.HasFlag(UpdateStatus.Team) ? reader.ReadFixedString() : null
+                team: status.HasFlag(UpdateStatus.Team) ? reader.ReadFixedUInt16String() : null
             );
         }
     }

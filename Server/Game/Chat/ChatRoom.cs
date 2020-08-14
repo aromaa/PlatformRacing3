@@ -16,7 +16,6 @@ using System.Linq;
 using System.Text;
 using Platform_Racing_3_Common.Redis;
 using StackExchange.Redis;
-using Net.Collections;
 
 namespace Platform_Racing_3_Server.Game.Chat
 {
@@ -41,7 +40,7 @@ namespace Platform_Racing_3_Server.Game.Chat
         private ConcurrentBag<IUserIdentifier> BannedClients;
 
         [JsonProperty("members")]
-        internal uint MembersCount => this.Clients.Count;
+        internal int MembersCount => this.Clients.Count;
 
         private ConcurrentQueue<ChatOutgoingMessage> RecentMessages;
 
@@ -51,7 +50,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         internal ChatRoom(ChatRoomType type, uint creatorUserId, string name, string pass, string note)
         {
-            this.Clients = new ClientSessionCollection(this.Leave0);
+            this.Clients = new ClientSessionCollection(removeCallback: this.Leave0);
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
 
             this.RecentMessages = new ConcurrentQueue<ChatOutgoingMessage>();
@@ -100,7 +99,7 @@ namespace Platform_Racing_3_Server.Game.Chat
             this.Leave(session);
         }
 
-        private void Leave0(ClientSession session, CilentCollectionRemoveReason reason)
+        private void Leave0(ClientSession session)
         {
             foreach (ClientSession other in this.Clients.Sessions)
             {
@@ -159,11 +158,11 @@ namespace Platform_Racing_3_Server.Game.Chat
 
                 if (sendToSelf)
                 {
-                    this.Clients.Send(packet);
+                    this.Clients.SendAsync(packet);
                 }
                 else
                 {
-                    this.Clients.Send(packet, session.Connection);
+                    this.Clients.SendAsync(packet, session);
                 }
 
                 if (this.Name == "chat-Home")
