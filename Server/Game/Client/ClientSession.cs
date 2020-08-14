@@ -16,6 +16,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Net.Sockets;
 
 namespace Platform_Racing_3_Server.Game.Client
@@ -89,7 +90,17 @@ namespace Platform_Racing_3_Server.Game.Client
 
         internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.SendAsync(messageOutgoing);
 
-        internal void Disconnect(string reason = null) => this.Connection.Disconnect(reason);
+        internal void Disconnect(string reason = null)
+        {
+            _ = TriggerDisconnect(reason);
+
+            async Task TriggerDisconnect(string reason)
+            {
+                await this.Connection.SendAsync(new LogoutTriggerOutgoingMessage(reason));
+
+                this.Connection.Disconnect(reason);
+            }
+        }
 
         internal bool UpgradeClientStatus(ClientStatus clientStatus)
         {
