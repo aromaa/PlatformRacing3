@@ -2,7 +2,9 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Net.Buffers;
+using Net.Sockets;
 using Net.Sockets.Pipeline.Handler;
 using Net.Sockets.Pipeline.Handler.Incoming;
 
@@ -19,8 +21,14 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
         {
             if (reader.SequenceEqual(FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Span))
             {
-                context.Socket.SendBytesAsync(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
-                context.Socket.Disconnect("Socket policy request");
+                _ = SendSocketPolicy(context.Socket);
+
+                static async Task SendSocketPolicy(ISocket socket)
+                {
+                    await socket.SendBytesAsync(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
+
+                    socket.Disconnect("Socket policy request");
+                }
 
                 return;
             }
