@@ -18,6 +18,7 @@ using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Web.Config;
+using Platform_Racing_3_Web.Controllers.DataAccess2;
 
 namespace Platform_Racing_3_Web
 {
@@ -43,6 +44,8 @@ namespace Platform_Racing_3_Web
             }
 
             Program.Config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));
+
+            DataAccess2.Init(Program.Config);
 
             DatabaseConnection.Init(Program.Config);
             RedisConnection.Init(Program.Config);

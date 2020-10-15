@@ -4,8 +4,6 @@ using NpgsqlTypes;
 using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Config;
 using Platform_Racing_3_Common.Level;
-using Renci.SshNet;
-using Renci.SshNet.Common;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -22,8 +20,7 @@ namespace Platform_Racing_3_Common.Database
 {
     public class DatabaseConnection : IDisposable
     {
-        private static string ConnectionString = null;
-        private static SshClient SshClient = null;
+        private static string ConnectionString;
 
         private NpgsqlConnection Connection;
         private NpgsqlCommand Command;
@@ -36,24 +33,7 @@ namespace Platform_Racing_3_Common.Database
 
         public static void Init(IDatabaseConfig dbConfig)
         {
-            if (dbConfig.DatabaseUseSsh)
-            {
-                DatabaseConnection.SshClient = new SshClient(dbConfig.DatabaseHost, dbConfig.DatabaseSshUser, new PrivateKeyFile(dbConfig.DatabaseSshKey));
-                DatabaseConnection.SshClient.Connect();
-
-                ForwardedPortLocal forward = new ForwardedPortLocal("127.0.0.1", "127.0.0.1", dbConfig.DatabasePort);
-
-                DatabaseConnection.SshClient.AddForwardedPort(forward);
-
-                forward.Start();
-
-                DatabaseConnection.ConnectionString = $"Host={forward.BoundHost};Port={forward.BoundPort};Username={dbConfig.DatabaseUser};Password={dbConfig.DatabasePass};Database={dbConfig.DatabaseName}";
-            }
-            else
-            {
-                DatabaseConnection.ConnectionString = $"Host={dbConfig.DatabaseHost};Username={dbConfig.DatabaseUser};Password={dbConfig.DatabasePass};Database={dbConfig.DatabaseName}";
-            }
-            
+            DatabaseConnection.ConnectionString = $"Host={dbConfig.DatabaseHost};Port={dbConfig.DatabasePort};Username={dbConfig.DatabaseUser};Password={dbConfig.DatabasePass};Database={dbConfig.DatabaseName}";
             DatabaseConnection.TestConnection();
         }
 
@@ -87,7 +67,7 @@ namespace Platform_Racing_3_Common.Database
             return this.Command.ExecuteReader();
         }
         
-        public Task<DbDataReader> ReadDataAsync(FormattableString query)
+        public Task<NpgsqlDataReader> ReadDataAsync(FormattableString query)
         {
             this.PrepareQuery(query);
 
@@ -96,7 +76,7 @@ namespace Platform_Racing_3_Common.Database
             return this.Command.ExecuteReaderAsync();
         }
 
-        public Task<DbDataReader> ReadDataUnsafeAsync(string query)
+        public Task<NpgsqlDataReader> ReadDataUnsafeAsync(string query)
         {
             this.Command.CommandText = query;
 

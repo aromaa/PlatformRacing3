@@ -8,10 +8,12 @@ using Platform_Racing_3_Web.Extensions;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("restorelevel")]
-    public class RestoreLevel : Controller
+    public class RestoreLevel : ControllerBase
     {
         [HttpGet]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] //Dynamic get
         public async Task<IActionResult> GetAll()
         {
             uint userId = this.HttpContext.IsAuthenicatedPr3User();

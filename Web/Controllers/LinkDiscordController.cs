@@ -11,13 +11,15 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("linkdiscord")]
-    public class LinkDiscordController : Controller
+    public class LinkDiscordController : ControllerBase
     {
         private const string DISCORD_API_TOKEN = "https://discord.com/api/v6/oauth2/token";
         private const string DISCORD_API_ME = "https://discord.com/api/v6/users/@me";
 
         [HttpGet]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] //Dynamic get
         public async Task<ContentResult> GetAsync([FromQuery] string code)
         {
             uint userId = this.HttpContext.IsAuthenicatedPr3User();

@@ -5,6 +5,7 @@ using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps;
 using Platform_Racing_3_Web.Responses;
 using Platform_Racing_3_Web.Responses.Procedures;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,16 +15,24 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
+using Microsoft.Extensions.Primitives;
+using Platform_Racing_3_Web.Extensions;
+using Platform_Racing_3_Common.User;
+using Platform_Racing_3_Web.Config;
 
 namespace Platform_Racing_3_Web.Controllers.DataAccess2
 {
+    [ApiController]
     [Route("dataaccess2")]
     [Produces("text/xml")]
-    public class DataAccess2 : Controller
+    public class DataAccess2 : ControllerBase
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static readonly byte[] KEY = Encoding.UTF8.GetBytes("012345678910ABCD");
+        private static readonly byte[] DEFAULT_KEY = Encoding.UTF8.GetBytes("012345678910ABCD");
         private static readonly IReadOnlyDictionary<string, IProcedure> Procedures = new Dictionary<string, IProcedure>()
         {
             { "GetServers2", new GetServers2Procedure() },
@@ -58,22 +67,162 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
             { "DeleteStamp", new DeleteStampProcedure() },
         };
 
+        private static readonly IReadOnlyDictionary<string, ConcurrentDictionary<byte[], byte>> KEYS = new Dictionary<string, ConcurrentDictionary<byte[], byte>>()
+        {
+            {
+                "Android",
+                new ConcurrentDictionary<byte[], byte>()
+            },
+            {
+                "iOS",
+                new ConcurrentDictionary<byte[], byte>()
+            },
+            {
+                "Browser",
+                new ConcurrentDictionary<byte[], byte>()
+            },
+            {
+                "Standalone",
+                new ConcurrentDictionary<byte[], byte>()
+            }
+        };
+
+        internal static void Init(WebConfig webConfig)
+        {
+            if (string.IsNullOrWhiteSpace(webConfig.GamePath))
+            {
+                return;
+            }
+
+            PhysicalFileProvider val = new PhysicalFileProvider(webConfig.GamePath, ExclusionFilters.Sensitive)
+            {
+                UsePollingFileWatcher = true,
+                UseActivePolling = true
+            };
+
+            IChangeToken token = val.Watch("*.swf");
+            token.RegisterChangeCallback(state =>
+            {
+                RefreshSwfs();
+            }, null);
+
+            RefreshSwfs();
+
+            void RefreshSwfs()
+            {
+                Console.WriteLine("Refreshing SWFs");
+
+                Parallel.ForEach(new DirectoryInfo(webConfig.GamePath).GetFiles().OrderBy(f => f.LastWriteTime), async swf =>
+                {
+                    byte[] bytes = await System.IO.File.ReadAllBytesAsync(swf.FullName);
+
+                    DataAccess2.CalcHashAndAdd(bytes);
+                });
+            }
+        }
+
+        private static void CalcHashAndAdd(byte[] bytes)
+        {
+            try
+            {
+                int crc = DataAccess2.GetCrc32(bytes.AsSpan(3));
+                string s = DataAccess2.GetHash(crc);
+
+                byte[] bytes2 = Encoding.UTF8.GetBytes(s);
+                if (bytes2.Length == 16)
+                {
+                    DataAccess2.KEYS["Android"].TryAdd(bytes2, 0);
+                    DataAccess2.KEYS["Browser"].TryAdd(bytes2, 0);
+                    DataAccess2.KEYS["Standalone"].TryAdd(bytes2, 0);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private static int GetCrc32(ReadOnlySpan<byte> span)
+        {
+            using (MemoryStream memoryStream = new MemoryStream(span.Slice(5).ToArray()))
+            {
+                using (InflaterInputStream val = new InflaterInputStream(memoryStream))
+                {
+                    using (MemoryStream memoryStream2 = new MemoryStream())
+                    {
+                        memoryStream2.Write(Encoding.UTF8.GetBytes("FWS"));
+                        memoryStream2.Write(span.Slice(0, 5));
+
+                        val.CopyTo(memoryStream2);
+
+                        return DataAccess2.CalculateCrc32(memoryStream2.ToArray());
+                    }
+                }
+            }
+        }
+
+        private static int CalculateCrc32(byte[] bytes)
+        {
+            int[] array = DataAccess2.Crc32Table();
+
+            uint num = uint.MaxValue;
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                num = (uint) (array[(num ^ bytes[i]) & 0xFF] ^ (int) (num >> 8));
+            }
+
+            return (int) (~num);
+        }
+
+        private static int[] Crc32Table()
+        {
+            int[] array = new int[256];
+            for (uint num = 0u; num < 256; num++)
+            {
+                uint num2 = num;
+                for (int i = 0; i< 8; i++)
+                {
+                    num2 = (uint) (((num2 & 1) != 0) ? (-306674912 ^ (int) (num2 >> 1)) : ((int)(num2 >> 1)));
+                }
+
+                array[num] = (int) num2;
+            }
+
+            return array;
+        }
+
+        private static string GetHash(int crc32)
+        {
+            using (MD5 mD = MD5.Create())
+            {
+                byte[] array = mD.ComputeHash(Encoding.UTF8.GetBytes($"L{crc32}L"));
+
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < array.Length; i++)
+                {
+                    stringBuilder.Append(array[i].ToString("x2"));
+                }
+
+                return $"{DataAccess2.IntOrZero(stringBuilder[9])}12345{DataAccess2.IntOrZero(stringBuilder[18]) + 56 - 32}8{DataAccess2.IntOrZero(stringBuilder[31]) + 11 - 11}10A{stringBuilder[16]}CD";
+            }
+        }
+
+        private static int IntOrZero(char c) => char.IsNumber(c) ? int.Parse(c.ToString()) : 0;
+        
         [HttpPost]
-        public async Task<object> DataAccessAsync([FromQuery] uint id, [FromForm] uint dataRequestID, [FromForm(Name = "gameId")] string gameIdEncoded, [FromForm(Name = "storedProcID")] string storedProcIdEncoded, [FromForm(Name = "storedProcedureName")] string storedProcedureNameEncoded, [FromForm(Name = "parametersXML")] string parametersXmlEncoded)
+        public async Task<object> DataAccessAsync([FromQuery] uint id, [FromForm] uint dataRequestID, [FromForm(Name = "gameId")] string gameIdEncoded, [FromForm(Name = "storedProcID")] string storedProcIdEncoded, [FromForm(Name = "storedProcedureName")] string storedProcedureNameEncoded, [FromForm(Name = "parametersXML")] string parametersXmlEncoded, [FromForm(Name = "platform")] string platform, [FromForm(Name = "playerType")] string playerType)
         {
             if (id == dataRequestID)
             {
                 if (gameIdEncoded != null && storedProcIdEncoded != null && storedProcedureNameEncoded != null && parametersXmlEncoded != null)
                 {
                     byte[] storedProcId = Convert.FromBase64String(storedProcIdEncoded);
-
-                    string gameId = this.DecryptData(gameIdEncoded, storedProcId, DataAccess2.KEY);
-                    if (gameId == "f1c25e3bd3523110394b5659c68d8092")
+                    byte[] key = await this.FindEncryptionKeyAsync(storedProcId, gameIdEncoded, platform, playerType);
+                    if (key != null)
                     {
-                        string storedProcedureName = this.DecryptData(storedProcedureNameEncoded, storedProcId, DataAccess2.KEY);
+                        string storedProcedureName = this.DecryptData(storedProcedureNameEncoded, storedProcId, key);
                         if (DataAccess2.Procedures.TryGetValue(storedProcedureName, out IProcedure procedure))
                         {
-                            XDocument xml = XDocument.Parse(this.DecryptData(parametersXmlEncoded, storedProcId, DataAccess2.KEY));
+                            XDocument xml = XDocument.Parse(this.DecryptData(parametersXmlEncoded, storedProcId, key));
 
                             try
                             {
@@ -97,10 +246,65 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                             return new DataAccessErrorResponse(dataRequestID, "No procedure found by the name");
                         }
                     }
+                    else
+                    {
+                        return new DataAccessEmptyResponse(dataRequestID);
+                    }
                 }
             }
 
             return this.BadRequest();
+        }
+
+        private async Task<byte[]> FindEncryptionKeyAsync(byte[] storedProcId, string gameIdEncoded, string platform, string playerType)
+        {
+            ICollection<byte[]> keys;
+            switch (platform)
+            {
+                case "iOS":
+                    keys = DataAccess2.KEYS["iOS"].Keys;
+                    break;
+                case "AND":
+                    keys = DataAccess2.KEYS["Android"].Keys;
+                    break;
+                default:
+                    switch (playerType)
+                    {
+                        case "ActiveX":
+                        case "PlugIn":
+                            keys = DataAccess2.KEYS["Browser"].Keys;
+                            break;
+                        default:
+                            keys = DataAccess2.KEYS["Standalone"].Keys;
+                            break;
+                    }
+                    break;
+            }
+
+            foreach (byte[] key in keys)
+            {
+                string gameId = this.DecryptData(gameIdEncoded, storedProcId, key);
+                if (gameId == "f1c25e3bd3523110394b5659c68d8092")
+                {
+                    return key;
+                }
+            }
+
+            uint userId = this.HttpContext.IsAuthenicatedPr3User();
+            if (userId > 0)
+            {
+                PlayerUserData player = await UserManager.TryGetUserDataByIdAsync(userId, true);
+                if (player != null && player.HasPermissions("debug"))
+                {
+                    string gameId = this.DecryptData(gameIdEncoded, storedProcId, DataAccess2.DEFAULT_KEY);
+                    if (gameId == "f1c25e3bd3523110394b5659c68d8092")
+                    {
+                        return DataAccess2.DEFAULT_KEY;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private string DecryptData(string data, byte[] iv, byte[] key)

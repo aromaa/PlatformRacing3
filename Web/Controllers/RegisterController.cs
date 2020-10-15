@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("register")]
-    public class RegisterController : Controller
+    public class RegisterController : ControllerBase
     {
         public const uint USERNAME_MIN_LENGTH = 1;
         public const uint USERNAME_MAX_LENGTH = 16;

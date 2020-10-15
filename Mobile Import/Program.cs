@@ -64,7 +64,7 @@ namespace Mobile_Import
                 string levelData = (string)level["levelData"];
                 if (levelData.StartsWith("v2 | "))
                 {
-                    levelData = levelData.Substring(5);
+                    levelData = levelData[5..];
                 }
                 else
                 {
@@ -95,7 +95,7 @@ namespace Mobile_Import
                 {
                     if (block.StartsWith('b'))
                     {
-                        uint blockId = uint.Parse(block.Substring(1));
+                        uint blockId = uint.Parse(block[1..]);
 
                         if (levelsByBlockId.TryGetValue(blockId, out string blockLevel))
                         {
@@ -172,7 +172,7 @@ namespace Mobile_Import
                         string settingsParsed;
                         if (settings.StartsWith("v2 | "))
                         {
-                            settingsParsed = settings.Substring(5);
+                            settingsParsed = settings[5..];
                         }
                         else
                         {
@@ -213,7 +213,7 @@ namespace Mobile_Import
                     }
                     else
                     {
-                        Console.WriteLine($"File {file.ToString()} is missing Row");
+                        Console.WriteLine($"File {file} is missing Row");
                     }
                 }
 
@@ -262,7 +262,7 @@ namespace Mobile_Import
                         string settingsParsed;
                         if (settings.StartsWith("v2 | "))
                         {
-                            settingsParsed = settings.Substring(5);
+                            settingsParsed = settings[5..];
                         }
                         else
                         {
@@ -318,7 +318,7 @@ namespace Mobile_Import
                     }
                     else
                     {
-                        Console.WriteLine($"File {file.ToString()} is missing Row");
+                        Console.WriteLine($"File {file} is missing Row");
                     }
                 }
 
@@ -361,7 +361,7 @@ namespace Mobile_Import
                     string levelData = (string)level["levelData"];
                     if (levelData.StartsWith("v2 | "))
                     {
-                        levelData = levelData.Substring(5);
+                        levelData = levelData[5..];
                     }
                     else
                     {
@@ -393,7 +393,7 @@ namespace Mobile_Import
                         string block = blockStr[i];
                         if (block.StartsWith('b'))
                         {
-                            uint blockId = uint.Parse(block.Substring(1));
+                            uint blockId = uint.Parse(block[1..]);
                             if (newIds.TryGetValue(blockId, out uint newId))
                             {
                                 blockStr[i] = "b" + newId;

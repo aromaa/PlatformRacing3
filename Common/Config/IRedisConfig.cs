@@ -8,9 +8,5 @@ namespace Platform_Racing_3_Common.Config
     {
         string RedisHost { get; }
         uint RedisPort { get; }
-
-        bool RedisUseSsh { get; }
-        string RedisSshKey { get; }
-        string RedisSshUser { get; }
     }
 }

@@ -16,7 +16,6 @@ using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server_API.Core;
-using Renci.SshNet;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;

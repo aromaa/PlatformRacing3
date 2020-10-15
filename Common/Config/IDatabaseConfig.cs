@@ -12,9 +12,5 @@ namespace Platform_Racing_3_Common.Config
         string DatabaseUser { get; }
         string DatabasePass { get; }
         string DatabaseName { get; }
-
-        bool DatabaseUseSsh { get; }
-        string DatabaseSshKey { get; }
-        string DatabaseSshUser { get; }
     }
 }

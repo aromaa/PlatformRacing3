@@ -7,6 +7,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.Level
 {
@@ -20,7 +21,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (levelId == 0)
             {
-                throw new ArgumentException(nameof(levelId));
+                throw new ArgumentException(null, nameof(levelId));
             }
 
             //TODO: Cache internally and listen for redis update event?
@@ -37,12 +38,12 @@ namespace Platform_Racing_3_Common.Level
         {
             if (levelId == 0)
             {
-                throw new ArgumentException(nameof(levelId));
+                throw new ArgumentException(null, nameof(levelId));
             }
 
             if (version == 0)
             {
-                throw new ArgumentException(nameof(levelId));
+                throw new ArgumentException(null, nameof(levelId));
             }
 
             //TODO: Cache internally and listen for redis update event?
@@ -54,7 +55,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             //TODO: Cache
@@ -66,7 +67,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (authorId == 0)
             {
-                throw new ArgumentException(nameof(authorId));
+                throw new ArgumentException(null, nameof(authorId));
             }
 
             //TODO: Cache
@@ -78,7 +79,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH insertTitle AS (INSERT INTO base.levels_titles(title, author_user_id) VALUES({title}, {userId}) ON CONFLICT(lower(title::text), author_user_id) DO UPDATE SET title = levels_titles.title RETURNING id) INSERT INTO base.levels(id, version, description, publish, song_id, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, king_of_the_hat, bg_image, level_data) SELECT (SELECT id FROM insertTitle) AS id, COALESCE(MAX(version) + 1, 1), {description}, {publish}, {songId}, {mode}, {seconds}, {gravity}, {alien}, {sfchm}, {snow}, {wind}, {items}, {health}, {kingOfTheHat}, {bgImage}, {levelData} FROM base.levels WHERE id = (SELECT id FROM insertTitle) RETURNING id").ContinueWith(LevelManager.ParseSqlSaveLevel));
@@ -88,7 +89,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (levelId == 0)
             {
-                throw new ArgumentException(nameof(levelId));
+                throw new ArgumentException(null, nameof(levelId));
             }
 
             if (authorId != default)
@@ -173,7 +174,7 @@ namespace Platform_Racing_3_Common.Level
         {
             if (rating != -1 && rating != 1)
             {
-                return Task.FromException(new ArgumentException(nameof(rating)));
+                return Task.FromException(new ArgumentException(null, nameof(rating)));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbconnection) => dbconnection.ExecuteNonQueryAsync($"INSERT INTO base.levels_ratings(level_id, user_id, rating) VALUES({levelId}, {userId}, {(rating == 1 ? "like" : "dislike")}::base.level_rating) ON CONFLICT(level_id, user_id) DO UPDATE SET rating = excluded.rating, updated_on = NOW()"));
@@ -213,7 +214,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else
             {
-                throw new ArgumentException(nameof(mode));
+                throw new ArgumentException(null, nameof(mode));
             }
 
             if (sort == "date")
@@ -234,7 +235,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else
             {
-                throw new ArgumentException(nameof(sort));
+                throw new ArgumentException(null, nameof(sort));
             }
 
             if (dir == "desc")
@@ -247,7 +248,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else
             {
-                throw new ArgumentException(nameof(dir));
+                throw new ArgumentException(null, nameof(dir));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) =>
@@ -280,7 +281,7 @@ namespace Platform_Racing_3_Common.Level
                 c.ReadDataAsync($"SELECT id, title FROM base.levels_deleted WHERE author_user_id = {userId}")
                  .ContinueWith(Parse));
 
-            IReadOnlyDictionary<uint, string> Parse(Task<DbDataReader> task)
+            static IReadOnlyDictionary<uint, string> Parse(Task<NpgsqlDataReader> task)
             {
                 Dictionary<uint, string> levels = new Dictionary<uint, string>();
 
@@ -310,7 +311,7 @@ namespace Platform_Racing_3_Common.Level
                 c.ReadDataAsync($"WITH deleted AS(DELETE FROM base.levels_deleted WHERE id = {levelId} AND author_user_id = {userId} RETURNING id, title, author_user_id) INSERT INTO base.levels_titles(id, title, author_user_id) SELECT id, COALESCE({(object)rename ?? DBNull.Value}, title), author_user_id FROM deleted")
                  .ContinueWith(Parse));
 
-            bool? Parse(Task<DbDataReader> task)
+            static bool? Parse(Task<NpgsqlDataReader> task)
             {
                 if (task.IsCompletedSuccessfully)
                 {
@@ -327,7 +328,7 @@ namespace Platform_Racing_3_Common.Level
             }
         }
 
-        private static bool ParseSqlDeleteLevel(Task<DbDataReader> task)
+        private static bool ParseSqlDeleteLevel(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -349,7 +350,7 @@ namespace Platform_Racing_3_Common.Level
             return false;
         }
 
-        private static uint ParseSqlCountMyLevels(Task<DbDataReader> task)
+        private static uint ParseSqlCountMyLevels(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -367,7 +368,7 @@ namespace Platform_Racing_3_Common.Level
             return 0u;
         }
 
-        private static LevelData ParseSqlLevelData(Task<DbDataReader> task)
+        private static LevelData ParseSqlLevelData(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -385,7 +386,7 @@ namespace Platform_Racing_3_Common.Level
             return null;
         }
 
-        private static uint ParseSqlSaveLevel(Task<DbDataReader> task)
+        private static uint ParseSqlSaveLevel(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -403,7 +404,7 @@ namespace Platform_Racing_3_Common.Level
             return 0u;
         }
 
-        private static IReadOnlyCollection<LevelData> ParseSqlLevelDataMultiple(Task<DbDataReader> task)
+        private static IReadOnlyCollection<LevelData> ParseSqlLevelDataMultiple(Task<NpgsqlDataReader> task)
         {
             List<LevelData> levels = new List<LevelData>();
             if (task.IsCompletedSuccessfully)
@@ -422,7 +423,7 @@ namespace Platform_Racing_3_Common.Level
             return levels;
         }
 
-        private static (uint results, IReadOnlyCollection<LevelData>) ParseSqlLevelDataMultipleAndTotal(Task<DbDataReader> task)
+        private static (uint results, IReadOnlyCollection<LevelData>) ParseSqlLevelDataMultipleAndTotal(Task<NpgsqlDataReader> task)
         {
             uint results = 0;
             List<LevelData> levels = new List<LevelData>();
@@ -447,7 +448,7 @@ namespace Platform_Racing_3_Common.Level
             return (results, levels);
         }
 
-        private static (uint levelId, uint plays) ParseSqlAddPlays(Task<DbDataReader> task)
+        private static (uint levelId, uint plays) ParseSqlAddPlays(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -465,7 +466,7 @@ namespace Platform_Racing_3_Common.Level
             return (0, 0);
         }
 
-        private static uint ParseSqlTransferLevel(Task<DbDataReader> task)
+        private static uint ParseSqlTransferLevel(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

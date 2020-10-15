@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.Server
 {
@@ -66,7 +67,7 @@ namespace Platform_Racing_3_Common.Server
             }
         }
 
-        private IReadOnlyCollection<ServerDetails> ParseSqlServers(Task<DbDataReader> task)
+        private IReadOnlyCollection<ServerDetails> ParseSqlServers(Task<NpgsqlDataReader> task)
         {
             List<ServerDetails> servers = new List<ServerDetails>();
             if (task.IsCompletedSuccessfully)
@@ -87,7 +88,7 @@ namespace Platform_Racing_3_Common.Server
             return servers;
         }
 
-        private void ParseSqlRedisFallback(Task<DbDataReader> task, object state)
+        private void ParseSqlRedisFallback(Task<NpgsqlDataReader> task, object state)
         {
             if (task.IsCompletedSuccessfully)
             {

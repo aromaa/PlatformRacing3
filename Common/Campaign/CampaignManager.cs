@@ -9,6 +9,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Customization;
 
@@ -147,7 +148,7 @@ namespace Platform_Racing_3_Common.Campaign
             }
         }
 
-        private static IReadOnlyDictionary<uint, (int Time, CampaignRun Run)> ParseSqlFriendsRuns(Task<DbDataReader> task)
+        private static IReadOnlyDictionary<uint, (int Time, CampaignRun Run)> ParseSqlFriendsRuns(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -182,7 +183,7 @@ namespace Platform_Racing_3_Common.Campaign
 
             return null;
         }
-        private static string ParseSqlRawRun(Task<DbDataReader> task)
+        private static string ParseSqlRawRun(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

@@ -1,4 +1,5 @@
 ﻿using log4net;
+using Npgsql;
 using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Platform_Racing_3_Common.Block
         {
             if (blockId == 0)
             {
-                throw new ArgumentException(nameof(blockId));
+                throw new ArgumentException(null, nameof(blockId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id, b.version, t.author_user_id, t.title, t.category, b.description, b.image_data, b.settings, b.last_updated FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.id = {blockId} LIMIT 1").ContinueWith(BlockManager.ParseSqlGetBlock));
@@ -37,7 +38,7 @@ namespace Platform_Racing_3_Common.Block
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             //TODO: CACHE
@@ -53,11 +54,11 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category ILIKE {category.Substring("category-".Length)}";
+                query = $"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}";
             }
             else
             {
-                throw new ArgumentException(nameof(category));
+                throw new ArgumentException(null, nameof(category));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(BlockManager.ParseSqlReadCountMyBlocks));
@@ -67,7 +68,7 @@ namespace Platform_Racing_3_Common.Block
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON (lower(category)) category FROM base.blocks_titles WHERE author_user_id = {userId} AND category != '' ORDER BY lower(category)").ContinueWith(BlockManager.ParseSqlGetCategorys));
@@ -77,7 +78,7 @@ namespace Platform_Racing_3_Common.Block
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             FormattableString query;
@@ -91,11 +92,11 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
             }
             else
             {
-                throw new ArgumentException(nameof(category));
+                throw new ArgumentException(null, nameof(category));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(BlockManager.ParseSqlGetMyBlocks));
@@ -105,7 +106,7 @@ namespace Platform_Racing_3_Common.Block
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH insertTitle AS (INSERT INTO base.blocks_titles(title, category, author_user_id) VALUES({title}, {category}, {userId}) ON CONFLICT(lower(title::text), lower(category::text), author_user_id) DO UPDATE SET title = blocks_titles.title RETURNING id) INSERT INTO base.blocks(id, version, description, image_data, settings) SELECT (SELECT id FROM insertTitle), COALESCE(MAX(version) + 1, 1), {description}, {imageData}, {settings} FROM base.blocks WHERE id = (SELECT id FROM insertTitle) RETURNING id").ContinueWith(BlockManager.ParseSqlSaveBlock));
@@ -128,7 +129,7 @@ namespace Platform_Racing_3_Common.Block
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH pm AS(INSERT INTO base.pms(to_user_id, from_user_id, type) VALUES({toUserId}, {authorId}, 'block') RETURNING from_user_id, id), block AS(SELECT id, title FROM base.blocks_titles WHERE id = {blockId} AND author_user_id = (SELECT from_user_id FROM pm) LIMIT 1) INSERT INTO base.transfers_block(id, block_id, title) SELECT p.id, b.id, b.title FROM pm p LEFT JOIN block b ON TRUE RETURNING id").ContinueWith(BlockManager.ParseSqlTransferBlock));
         }
 
-        private static BlockData ParseSqlGetBlock(Task<DbDataReader> task)
+        private static BlockData ParseSqlGetBlock(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -146,7 +147,7 @@ namespace Platform_Racing_3_Common.Block
             return null;
         }
 
-        private static List<BlockData> ParseSqlGetBlocks(Task<DbDataReader> task)
+        private static List<BlockData> ParseSqlGetBlocks(Task<NpgsqlDataReader> task)
         {
             List<BlockData> blocks = new List<BlockData>();
             if (task.IsCompletedSuccessfully)
@@ -165,7 +166,7 @@ namespace Platform_Racing_3_Common.Block
             return blocks;
         }
 
-        private static uint ParseSqlReadCountMyBlocks(Task<DbDataReader> task)
+        private static uint ParseSqlReadCountMyBlocks(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -183,7 +184,7 @@ namespace Platform_Racing_3_Common.Block
             return 0u;
         }
 
-        private static HashSet<string> ParseSqlGetCategorys(Task<DbDataReader> task)
+        private static HashSet<string> ParseSqlGetCategorys(Task<NpgsqlDataReader> task)
         {
             HashSet<string> categories = new HashSet<string>();
             if (task.IsCompletedSuccessfully)
@@ -202,7 +203,7 @@ namespace Platform_Racing_3_Common.Block
             return categories;
         }
 
-        private static HashSet<uint> ParseSqlGetMyBlocks(Task<DbDataReader> task)
+        private static HashSet<uint> ParseSqlGetMyBlocks(Task<NpgsqlDataReader> task)
         {
             HashSet<uint> blocks = new HashSet<uint>();
             if (task.IsCompletedSuccessfully)
@@ -221,7 +222,7 @@ namespace Platform_Racing_3_Common.Block
             return blocks;
         }
 
-        private static bool ParseSqlSaveBlock(Task<DbDataReader> task)
+        private static bool ParseSqlSaveBlock(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -241,7 +242,7 @@ namespace Platform_Racing_3_Common.Block
             return false;
         }
 
-        private static bool ParseSqlDeleteBlock(Task<DbDataReader> task)
+        private static bool ParseSqlDeleteBlock(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -261,7 +262,7 @@ namespace Platform_Racing_3_Common.Block
             return false;
         }
 
-        private static uint ParseSqlTransferBlock(Task<DbDataReader> task)
+        private static uint ParseSqlTransferBlock(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

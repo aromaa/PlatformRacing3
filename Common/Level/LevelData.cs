@@ -164,7 +164,7 @@ namespace Platform_Racing_3_Common.Level
             {
                 string mode = this.Mode.ToString();
 
-                return Char.ToLowerInvariant(mode[0]) + mode.Substring(1);
+                return Char.ToLowerInvariant(mode[0]) + mode[1..];
             }
         }
 

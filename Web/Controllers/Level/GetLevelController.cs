@@ -11,9 +11,10 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers.Level
 {
+    [ApiController]
     [Route("GetLevel")]
     [Produces("text/xml")]
-    public class GetLevelController : Controller
+    public class GetLevelController : ControllerBase
     {
         [HttpGet]
         public async Task<object> GetLevelAsync([FromQuery] uint id, [FromQuery] uint version)

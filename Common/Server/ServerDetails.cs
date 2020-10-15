@@ -15,7 +15,7 @@ namespace Platform_Racing_3_Common.Server
         public uint Id { get; }
         
         public string Name { get; internal set; }
-        public IPEndPoint EndPoint { get; internal set; }
+        public EndPoint EndPoint { get; internal set; }
         private string _Status;
 
         /// <summary>
@@ -32,31 +32,40 @@ namespace Platform_Racing_3_Common.Server
         {
             this.Id = (uint)(int)reader["id"];
             this.Name = (string)reader["name"];
-            this.EndPoint = new IPEndPoint((IPAddress)reader["ip"], (int)reader["port"]);
+
+            string ip = (string)reader["ip"];
+            int port = (int)reader["port"];
+
+            if (IPAddress.TryParse(ip, out IPAddress address))
+            {
+                this.EndPoint = new IPEndPoint(address, port);
+            }
+            else
+            {
+                this.EndPoint = new DnsEndPoint(ip, port);
+            }
 
             this._Status = ServerManager.SERVER_STATUS_TIMEOUT_MESSAGE; //Lets show this by default
             this.LastStatusUpdate = new Stopwatch();
         }
 
         public string Status => this.LastStatusUpdate.Elapsed.TotalSeconds > ServerManager.SERVER_STATUS_TIMEOUT ? ServerManager.SERVER_STATUS_TIMEOUT_MESSAGE : this._Status;
-            
-        public IPAddress IPAddress
+
+        public string IP => this.EndPoint switch
         {
-            get => this.EndPoint.Address;
-            set => this.EndPoint.Address = value;
-        }
-        
-        public string IP
+            IPEndPoint ip => ip.Address.ToString(),
+            DnsEndPoint dns => dns.Host,
+
+            _ => throw new NotSupportedException()
+        };
+
+        public int Port => this.EndPoint switch
         {
-            get => this.EndPoint.Address.ToString();
-            set => this.EndPoint.Address = IPAddress.Parse(value);
-        }
-        
-        public ushort Port
-        {
-            get => (ushort)this.EndPoint.Port;
-            set => this.EndPoint.Port = value;
-        }
+            IPEndPoint ip => ip.Port,
+            DnsEndPoint dns => dns.Port,
+
+            _ => throw new NotSupportedException()
+        };
 
         internal void SetStatus(string status)
         {

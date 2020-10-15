@@ -6,19 +6,16 @@
   "database_pass": "joni",
   "database_name": "pr3",
 
-  "database_use_ssh": false,
-  "database_ssh_key": "",
-  "database_ssh_user": "",
-
   "redis_host": "127.0.0.1",
   "redis_port": 6379,
-
-  "redis_use_ssh": false,
-  "redis_ssh_key": "",
-  "redis_ssh_user": "",
 
   "smtp_host": "",
   "smtp_port": 0,
   "smtp_user": "",
-  "smtp_pass": ""
+  "smtp_pass": "",
+
+  "discord_client_id": "",
+  "discord_client_secret": "",
+
+  "game_path": "" 
 }

@@ -72,7 +72,7 @@ namespace Platform_Racing_3_Common.Utils
                     {
                         string mode = levelMode.ToString();
 
-                        value = Char.ToLowerInvariant(mode[0]) + mode.Substring(1);
+                        value = Char.ToLowerInvariant(mode[0]) + mode[1..];
                     }
 
                     to[jsonAttribute.PropertyName] = value;

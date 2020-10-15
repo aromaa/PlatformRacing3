@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("login")]
-    public class LoginController : Controller
+    public class LoginController : ControllerBase
     {
         [HttpPost]
         public async Task<string> LoginAsync([FromForm(Name = "username")] string identifier, [FromForm] string password)

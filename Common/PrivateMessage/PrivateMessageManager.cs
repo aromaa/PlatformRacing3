@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.PrivateMessage
 {
@@ -55,7 +56,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.pms_reported(id) SELECT id FROM base.pms WHERE id = {pmId} AND to_user_id = {receiverUserId} ON CONFLICT DO NOTHING"));
         }
 
-        private static (uint Results, IReadOnlyList<IPrivateMessage> PMs) ParseSqlMultiplePMs(Task<DbDataReader> task)
+        private static (uint Results, IReadOnlyList<IPrivateMessage> PMs) ParseSqlMultiplePMs(Task<NpgsqlDataReader> task)
         {
             uint results = 0;
             List<IPrivateMessage> pms = new List<IPrivateMessage>();
@@ -80,7 +81,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             return (results, pms);
         }
 
-        private static IPrivateMessage ParseSqlPm(Task<DbDataReader> task)
+        private static IPrivateMessage ParseSqlPm(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -121,7 +122,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             }
         }
 
-        private static IReadOnlyCollection<uint> ParseSqlDeletePms(Task<DbDataReader> task)
+        private static IReadOnlyCollection<uint> ParseSqlDeletePms(Task<NpgsqlDataReader> task)
         {
             List<uint> pms = new List<uint>();
             if (task.IsCompletedSuccessfully)
@@ -140,7 +141,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             return pms;
         }
 
-        private static uint ParseSqlSendTextPm(Task<DbDataReader> task)
+        private static uint ParseSqlSendTextPm(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

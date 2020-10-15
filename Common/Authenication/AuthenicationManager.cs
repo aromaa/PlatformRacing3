@@ -19,7 +19,7 @@ namespace Platform_Racing_3_Common.Authenication
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             byte[] bytes = new byte[4]; //Four bytes should so it can be converted to int
