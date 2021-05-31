@@ -19,7 +19,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps
             uint userId = httpContext.IsAuthenicatedPr3User();
             if (userId > 0)
             {
-                DataAccessGetMyStampCategories categories = new DataAccessGetMyStampCategories();
+                DataAccessGetMyStampCategories categories = new();
 
                 foreach(string category in await StampManager.GetMyStampCategoriesAsync(userId))
                 {

@@ -167,7 +167,7 @@ namespace Platform_Racing_3_Common.Stamp
 
         private static ISet<uint> ParseSqlGetMyStamps(Task<NpgsqlDataReader> task)
         {
-            HashSet<uint> stamps = new HashSet<uint>();
+            HashSet<uint> stamps = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;

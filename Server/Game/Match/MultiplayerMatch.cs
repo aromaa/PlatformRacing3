@@ -143,7 +143,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void OnReservedFor(ClientSession session)
         {
-            MatchPlayer matchPlayer = new MatchPlayer(this, session.UserData, session.SocketId, session.IPAddres);
+            MatchPlayer matchPlayer = new(this, session.UserData, session.SocketId, session.IPAddres);
 
             lock (this.Players)
             {
@@ -303,7 +303,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 }
                 else if (this._Status == MultiplayerMatchStatus.Ongoing)
                 {
-                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.MatchTimer.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
+                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat && this.MatchTimer.Elapsed.TotalSeconds > this.LevelData.Seconds;
                     if (timeRanOut)
                     {
                         if (this.LevelData.Mode == LevelMode.CoinFiend || this.LevelData.Mode == LevelMode.DamageDash)
@@ -361,9 +361,9 @@ namespace Platform_Racing_3_Server.Game.Match
                 rng.GetBytes(bytes);
             }
 
-            Random random = new Random(BitConverter.ToInt32(bytes, 0));
+            Random random = new(BitConverter.ToInt32(bytes, 0));
 
-            HashSet<string> events = new HashSet<string>();
+            HashSet<string> events = new();
             if (this.LevelData.Snow > random.NextDouble() * 100)
             {
                 events.Add("snow");
@@ -786,7 +786,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (this.LevelData.Data.StartsWith("v2 | "))
                 {
-                    JObject levelData = JsonConvert.DeserializeObject<JObject>(this.LevelData.Data.Substring(5));
+                    JObject levelData = JsonConvert.DeserializeObject<JObject>(this.LevelData.Data[5..]);
                     if (levelData.TryGetValue("blockStr", out JToken jsonBlockStr))
                     {
                         string blockStr = (string)jsonBlockStr;
@@ -796,13 +796,13 @@ namespace Platform_Racing_3_Server.Game.Match
                             int x = 0;
                             int y = 0;
 
-                            HashSet<uint> blockIds = new HashSet<uint>();
-                            Dictionary<Point, uint> blocks = new Dictionary<Point, uint>();
+                            HashSet<uint> blockIds = new();
+                            Dictionary<Point, uint> blocks = new();
                             foreach (string block in blockStr.Split(','))
                             {
                                 if (block[0] == 'b')
                                 {
-                                    blockId = uint.Parse(block.Substring(1));
+                                    blockId = uint.Parse(block[1..]);
                                     blockIds.Add(blockId);
                                 }
                                 else
@@ -816,7 +816,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
                             }
 
-                            HashSet<uint> finishBlocks = new HashSet<uint>();
+                            HashSet<uint> finishBlocks = new();
                             foreach (uint blockId_ in blockIds.ToList())
                             {
                                 if (blockId_ < 700)
@@ -833,7 +833,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             //Not found in cached blocks
                             if (blockIds.Count > 0)
                             {
-                                using (DatabaseConnection dbConnection = new DatabaseConnection())
+                                using (DatabaseConnection dbConnection = new())
                                 {
                                     DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
                                     while (reader?.Read() ?? false)
@@ -842,7 +842,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                         string settings = (string)reader["settings"];
                                         if (settings.StartsWith("v2 | "))
                                         {
-                                            JObject blockData = JsonConvert.DeserializeObject<JObject>(settings.Substring(5));
+                                            JObject blockData = JsonConvert.DeserializeObject<JObject>(settings[5..]);
                                             if (blockData.TryGetValue("left", out JToken sideSettings) && this.ReadBlockSideSettings(sideSettings))
                                             {
                                                 finishBlocks.Add(id);
@@ -1025,7 +1025,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 ulong expEarned = ExpUtils.GetExpEarnedForFinishing(now);
 
-                List<object[]> expArray = new List<object[]>();
+                List<object[]> expArray = new();
                 if (this.LevelData.Mode == LevelMode.Race)
                 {
                     expArray.Add(new object[] { "Level completed", expEarned });
@@ -1189,11 +1189,10 @@ namespace Platform_Racing_3_Server.Game.Match
                     expEarned += (ulong)Math.Round(baseExp * 0.25F);
                     expArray.Add(new object[] { "LOTD bonus", "EXP X 1.25" });
                 }
-
-                ulong bonusExpDrained = 0;
+                
                 if (player.UserData.BonusExp > 0)
                 {
-                    bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
+	                ulong bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
                     if (bonusExpDrained > 0)
                     {
                         expEarned += bonusExpDrained;
@@ -1268,7 +1267,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void SendUseItem(ClientSession session, double[] pos, bool sendToSelf = false)
         {
-            UseItemOutgoingMessage packet = new UseItemOutgoingMessage(this.Name, session.SocketId, pos);
+            UseItemOutgoingMessage packet = new(this.Name, session.SocketId, pos);
 
             if (sendToSelf)
             {
@@ -1284,16 +1283,16 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (message.StartsWith("/"))
             {
-                string[] args = message.Substring(1).Split(' ');
+                string[] args = message[1..].Split(' ');
 
-                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan().Slice(1, args.Length - 1)))
+                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(1, args.Length - 1)))
                 {
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }
             }
             else
             {
-                ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
+                ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
                 if (sendToSelf)
                 {
@@ -1308,14 +1307,14 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void SendChatMessage(string senderName, uint senderSocketId, uint senderUserId, Color senderNameColor, string message)
         {
-            ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
+            ChatOutgoingMessage packet = new(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
 
             this.Clients.SendAsync(packet);
         }
 
         private void SendShatterBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
         {
-            ShatterBlockOutgoingMessage packet = new ShatterBlockOutgoingMessage(this.Name, tileY, tileX);
+            ShatterBlockOutgoingMessage packet = new(this.Name, tileY, tileX);
 
             if (sendToSelf)
             {
@@ -1329,7 +1328,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void SendExplodeBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
         {
-            ExplodeBlockOutgoingMessage packet = new ExplodeBlockOutgoingMessage(this.Name, tileY, tileX);
+            ExplodeBlockOutgoingMessage packet = new(this.Name, tileY, tileX);
 
             if (sendToSelf)
             {
@@ -1433,7 +1432,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             mins = Math.Max(mins, 0);
                             secs = Math.Max(secs, 0);
 
-                            time = $"{mins}:{secs.ToString("00")}";
+                            time = $"{mins}:{secs:00}";
                         }
                     }
                     else

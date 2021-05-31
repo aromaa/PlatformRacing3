@@ -32,7 +32,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
         private const uint BG_ID_MIN = 0;
         private const uint BG_ID_MAX = 11;
 
-        private static readonly HashSet<string> SupportedItems = new HashSet<string>()
+        private static readonly HashSet<string> SupportedItems = new()
         {
             "li",
             "r",
@@ -167,7 +167,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     {
                         return new DataAccessErrorResponse("Background image data dont start with 'BG'");
                     }
-                    else if (!uint.TryParse(bgImage.Substring(2), out uint bgImageId) || bgImageId < SaveLevel4Procedure.BG_ID_MIN || bgImageId > SaveLevel4Procedure.BG_ID_MAX)
+                    else if (!uint.TryParse(bgImage[2..], out uint bgImageId) || bgImageId < SaveLevel4Procedure.BG_ID_MIN || bgImageId > SaveLevel4Procedure.BG_ID_MAX)
                     {
                         return new DataAccessErrorResponse($"Background image id must be between of {SaveLevel4Procedure.BG_ID_MIN} and {SaveLevel4Procedure.BG_ID_MAX}");
                     }

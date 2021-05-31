@@ -322,9 +322,9 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
             MultiplayerMatch match = PlatformRacing3Server.MatchManager.CreateMultiplayerMatch(this);
 
-            Random random = new Random();
+            Random random = new();
 
-            StartGameOutgoingMessage startGame = new StartGameOutgoingMessage(this.Name, match.Name);
+            StartGameOutgoingMessage startGame = new(this.Name, match.Name);
             foreach (ClientSession session in this._Clients.Sessions.OrderBy((s) => random.Next(int.MinValue, int.MaxValue)))
             {
                 session.LobbySession.MatchListing = null;

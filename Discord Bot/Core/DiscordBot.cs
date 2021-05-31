@@ -43,7 +43,7 @@ namespace Discord_Bot.Core
         {
             if (this.Services == null)
             {
-                ServerManager serverManager = new ServerManager();
+                ServerManager serverManager = new();
                 serverManager.LoadServersAsync().GetAwaiter().GetResult();
 
                 this.Services = new ServiceCollection().AddSingleton(serverManager).BuildServiceProvider();
@@ -74,7 +74,7 @@ namespace Discord_Bot.Core
                     return;
                 }
 
-                SocketCommandContext context = new SocketCommandContext(this.Client, userMessage);
+                SocketCommandContext context = new(this.Client, userMessage);
 
                 await this.CommandService.ExecuteAsync(context, commandIndex, this.Services);
             }

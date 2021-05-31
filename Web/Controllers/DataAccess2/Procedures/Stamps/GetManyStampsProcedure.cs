@@ -20,7 +20,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps
                 uint[] stampIds = ((string)data.Element("p_stamp_array") ?? throw new DataAccessProcedureMissingData()).Split(',').Select((b) => uint.Parse(b)).ToArray();
                 if (stampIds.Length > 0)
                 {
-                    DataAccessGetManyStampsResponse response = new DataAccessGetManyStampsResponse();
+                    DataAccessGetManyStampsResponse response = new();
 
                     IList<StampData> stamps = await StampManager.GetStampsAsync(stampIds);
                     foreach (StampData block in stamps)

@@ -32,7 +32,7 @@ namespace Discord_Bot.Commands
 
                 (int Count, int Max) hats = default;
 
-                StringBuilder hatsWriter = new StringBuilder();
+                StringBuilder hatsWriter = new();
                 foreach (Hat hat in Enum.GetValues(typeof(Hat)))
                 {
                     if (hat == Hat.None || hat.IsStaffOnly())
@@ -134,7 +134,7 @@ namespace Discord_Bot.Commands
                     }
                 }
 
-                EmbedBuilder embed = new EmbedBuilder();
+                EmbedBuilder embed = new();
                 embed.AddField(new EmbedFieldBuilder()
                 {
                     Name = $"Hats ({hats.Count}/{hats.Max})",

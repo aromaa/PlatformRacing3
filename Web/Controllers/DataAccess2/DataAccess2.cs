@@ -94,19 +94,14 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                 return;
             }
 
-            PhysicalFileProvider val = new PhysicalFileProvider(webConfig.GamePath, ExclusionFilters.Sensitive)
+            PhysicalFileProvider val = new(webConfig.GamePath, ExclusionFilters.Sensitive)
             {
                 UsePollingFileWatcher = true,
                 UseActivePolling = true
             };
-
-            IChangeToken token = val.Watch("*.swf");
-            token.RegisterChangeCallback(state =>
-            {
-                RefreshSwfs();
-            }, null);
-
+            
             RefreshSwfs();
+            RegisterWatch();
 
             void RefreshSwfs()
             {
@@ -118,6 +113,16 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
 
                     DataAccess2.CalcHashAndAdd(bytes);
                 });
+            }
+
+            void RegisterWatch()
+            {
+	            IChangeToken token = val.Watch("*.swf");
+	            token.RegisterChangeCallback(state =>
+	            {
+		            RefreshSwfs();
+		            RegisterWatch();
+                }, null);
             }
         }
 
@@ -143,14 +148,14 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
 
         private static int GetCrc32(ReadOnlySpan<byte> span)
         {
-            using (MemoryStream memoryStream = new MemoryStream(span.Slice(5).ToArray()))
+            using (MemoryStream memoryStream = new(span[5..].ToArray()))
             {
-                using (InflaterInputStream val = new InflaterInputStream(memoryStream))
+                using (InflaterInputStream val = new(memoryStream))
                 {
-                    using (MemoryStream memoryStream2 = new MemoryStream())
+                    using (MemoryStream memoryStream2 = new())
                     {
                         memoryStream2.Write(Encoding.UTF8.GetBytes("FWS"));
-                        memoryStream2.Write(span.Slice(0, 5));
+                        memoryStream2.Write(span[..5]);
 
                         val.CopyTo(memoryStream2);
 
@@ -196,7 +201,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
             {
                 byte[] array = mD.ComputeHash(Encoding.UTF8.GetBytes($"L{crc32}L"));
 
-                StringBuilder stringBuilder = new StringBuilder();
+                StringBuilder stringBuilder = new();
                 for (int i = 0; i < array.Length; i++)
                 {
                     stringBuilder.Append(array[i].ToString("x2"));
@@ -258,30 +263,18 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
 
         private async Task<byte[]> FindEncryptionKeyAsync(byte[] storedProcId, string gameIdEncoded, string platform, string playerType)
         {
-            ICollection<byte[]> keys;
-            switch (platform)
-            {
-                case "iOS":
-                    keys = DataAccess2.KEYS["iOS"].Keys;
-                    break;
-                case "AND":
-                    keys = DataAccess2.KEYS["Android"].Keys;
-                    break;
-                default:
-                    switch (playerType)
-                    {
-                        case "ActiveX":
-                        case "PlugIn":
-                            keys = DataAccess2.KEYS["Browser"].Keys;
-                            break;
-                        default:
-                            keys = DataAccess2.KEYS["Standalone"].Keys;
-                            break;
-                    }
-                    break;
-            }
+			ICollection<byte[]> keys = platform switch
+			{
+				"iOS" => DataAccess2.KEYS["iOS"].Keys,
+				"AND" => DataAccess2.KEYS["Android"].Keys,
 
-            foreach (byte[] key in keys)
+				_ => playerType switch
+				{
+					"ActiveX" or "PlugIn" => DataAccess2.KEYS["Browser"].Keys,
+					_ => DataAccess2.KEYS["Standalone"].Keys,
+				},
+			};
+			foreach (byte[] key in keys)
             {
                 string gameId = this.DecryptData(gameIdEncoded, storedProcId, key);
                 if (gameId == "f1c25e3bd3523110394b5659c68d8092")
@@ -320,11 +313,11 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                 crypt.IV = iv;
                 crypt.Key = key;
 
-                using (MemoryStream memoryStream = new MemoryStream())
+                using (MemoryStream memoryStream = new())
                 {
                     using (ICryptoTransform decryptor = crypt.CreateDecryptor())
                     {
-                        using (CryptoStream stream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Write))
+                        using (CryptoStream stream = new(memoryStream, decryptor, CryptoStreamMode.Write))
                         {
                             stream.Write(bytes, 0, bytes.Length);
                         }

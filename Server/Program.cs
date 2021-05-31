@@ -12,7 +12,7 @@ namespace Platform_Racing_3_Server
     internal class Program
     {
         private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private static readonly PlatformRacing3Server Instance = new PlatformRacing3Server();
+        private static readonly PlatformRacing3Server Instance = new();
 
         private static void Main(string[] args)
         {
@@ -24,14 +24,14 @@ namespace Platform_Racing_3_Server
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Failed to setup logging! {ex.ToString()}");
+                Console.WriteLine($"Failed to setup logging! {ex}");
             }
 
             Program.Logger.Info("Starting up server...");
             Program.Instance.Init();
             Program.Logger.Info("Server is ready!");
 
-            ConsoleCommandExecutor consoleExecutor = new ConsoleCommandExecutor();
+            ConsoleCommandExecutor consoleExecutor = new();
 
             while (true)
             {

@@ -23,13 +23,13 @@ namespace Mobile_Import
             Console.WriteLine("Connecting to database... ");
             DatabaseConnection.Init(config);
 
-            List<FileInfo> blocks = new List<FileInfo>();
-            List<FileInfo> levels = new List<FileInfo>();
+            List<FileInfo> blocks = new();
+            List<FileInfo> levels = new();
             FileInfo levelList = null;
 
             foreach (string path in Directory.GetFiles("Data"))
             {
-                FileInfo file = new FileInfo(path);
+                FileInfo file = new(path);
                 if (file.Name.StartsWith("Block"))
                 {
                     blocks.Add(file);
@@ -70,11 +70,11 @@ namespace Mobile_Import
                 {
                     try
                     {
-                        using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String(levelData)))
+                        using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(levelData)))
                         {
-                            using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                            using (InflaterInputStream inflater = new(compressedMemoryStream))
                             {
-                                using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                                using (MemoryStream uncompressedMemoryStream = new())
                                 {
                                     inflater.CopyTo(uncompressedMemoryStream);
 
@@ -115,9 +115,9 @@ namespace Mobile_Import
             IDictionary<uint, uint> newIds = new Dictionary<uint, uint>();
             ISet<string> dbNames = new HashSet<string>();
 
-            List<FileInfo> changeBlocks = new List<FileInfo>();
+            List<FileInfo> changeBlocks = new();
 
-            using (DatabaseConnection dbConnection = new DatabaseConnection())
+            using (DatabaseConnection dbConnection = new())
             {
                 Console.WriteLine("Connected to database");
 
@@ -156,7 +156,7 @@ namespace Mobile_Import
                             levelTitle = "unused";
                         }
 
-                        string dbName = title.Substring(0, Math.Min(title.Length, 50));
+                        string dbName = title[..Math.Min(title.Length, 50)];
                         if (!dbNames.Add($"{dbName}-{levelTitle}"))
                         {
                             for (int i = 2; i <= 5; i++)
@@ -178,11 +178,11 @@ namespace Mobile_Import
                         {
                             try
                             {
-                                using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String(settings)))
+                                using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(settings)))
                                 {
-                                    using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                                    using (InflaterInputStream inflater = new(compressedMemoryStream))
                                     {
-                                        using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                                        using (MemoryStream uncompressedMemoryStream = new())
                                         {
                                             inflater.CopyTo(uncompressedMemoryStream);
 
@@ -246,7 +246,7 @@ namespace Mobile_Import
                             levelTitle = "unused";
                         }
 
-                        string dbName = title.Substring(0, Math.Min(title.Length, 50));
+                        string dbName = title[..Math.Min(title.Length, 50)];
                         if (!dbNames.Add($"{dbName}-{levelTitle}"))
                         {
                             for (int i = 2; i <= 5; i++)
@@ -268,11 +268,11 @@ namespace Mobile_Import
                         {
                             try
                             {
-                                using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String(settings)))
+                                using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(settings)))
                                 {
-                                    using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                                    using (InflaterInputStream inflater = new(compressedMemoryStream))
                                     {
-                                        using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                                        using (MemoryStream uncompressedMemoryStream = new())
                                         {
                                             inflater.CopyTo(uncompressedMemoryStream);
 
@@ -367,11 +367,11 @@ namespace Mobile_Import
                     {
                         try
                         {
-                            using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String(levelData)))
+                            using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(levelData)))
                             {
-                                using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                                using (InflaterInputStream inflater = new(compressedMemoryStream))
                                 {
-                                    using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                                    using (MemoryStream uncompressedMemoryStream = new())
                                     {
                                         inflater.CopyTo(uncompressedMemoryStream);
 

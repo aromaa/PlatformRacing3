@@ -394,7 +394,7 @@ namespace Platform_Racing_3_Server.Game.Match
         internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
         internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
         {
-            Dictionary<string, object> userVars = new Dictionary<string, object>();
+            Dictionary<string, object> userVars = new();
 
             JsonUtils.GetVars(this.UserData, vars, userVars);
             JsonUtils.GetVars(this, vars, userVars);

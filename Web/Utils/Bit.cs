@@ -28,10 +28,10 @@ namespace Platform_Racing_3_Web.Utils
         public override int GetHashCode() => this.Value.GetHashCode();
         public override string ToString() => this.Value.ToString();
 
-        public static implicit operator Bit(bool value) => new Bit(value);
+        public static implicit operator Bit(bool value) => new(value);
         public static implicit operator bool(Bit value) => value.Value == 1;
 
-        public static explicit operator Bit(XElement value) => new Bit(value.Value == "1");
+        public static explicit operator Bit(XElement value) => new(value.Value == "1");
         public static explicit operator Bit?(XElement value) => (bool?)value ?? false;
 
         public XmlSchema GetSchema() => null;

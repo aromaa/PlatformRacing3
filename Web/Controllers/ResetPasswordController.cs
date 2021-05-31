@@ -50,7 +50,7 @@ namespace Platform_Racing_3_Web.Controllers
                 return "Error, try again";
             }
 
-            using (MailMessage mail = new MailMessage())
+            using (MailMessage mail = new())
             {
                 mail.To.Add(email);
                 mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";

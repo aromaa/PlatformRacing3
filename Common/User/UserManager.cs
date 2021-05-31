@@ -33,13 +33,13 @@ namespace Platform_Racing_3_Common.User
         //Yeah, I'm lazy bastard at doing this properly at the moment
 
         private static readonly TimeSpan UserCacheTime = TimeSpan.FromDays(1);
-        private static readonly MemoryCache Users = new MemoryCache(new MemoryCacheOptions()
+        private static readonly MemoryCache Users = new(new MemoryCacheOptions()
         {
             ExpirationScanFrequency = TimeSpan.FromHours(1),
         });
 
         private static readonly TimeSpan UserIdsCacheTime = TimeSpan.FromDays(7);
-        private static readonly MemoryCache UserIds = new MemoryCache(new MemoryCacheOptions()
+        private static readonly MemoryCache UserIds = new(new MemoryCacheOptions()
         {
             ExpirationScanFrequency = TimeSpan.FromDays(1),
         });
@@ -194,7 +194,7 @@ namespace Platform_Racing_3_Common.User
         public static Task<uint> TryAuthenicateAsync(string identifier, string password)
         {
             Task<NpgsqlDataReader> userDataTask = null;
-            DatabaseConnection dbConnection = new DatabaseConnection();
+            DatabaseConnection dbConnection = new();
 
             try
             {
@@ -335,7 +335,7 @@ namespace Platform_Racing_3_Common.User
                 RedisValue[] results = task.Result;
                 if (results?.All(v => v.HasValue) ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(results);
+                    PlayerUserData playerUserData = new(results);
                     return UserManager.CachePlayerUserData(playerUserData, true);
                 }
             }
@@ -354,7 +354,7 @@ namespace Platform_Racing_3_Common.User
                 DbDataReader reader = task.Result;
                 if (reader?.Read() ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(reader);
+                    PlayerUserData playerUserData = new(reader);
                     return UserManager.CachePlayerUserData(playerUserData);
                 }
             }
@@ -407,13 +407,13 @@ namespace Platform_Racing_3_Common.User
 
         private static IReadOnlyCollection<PlayerUserData> ParseSqlMultipleUserData(Task<NpgsqlDataReader> task)
         {
-            List<PlayerUserData> users = new List<PlayerUserData>();
+            List<PlayerUserData> users = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
                 while (reader?.Read() ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(reader);
+                    PlayerUserData playerUserData = new(reader);
                     users.Add(UserManager.CachePlayerUserData(playerUserData));
                 }
             }

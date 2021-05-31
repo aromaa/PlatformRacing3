@@ -15,7 +15,7 @@ namespace Platform_Racing_3_UnsafeHelpers.IL
         private static CompareExchangeDelegate CreateCompareExchange()
         {
             Type underlyingType = Enum.GetUnderlyingType(typeof(T));
-            DynamicMethod dynamicMethod = new DynamicMethod(string.Empty, typeof(T), new[]
+            DynamicMethod dynamicMethod = new(string.Empty, typeof(T), new[]
             {
                 typeof(T).MakeByRefType(),
                 typeof(T),

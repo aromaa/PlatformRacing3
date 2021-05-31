@@ -16,7 +16,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 
         internal JsonMemberListOutgoingMessage(ICollection<ClientSession> members)
         {
-            List<IReadOnlyDictionary<string, object>> membersList = new List<IReadOnlyDictionary<string, object>>();
+            List<IReadOnlyDictionary<string, object>> membersList = new();
             foreach(ClientSession member in members)
             {
                 membersList.Add(member.GetVars("socketID", "userID", "userName", "nameColor"));

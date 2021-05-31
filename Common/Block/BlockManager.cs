@@ -149,7 +149,7 @@ namespace Platform_Racing_3_Common.Block
 
         private static List<BlockData> ParseSqlGetBlocks(Task<NpgsqlDataReader> task)
         {
-            List<BlockData> blocks = new List<BlockData>();
+            List<BlockData> blocks = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
@@ -186,7 +186,7 @@ namespace Platform_Racing_3_Common.Block
 
         private static HashSet<string> ParseSqlGetCategorys(Task<NpgsqlDataReader> task)
         {
-            HashSet<string> categories = new HashSet<string>();
+            HashSet<string> categories = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
@@ -205,7 +205,7 @@ namespace Platform_Racing_3_Common.Block
 
         private static HashSet<uint> ParseSqlGetMyBlocks(Task<NpgsqlDataReader> task)
         {
-            HashSet<uint> blocks = new HashSet<uint>();
+            HashSet<uint> blocks = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;

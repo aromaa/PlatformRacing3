@@ -16,7 +16,7 @@ namespace Platform_Racing_3_Common.Utils
 {
     public static class JsonUtils
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyAttribute, Func<object, object>>> CachedProperties = new ConcurrentDictionary<Type, Dictionary<JsonPropertyAttribute, Func<object, object>>>();
+        private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyAttribute, Func<object, object>>> CachedProperties = new();
 
         private static Dictionary<JsonPropertyAttribute, Func<object, object>> GetProperties<T>()
         {
@@ -46,7 +46,7 @@ namespace Platform_Racing_3_Common.Utils
         public static IReadOnlyDictionary<string, object> GetVars<T>(T target, params string[] vars) => JsonUtils.GetVars(target, vars.ToHashSet());
         public static IReadOnlyDictionary<string, object> GetVars<T>(T target, HashSet<string> vars)
         {
-            Dictionary<string, object> userVars = new Dictionary<string, object>();
+            Dictionary<string, object> userVars = new();
 
             JsonUtils.GetVars(target, vars, userVars);
 

@@ -16,7 +16,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Parsers.
     [PacketParserId(0u)]
     internal class JsonPacketParser : IIncomingPacketParser<JsonPacket>
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings();
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new();
 
         static JsonPacketParser()
         {

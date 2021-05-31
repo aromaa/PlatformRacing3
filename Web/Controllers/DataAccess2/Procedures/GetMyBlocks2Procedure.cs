@@ -27,7 +27,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     uint count = (uint?)data.Element("p_count") ?? throw new DataAccessProcedureMissingData();
                     string category = (string)data.Element("p_category") ?? throw new DataAccessProcedureMissingData();
 
-                    DataAccessGetMyBlocks2Response response = new DataAccessGetMyBlocks2Response(category);
+                    DataAccessGetMyBlocks2Response response = new(category);
 
                     HashSet<uint> blocks = await BlockManager.GetMyBlocksAsync(userId, category, start, count);
                     foreach(uint block in blocks)

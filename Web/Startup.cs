@@ -37,7 +37,7 @@ namespace Platform_Racing_3_Web
                 options.Cookie.Name = "PR3-Auth";
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SameSite = SameSiteMode.None; //None due to Chrome 71 breaking changes
-                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
             services.AddMvc().AddXmlSerializerFormatters();

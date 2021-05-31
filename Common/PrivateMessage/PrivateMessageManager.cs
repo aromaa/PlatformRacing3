@@ -59,7 +59,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
         private static (uint Results, IReadOnlyList<IPrivateMessage> PMs) ParseSqlMultiplePMs(Task<NpgsqlDataReader> task)
         {
             uint results = 0;
-            List<IPrivateMessage> pms = new List<IPrivateMessage>();
+            List<IPrivateMessage> pms = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
@@ -124,7 +124,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
 
         private static IReadOnlyCollection<uint> ParseSqlDeletePms(Task<NpgsqlDataReader> task)
         {
-            List<uint> pms = new List<uint>();
+            List<uint> pms = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;

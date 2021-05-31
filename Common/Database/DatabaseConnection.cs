@@ -39,11 +39,11 @@ namespace Platform_Racing_3_Common.Database
 
         private static void TestConnection()
         {
-            using (NpgsqlConnection dbConnection = new NpgsqlConnection(DatabaseConnection.ConnectionString))
+            using (NpgsqlConnection dbConnection = new(DatabaseConnection.ConnectionString))
             {
                 dbConnection.Open();
 
-                using (NpgsqlCommand command = new NpgsqlCommand("SELECT 1", dbConnection))
+                using (NpgsqlCommand command = new("SELECT 1", dbConnection))
                 {
                     command.ExecuteReader();
                 }
@@ -170,7 +170,7 @@ namespace Platform_Racing_3_Common.Database
 
         public static Task NewAsyncConnection(Func<DatabaseConnection, Task> func)
         {
-            DatabaseConnection dbConnection = new DatabaseConnection();
+            DatabaseConnection dbConnection = new();
 
             try
             {
@@ -190,7 +190,7 @@ namespace Platform_Racing_3_Common.Database
 
         public static Task<TNewResult> NewAsyncConnection<TNewResult>(Func<DatabaseConnection, Task<TNewResult>> func)
         {
-            DatabaseConnection dbConnection = new DatabaseConnection();
+            DatabaseConnection dbConnection = new();
 
             try
             {

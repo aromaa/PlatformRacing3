@@ -187,7 +187,7 @@ namespace Platform_Racing_3_Common.Level
 
         public static Task<IReadOnlyCollection<LevelData>> SearchLevels(string mode, string sort, string dir, string searchStr, UserData user = null)
         {
-            StringBuilder query = new StringBuilder();
+            StringBuilder query = new();
             if (!user?.IsGuest ?? false)
             {
                 if (user.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS))
@@ -283,7 +283,7 @@ namespace Platform_Racing_3_Common.Level
 
             static IReadOnlyDictionary<uint, string> Parse(Task<NpgsqlDataReader> task)
             {
-                Dictionary<uint, string> levels = new Dictionary<uint, string>();
+                Dictionary<uint, string> levels = new();
 
                 if (task.IsCompletedSuccessfully)
                 {
@@ -406,7 +406,7 @@ namespace Platform_Racing_3_Common.Level
 
         private static IReadOnlyCollection<LevelData> ParseSqlLevelDataMultiple(Task<NpgsqlDataReader> task)
         {
-            List<LevelData> levels = new List<LevelData>();
+            List<LevelData> levels = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
@@ -426,7 +426,7 @@ namespace Platform_Racing_3_Common.Level
         private static (uint results, IReadOnlyCollection<LevelData>) ParseSqlLevelDataMultipleAndTotal(Task<NpgsqlDataReader> task)
         {
             uint results = 0;
-            List<LevelData> levels = new List<LevelData>();
+            List<LevelData> levels = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;

@@ -23,11 +23,11 @@ namespace Discord_Bot
             DatabaseConnection.Init(config);
             RedisConnection.Init(config);
 
-            CampaignManager campaignManager = new CampaignManager();
+            CampaignManager campaignManager = new();
 
             Task.WaitAll(campaignManager.LoadCampaignTimesAsync(), campaignManager.LoadPrizesAsync());
 
-            DiscordBot bot = new DiscordBot(config);
+            DiscordBot bot = new(config);
 
             await bot.LoadCommandsAsync();
             await bot.SetupDiscordBot();

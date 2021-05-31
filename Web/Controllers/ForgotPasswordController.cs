@@ -62,7 +62,7 @@ namespace Platform_Racing_3_Web.Controllers
                     return "Something went wrong when trying to create the token! Try again!";
                 }
 
-                using (MailMessage mail = new MailMessage())
+                using (MailMessage mail = new())
                 {
                     mail.To.Add(email);
                     mail.Subject = $"Platform Racing 3 - {player.Username} - Password Reset";

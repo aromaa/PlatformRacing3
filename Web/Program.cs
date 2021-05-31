@@ -40,7 +40,7 @@ namespace Platform_Racing_3_Web
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to setup logging! {ex.ToString()}");
+                Console.WriteLine($"Failed to setup logging! {ex}");
             }
 
             Program.Config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));

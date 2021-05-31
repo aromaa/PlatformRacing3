@@ -83,7 +83,7 @@ namespace Platform_Racing_3_Server.Game.Client
 
         public uint PermissionRank => (this.UserData as PlayerUserData)?.PermissionRank ?? 0;
 
-        private LobbySession SetupLobbySession => new LobbySession(this);
+        private LobbySession SetupLobbySession => new(this);
         private object[] SetupVarsObject() => new object[] { this, this.UserData };
 
         public LobbySession LobbySession => this._LobbySession.Value;
@@ -204,7 +204,7 @@ namespace Platform_Racing_3_Server.Game.Client
         internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
         internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
         {
-            Dictionary<string, object> userVars = new Dictionary<string, object>();
+            Dictionary<string, object> userVars = new();
 
             JsonUtils.GetVars(this.UserData, vars, userVars);
             JsonUtils.GetVars(this, vars, userVars);

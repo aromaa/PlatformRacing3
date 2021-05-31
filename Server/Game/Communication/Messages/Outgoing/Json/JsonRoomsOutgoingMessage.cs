@@ -17,7 +17,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 
         internal JsonRoomsOutgoingMessage(ICollection<ChatRoom> chatRooms)
         {
-            List<IReadOnlyDictionary<string, object>> rooms = new List<IReadOnlyDictionary<string, object>>();
+            List<IReadOnlyDictionary<string, object>> rooms = new();
             foreach(ChatRoom chatRoom in chatRooms)
             {
                 rooms.Add(chatRoom.GetVars("roomName", "members"));

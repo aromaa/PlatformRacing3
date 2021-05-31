@@ -139,7 +139,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
             if (message.StartsWith('/'))
             {
-                string[] args = message.Substring(1).Split(' ');
+                string[] args = message[1..].Split(' ');
 
                 if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(start: 1, length: args.Length - 1)))
                 {
@@ -148,7 +148,7 @@ namespace Platform_Racing_3_Server.Game.Chat
             }
             else if (message.Length > 0)
             {
-                ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
+                ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
                 this.RecentMessages.Enqueue(packet);
                 while (this.RecentMessages.Count > ChatRoom.MAX_RECENT_MESSAGES)

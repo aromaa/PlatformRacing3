@@ -71,7 +71,7 @@ namespace Platform_Racing_3_Web.Controllers
 
                     async Task<DiscordUserResponse> GetUser()
                     {
-                        using (HttpClient httpClient = new HttpClient())
+                        using (HttpClient httpClient = new())
                         {
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(tokenResponse.TokenType, tokenResponse.AccessToken);
 
@@ -93,9 +93,9 @@ namespace Platform_Racing_3_Web.Controllers
                             { "scope", "identify" },
                         };
 
-                        using (HttpClient httpClient = new HttpClient())
+                        using (HttpClient httpClient = new())
                         {
-                            using (FormUrlEncodedContent content = new FormUrlEncodedContent(values))
+                            using (FormUrlEncodedContent content = new(values))
                             {
                                 using (HttpResponseMessage message = await httpClient.PostAsync(LinkDiscordController.DISCORD_API_TOKEN, content))
                                 {

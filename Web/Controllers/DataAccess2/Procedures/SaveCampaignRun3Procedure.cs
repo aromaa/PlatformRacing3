@@ -34,11 +34,11 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     int finishTime = (int?)data.Element("p_finish_time") ?? throw new DataAccessProcedureMissingData();
 
                     CampaignRun campaignRun = null;
-                    using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String(recordRun)))
+                    using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(recordRun)))
                     {
-                        using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                        using (InflaterInputStream inflater = new(compressedMemoryStream))
                         {
-                            using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                            using (MemoryStream uncompressedMemoryStream = new())
                             {
                                 inflater.CopyTo(uncompressedMemoryStream);
 

@@ -20,7 +20,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
             uint userId = httpContext.IsAuthenicatedPr3User();
             if (userId > 0)
             {
-                DataAccessGetMyBlockCategorysResponse response = new DataAccessGetMyBlockCategorysResponse();
+                DataAccessGetMyBlockCategorysResponse response = new();
 
                 HashSet<string> categories = await BlockManager.GetMyCategorysAsync(userId);
                 foreach(string category in categories)

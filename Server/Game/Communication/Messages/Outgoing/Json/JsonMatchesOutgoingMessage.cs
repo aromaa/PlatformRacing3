@@ -21,7 +21,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
         {
             this.LobbyId = lobbyId;
 
-            List<IReadOnlyDictionary<string, object>> matches = new List<IReadOnlyDictionary<string, object>>();
+            List<IReadOnlyDictionary<string, object>> matches = new();
             foreach(MatchListing matchListing in matchListings)
             {
                 matches.Add(matchListing.GetVars("*"));

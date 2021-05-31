@@ -36,13 +36,13 @@ namespace Platform_Racing_3_Common.Campaign
 
         public async Task LoadCampaignTimesAsync()
         {
-            Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)>  times = new Dictionary<uint, (string, Dictionary<CampaignMedal, uint>)>();
-            using (DatabaseConnection dbConnection = new DatabaseConnection())
+            Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)>  times = new();
+            using (DatabaseConnection dbConnection = new())
             {
                 DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT level_id, bronze_time, silver_time, gold_time, season FROM base.campaigns");
                 while (reader?.Read() ?? false)
                 {
-                    Dictionary<CampaignMedal, uint> level = new Dictionary<CampaignMedal, uint>()
+                    Dictionary<CampaignMedal, uint> level = new()
                     {
                         { CampaignMedal.Bronze, (uint)(int)reader["bronze_time"] * 1000 },
                         { CampaignMedal.Silver, (uint)(int)reader["silver_time"] * 1000 },
@@ -59,8 +59,8 @@ namespace Platform_Racing_3_Common.Campaign
 
         public async Task LoadPrizesAsync()
         {
-            Dictionary<string, List<CampaignPrize>> prizes = new Dictionary<string, List<CampaignPrize>>();
-            using (DatabaseConnection dbConnection = new DatabaseConnection())
+            Dictionary<string, List<CampaignPrize>> prizes = new();
+            using (DatabaseConnection dbConnection = new())
             {
                 DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT id, type, medals_required, season FROM base.campaigns_prizes ORDER BY medals_required");
                 while (reader?.Read() ?? false)
@@ -158,11 +158,11 @@ namespace Platform_Racing_3_Common.Campaign
                 while (reader?.Read() ?? false)
                 {
                     CampaignRun campaignRun;
-                    using (MemoryStream compressedMemoryStream = new MemoryStream(Convert.FromBase64String((string)reader["recorded_run"])))
+                    using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String((string)reader["recorded_run"])))
                     {
-                        using (InflaterInputStream inflater = new InflaterInputStream(compressedMemoryStream))
+                        using (InflaterInputStream inflater = new(compressedMemoryStream))
                         {
-                            using (MemoryStream uncompressedMemoryStream = new MemoryStream())
+                            using (MemoryStream uncompressedMemoryStream = new())
                             {
                                 inflater.CopyTo(uncompressedMemoryStream);
 

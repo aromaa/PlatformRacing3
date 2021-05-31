@@ -9,14 +9,12 @@ namespace Platform_Racing_3_Common.Extensions
     {
         public static bool IsStaffOnly(this Hat hat)
         {
-            switch(hat)
-            {
-                case Hat.Cowboy:
-                case Hat.Crown:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+			return hat switch
+			{
+				Hat.Cowboy or Hat.Crown => true,
+
+				_ => false,
+			};
+		}
     }
 }

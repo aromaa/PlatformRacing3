@@ -46,7 +46,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     //    maxMembers = 8;
                     //}
 
-                    MatchListing listing = new MatchListing(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
+                    MatchListing listing = new(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
 
                     if (this.MatchListings.TryAdd(listing.Name, listing))

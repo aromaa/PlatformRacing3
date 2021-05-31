@@ -21,7 +21,7 @@ namespace Discord_Bot.Commands
         [Summary("Whos online? Log in")]
         public Task GetOnlinePlayersCount()
         {
-            StringBuilder stringBuilder = new StringBuilder(this.Context.User.Mention);
+            StringBuilder stringBuilder = new(this.Context.User.Mention);
             stringBuilder.AppendLine();
 
             foreach (ServerDetails server in this.ServerManager.GetServers())

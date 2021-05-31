@@ -20,7 +20,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                 uint[] blockIds = ((string)data.Element("p_block_array") ?? throw new DataAccessProcedureMissingData()).Split(',').Select((b) => uint.Parse(b)).ToArray();
                 if (blockIds.Length > 0)
                 {
-                    DataAccessGetManyBlocksResponse response = new DataAccessGetManyBlocksResponse();
+                    DataAccessGetManyBlocksResponse response = new();
 
                     List<BlockData> blocks = await BlockManager.GetBlocksAsync(blockIds);
                     foreach(BlockData block in blocks)
