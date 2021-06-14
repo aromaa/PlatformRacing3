@@ -174,7 +174,9 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
 
                     string levelData = (string)data.Element("p_level_data") ?? throw new DataAccessProcedureMissingData();
 
-                    uint levelId = await LevelManager.SaveLevelAsync(userId, title, description, publish, songId, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, kingOfTheHat, bgImage, levelData);
+                    string lua = (string)data.Element("p_lua") ?? string.Empty;
+
+                    uint levelId = await LevelManager.SaveLevelAsync(userId, title, description, publish, songId, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, kingOfTheHat, bgImage, levelData, lua);
                     if (levelId > 0)
                     {
                         return new DataAccessSaveLevel4Response(levelId);

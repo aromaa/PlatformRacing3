@@ -54,6 +54,7 @@ namespace Platform_Racing_3_Common.Level
 
         public string BgImage { get; }
         public string Data { get; }
+        public string Lua { get; }
 
         public DateTime LastUpdated { get; }
         
@@ -120,6 +121,7 @@ namespace Platform_Racing_3_Common.Level
 
             this.BgImage = (string)reader["bg_image"];
             this.Data = (string)reader["level_data"];
+            this.Lua = (string)reader["lua"];
 
             this.LastUpdated = (DateTime)reader["last_updated"];
 
@@ -204,6 +206,7 @@ namespace Platform_Racing_3_Common.Level
 
             writer.WriteElementString("bg_image", this.BgImage.ToString());
             writer.WriteElementString("level_data", this.Data);
+            writer.WriteElementString("lua", this.Lua);
 
             writer.WriteElementString("last_updated", this.LastUpdated.ToString());
 
