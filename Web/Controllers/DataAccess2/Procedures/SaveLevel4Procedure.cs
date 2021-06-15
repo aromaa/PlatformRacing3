@@ -54,7 +54,8 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
             "sp",
             "h",
             "lc",
-			"gr",
+	    "gr",
+	    "re",
         };
 
         public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
