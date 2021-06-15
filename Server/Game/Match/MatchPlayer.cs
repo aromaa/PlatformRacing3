@@ -7,8 +7,10 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Net;
 using System.Text;
+using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -51,6 +53,7 @@ namespace Platform_Racing_3_Server.Game.Match
         private string _Team;
 
         internal double? FinishTime { get; set; }
+        internal int? FinishPlace { get; set; }
         internal bool Forfiet { get; set; }
         internal bool Gone { get; set; }
 
@@ -58,8 +61,6 @@ namespace Platform_Racing_3_Server.Game.Match
         internal string Koth { get; set; }
 
         internal UpdateStatus ToUpdate { get; private set; }
-
-        private Lazy<object[]> VarsObject;
 
         internal MatchPlayer(MultiplayerMatch match, UserData userData, uint socketId, IPAddress ipAddress)
         {
@@ -76,11 +77,7 @@ namespace Platform_Racing_3_Server.Game.Match
             this._Hats = new Queue<MatchPlayerHat>();
 
             this.ToUpdate = UpdateStatus.None;
-
-            this.VarsObject = new Lazy<object[]>(this.BuildVarsObject);
         }
-
-        private object[] BuildVarsObject() => new object[] { this.UserData, this };
 
         internal IReadOnlyCollection<MatchPlayerHat> Hats => this._Hats;
 
@@ -378,26 +375,31 @@ namespace Platform_Racing_3_Server.Game.Match
             }
         }
 
-        internal UpdateOutgoingMessage GetUpdatePacket()
+        internal bool GetUpdatePacket(out UpdateOutgoingPacket packet)
         {
             if (this.ToUpdate != UpdateStatus.None)
             {
-                try
-                {
-                    return new UpdateOutgoingMessage(this);
-                }
-                finally
-                {
-                    this.ToUpdate = UpdateStatus.None;
-                }
+                packet = new UpdateOutgoingPacket(this.ToUpdate, this);
+
+                this.ToUpdate = UpdateStatus.None;
+
+                return true;
             }
-            else
-            {
-                return null;
-            }
+
+            packet = default;
+
+            return false;
         }
 
-        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
-        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
+        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
+        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
+        {
+            Dictionary<string, object> userVars = new();
+
+            JsonUtils.GetVars(this.UserData, vars, userVars);
+            JsonUtils.GetVars(this, vars, userVars);
+
+            return userVars;
+        }
     }
 }

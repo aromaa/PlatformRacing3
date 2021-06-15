@@ -14,9 +14,10 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("isloggedin")]
     [Produces("text/xml")]
-    public class IsLoggedInController : Controller
+    public class IsLoggedInController : ControllerBase
     {
         [HttpPost]
         public async Task<object> IsLoggedInAsync([FromQuery] string id, [FromForm] string gameId)

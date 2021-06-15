@@ -27,7 +27,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal MultiplayerMatch CreateMultiplayerMatch(MatchListing matchListing)
         {
-            MultiplayerMatch match = new MultiplayerMatch(matchListing.Type, matchListing.Type.GetMatchId(this.GetNextMatchId()), matchListing.LevelData);
+            MultiplayerMatch match = new(matchListing.Type, matchListing.Type.GetMatchId(this.GetNextMatchId()), matchListing.LevelData);
             if (this.MultiplayerMatches.TryAdd(match.Name, match))
             {
                 return match;

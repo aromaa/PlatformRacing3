@@ -25,7 +25,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps
                     uint count = (uint?)data.Element("p_count") ?? throw new DataAccessProcedureMissingData();
                     string category = (string)data.Element("p_category") ?? throw new DataAccessProcedureMissingData();
 
-                    DataAccessGetMyStampsResponse response = new DataAccessGetMyStampsResponse(category);
+                    DataAccessGetMyStampsResponse response = new(category);
 
                     foreach(uint stamp in await StampManager.GetMyStampsAsync(userId, category, start, count))
                     {

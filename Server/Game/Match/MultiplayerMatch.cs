@@ -29,6 +29,7 @@ using Platform_Racing_3_Server.Game.Lobby;
 using log4net;
 using System.Reflection;
 using Platform_Racing_3_Common.User;
+using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -92,11 +93,9 @@ namespace Platform_Racing_3_Server.Game.Match
         private ClientSessionCollection Clients;
 
         private HashSet<uint> DrawingUsers;
-        private ConcurrentDictionary<uint, MatchPlayer> Players;
-        private Queue<MatchPlayer> PlayerOrderKeeper;
+        private SortedDictionary<uint, MatchPlayer> Players;
 
-        private uint ReservedSlots;
-        private uint UsersReady;
+        private int UsersReady;
 
         private uint NextHatId;
         private ConcurrentDictionary<uint, MatchPlayerHat> DroppedHats;
@@ -113,12 +112,11 @@ namespace Platform_Racing_3_Server.Game.Match
             this.Type = type;
 
             this._Status = MultiplayerMatchStatus.PreparingForStart;
-            this.ReservedFor = new ClientSessionCollection(this.OnReservedDisconnect);
-            this.Clients = new ClientSessionCollection(this.OnDisconnect);
+            this.ReservedFor = new ClientSessionCollection(addCallback: this.OnReservedFor, removeCallback: this.OnReservedLeave);
+            this.Clients = new ClientSessionCollection(addCallback: this.OnJoinGame, removeCallback: this.Leave0);
 
             this.DrawingUsers = new HashSet<uint>();
-            this.Players = new ConcurrentDictionary<uint, MatchPlayer>();
-            this.PlayerOrderKeeper = new Queue<MatchPlayer>();
+            this.Players = new SortedDictionary<uint, MatchPlayer>();
 
             this.Name = name;
             this.LevelData = levelData;
@@ -131,18 +129,6 @@ namespace Platform_Racing_3_Server.Game.Match
 
         public MultiplayerMatchStatus Status => this._Status;
 
-        private void OnReservedDisconnect(ClientSession session)
-        {
-            InterlockedExtansions.Decrement(ref this.ReservedSlots);
-
-            this.CheckGameState();
-        }
-
-        private void OnDisconnect(ClientSession session)
-        {
-            this.Leave0(session);
-        }
-
         private uint GetNextHatId() => InterlockedExtansions.Increment(ref this.NextHatId);
 
         internal bool Reserve(ClientSession session)
@@ -152,14 +138,47 @@ namespace Platform_Racing_3_Server.Game.Match
                 throw new InvalidOperationException();
             }
 
-            if (this.ReservedFor.Add(session))
-            {
-                InterlockedExtansions.Increment(ref this.ReservedSlots);
+            return this.ReservedFor.TryAdd(session);
+        }
 
-                return true;
+        private void OnReservedFor(ClientSession session)
+        {
+            MatchPlayer matchPlayer = new(this, session.UserData, session.SocketId, session.IPAddres);
+
+            lock (this.Players)
+            {
+                if (!this.Players.TryAdd(session.SocketId, matchPlayer))
+                {
+                    throw new InvalidOperationException();
+                }
             }
 
-            return false;
+            session.MultiplayerMatchSession = new MultiplayerMatchSession(this, matchPlayer);
+
+            lock (this.DrawingUsers)
+            {
+                this.DrawingUsers.Add(session.SocketId);
+            }
+        }
+
+        private void OnReservedLeave(ClientSession session)
+        {
+            lock (this.Players)
+            {
+                this.Players.Remove(session.SocketId);
+
+                foreach (ClientSession other in this.Clients.Sessions)
+                {
+                    other.UntrackUserInRoom(this.Name, session.SocketId);
+                }
+            }
+
+            lock (this.DrawingUsers)
+            {
+                this.DrawingUsers.Remove(session.SocketId);
+            }
+
+            this.CheckGameState();
         }
 
         internal void Lock()
@@ -178,6 +197,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.PreparingForStart) == MultiplayerMatchStatus.PreparingForStart)
                 {
                     this.CheckGameState();
+
                     return;
                 }
             }
@@ -187,72 +207,67 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void Join(ClientSession session)
         {
-            lock (((ICollection)this.PlayerOrderKeeper).SyncRoot) //Due to how things work we need to lock this whole block, TODO: looking for better solution
+            if (!this.ReservedFor.TryRemove(session, callEvent: false))
             {
-                if (this.ReservedFor.Remove(session))
+                //Spectate
+                this.Clients.TryAdd(session);
+
+                return;
+            }
+
+            if (!this.Clients.TryAdd(session))
+            {
+                this.OnReservedLeave(session);
+
+                return;
+            }
+
+            Interlocked.Increment(ref this.UsersReady);
+
+            this.CheckGameState();
+        }
+
+        private void OnJoinGame(ClientSession session)
+        {
+            lock (this.Players)
+            {
+                foreach (MatchPlayer player in this.Players.Values)
                 {
-                    if (this.Clients.Add(session) && this.DrawingUsers.Add(session.SocketId))
+                    session.TrackUserInRoom(this.Name, player.SocketId, player.UserData.Id, player.UserData.Username, player.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
+
+                    lock (this.DrawingUsers)
                     {
-                        MatchPlayer matchPlayer = new MatchPlayer(this, session.UserData, session.SocketId, session.IPAddres);
-                        if (this.Players.TryAdd(session.SocketId, matchPlayer))
+                        if (!this.DrawingUsers.Contains(player.SocketId))
                         {
-                            session.MultiplayerMatchSession = new MultiplayerMatchSession(this, matchPlayer);
-
-                            this.PlayerOrderKeeper.Enqueue(matchPlayer);
-
-                            foreach (MatchPlayer player in this.PlayerOrderKeeper)
-                            {
-                                session.TrackUserInRoom(this.Name, player.SocketId, player.UserData.Id, player.UserData.Username, player.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
-
-                                if (!this.DrawingUsers.Contains(player.SocketId))
-                                {
-                                    session.SendUserRoomData(this.Name, player.SocketId, new FinishDrawingOutgoingMessage(player.SocketId));
-                                }
-                            }
-
-                            foreach (ClientSession other in this.Clients.Values.ToList())
-                            {
-                                other.TrackUserInRoom(this.Name, matchPlayer.SocketId, matchPlayer.UserData.Id, matchPlayer.UserData.Username, matchPlayer.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
-                            }
-
-                            InterlockedExtansions.Increment(ref this.UsersReady);
-
-                            this.CheckGameState();
-                        }
-                        else
-                        {
-                            //Ehhh????
+                            session.SendUserRoomData(this.Name, player.SocketId, new FinishDrawingOutgoingMessage(player.SocketId));
                         }
                     }
-                }
-                else
-                {
-                    //Spectate
-                    this.Clients.Add(session);
                 }
             }
         }
 
         internal void SendUpdateIfRequired(ClientSession session, MatchPlayer matchPlayer)
         {
-            UpdateOutgoingMessage packet = matchPlayer.GetUpdatePacket();
-            if (packet != null)
+            if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
             {
-                this.Clients.SendPacket(packet, session);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
         internal void FinishDrawing(ClientSession session)
         {
-            if (this.DrawingUsers.Remove(session.SocketId))
+            lock (this.DrawingUsers)
             {
-                foreach(ClientSession other in this.Clients.Values)
+                if (this.DrawingUsers.Remove(session.SocketId))
                 {
-                    other.SendUserRoomData(this.Name, session.SocketId, new FinishDrawingOutgoingMessage(session.SocketId));
+                    foreach (ClientSession other in this.Clients.Sessions)
+                    {
+                        other.SendUserRoomData(this.Name, session.SocketId, new FinishDrawingOutgoingMessage(session.SocketId));
+                    }
                 }
-
-                this.CheckGameState();
             }
+
+            this.CheckGameState();
         }
 
         internal void CheckGameState()
@@ -261,48 +276,50 @@ namespace Platform_Racing_3_Server.Game.Match
             {
                 if (this._Status == MultiplayerMatchStatus.WaitingForUsersToJoin)
                 {
-                    if (this.UsersReady == this.ReservedSlots)
+                    lock (this.Players)
                     {
-                        InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToDraw, MultiplayerMatchStatus.WaitingForUsersToJoin);
+                        if (this.UsersReady != this.Players.Count)
+                        {
+                            break;
+                        }
                     }
-                    else
-                    {
-                        break;
-                    }
+
+                    InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.WaitingForUsersToDraw, MultiplayerMatchStatus.WaitingForUsersToJoin);
                 }
                 else if (this._Status == MultiplayerMatchStatus.WaitingForUsersToDraw)
                 {
-                    if (this.DrawingUsers.Count == 0)
+                    lock (this.DrawingUsers)
                     {
-                        if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw) == MultiplayerMatchStatus.WaitingForUsersToDraw)
+                        if (this.DrawingUsers.Count != 0)
                         {
-                            this.Start();
+                            break;
                         }
                     }
-                    else
+
+                    if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw) == MultiplayerMatchStatus.WaitingForUsersToDraw)
                     {
-                        break;
+                        this.Start();
                     }
                 }
                 else if (this._Status == MultiplayerMatchStatus.Ongoing)
                 {
-                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat ? this.MatchTimer.Elapsed.TotalSeconds > this.LevelData.Seconds : false;
+                    bool timeRanOut = this.LevelData.Seconds > 0 && this.LevelData.Mode != LevelMode.KingOfTheHat && this.MatchTimer.Elapsed.TotalSeconds > this.LevelData.Seconds;
                     if (timeRanOut)
                     {
                         if (this.LevelData.Mode == LevelMode.CoinFiend || this.LevelData.Mode == LevelMode.DamageDash)
                         {
-                            foreach (ClientSession session in this.Clients.Values)
+                            foreach (ClientSession session in this.Clients.Sessions)
                             {
                                 this.FinishMatch(session);
                             }
                         }
                     }
-                    
+
                     if (timeRanOut || this.Players.Values.All((p) => p.Forfiet || p.FinishTime != null))
                     {
                         if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Ended, MultiplayerMatchStatus.Ongoing) == MultiplayerMatchStatus.Ongoing)
                         {
-                            this.Clients.SendPacket(new EndGameOutgoingMessage());
+                            this.Clients.SendAsync(new EndGameOutgoingMessage());
                         }
                     }
                     else
@@ -333,10 +350,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal void Leave(ClientSession session)
         {
-            if (this.Clients.Remove(session))
-            {
-                this.Leave0(session);
-            }
+            this.Clients.TryRemove(session);
         }
 
         internal void Start()
@@ -347,9 +361,9 @@ namespace Platform_Racing_3_Server.Game.Match
                 rng.GetBytes(bytes);
             }
 
-            Random random = new Random(BitConverter.ToInt32(bytes, 0));
+            Random random = new(BitConverter.ToInt32(bytes, 0));
 
-            HashSet<string> events = new HashSet<string>();
+            HashSet<string> events = new();
             if (this.LevelData.Snow > random.NextDouble() * 100)
             {
                 events.Add("snow");
@@ -400,7 +414,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 //Resend hats to avoid graphical bug on client side
                 foreach (MatchPlayer player in this.Players.Values)
                 {
-                    this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                    this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
                 }
             }
 
@@ -462,12 +476,12 @@ namespace Platform_Racing_3_Server.Game.Match
 
                         void CheckPartDrops()
                         {
-                            if (CheckEventPartDrop())
+                            if (CheckSpecialPartDrop())
                             {
                                 return;
                             }
 
-                            if (CheckSpecialPartDrop())
+                            if (CheckEventPartDrop())
                             {
                                 return;
                             }
@@ -556,10 +570,16 @@ namespace Platform_Racing_3_Server.Game.Match
                                 this.Prize = new MatchPrize("hat", (uint)new Hat[]
                                 {
                                     Hat.None,
-                                    Hat.BaseballCap,
                                     Hat.Cowboy,
                                     Hat.Crown
                                 }.OrderBy((h) => random.NextDouble()).First());
+
+                                return true;
+                            }
+
+                            if (random.Next(333 / (radiatingLuck.Count + 1)) == 0)
+                            {
+                                this.Prize = new MatchPrize("hat", (uint)Hat.BaseballCap);
 
                                 return true;
                             }
@@ -718,12 +738,13 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (this.Prize != null)
             {
-                this.Clients.SendPacket(new PrizeOutgoingMessage(this.Prize, "available"));
+                this.Clients.SendAsync(new PrizeOutgoingMessage(this.Prize, "available"));
             }
 
             this.MatchTimer = MatchTimer.StartNew(TimeSpan.FromMilliseconds(2664));
 
-            this.Clients.SendPackets(new EventsOutgoingMessage(events), new BeginMatchOutgoingMessage());
+            this.Clients.SendAsync(new EventsOutgoingMessage(events));
+            this.Clients.SendAsync(new BeginMatchOutgoingMessage());
 
             LevelManager.AddPlaysAsync(this.LevelData.Id, (uint)this.Players.Count); //Lets do the most important thing now!
         }
@@ -765,7 +786,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (this.LevelData.Data.StartsWith("v2 | "))
                 {
-                    JObject levelData = JsonConvert.DeserializeObject<JObject>(this.LevelData.Data.Substring(5));
+                    JObject levelData = JsonConvert.DeserializeObject<JObject>(this.LevelData.Data[5..]);
                     if (levelData.TryGetValue("blockStr", out JToken jsonBlockStr))
                     {
                         string blockStr = (string)jsonBlockStr;
@@ -775,13 +796,13 @@ namespace Platform_Racing_3_Server.Game.Match
                             int x = 0;
                             int y = 0;
 
-                            HashSet<uint> blockIds = new HashSet<uint>();
-                            Dictionary<Point, uint> blocks = new Dictionary<Point, uint>();
+                            HashSet<uint> blockIds = new();
+                            Dictionary<Point, uint> blocks = new();
                             foreach (string block in blockStr.Split(','))
                             {
                                 if (block[0] == 'b')
                                 {
-                                    blockId = uint.Parse(block.Substring(1));
+                                    blockId = uint.Parse(block[1..]);
                                     blockIds.Add(blockId);
                                 }
                                 else
@@ -795,7 +816,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
                             }
 
-                            HashSet<uint> finishBlocks = new HashSet<uint>();
+                            HashSet<uint> finishBlocks = new();
                             foreach (uint blockId_ in blockIds.ToList())
                             {
                                 if (blockId_ < 700)
@@ -812,7 +833,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             //Not found in cached blocks
                             if (blockIds.Count > 0)
                             {
-                                using (DatabaseConnection dbConnection = new DatabaseConnection())
+                                using (DatabaseConnection dbConnection = new())
                                 {
                                     DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
                                     while (reader?.Read() ?? false)
@@ -821,7 +842,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                         string settings = (string)reader["settings"];
                                         if (settings.StartsWith("v2 | "))
                                         {
-                                            JObject blockData = JsonConvert.DeserializeObject<JObject>(settings.Substring(5));
+                                            JObject blockData = JsonConvert.DeserializeObject<JObject>(settings[5..]);
                                             if (blockData.TryGetValue("left", out JToken sideSettings) && this.ReadBlockSideSettings(sideSettings))
                                             {
                                                 finishBlocks.Add(id);
@@ -889,10 +910,10 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             player.AddHat(this.GetNextHatId(), hat, color, spawned);
 
-            this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+            this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
         }
 
-        internal void Forfiet(ClientSession session, bool leave = false)
+        internal void Forfeit(ClientSession session, bool leave = false)
         {
             if (leave)
             {
@@ -905,43 +926,47 @@ namespace Platform_Racing_3_Server.Game.Match
 
             if (this._Status < MultiplayerMatchStatus.Starting)
             {
-                this.DrawingUsers.Remove(session.SocketId);
-                this.Players.TryRemove(session.SocketId, out _);
-            }
-            else
-            {
-                if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
+                lock (this.DrawingUsers)
                 {
-                    if (this.LevelData.Mode == LevelMode.HatAttack || this.LevelData.Mode == LevelMode.KingOfTheHat)
-                    {
-                        while (player.Hats.Count > 0)
-                        {
-                            this.ForceDropHat(player, 15);
-                        }
-                    }
-
-                    //If player dosen't have finish time it should always be considered as forfiet
-                    if (player.FinishTime == null)
-                    {
-                        if (!player.Forfiet && this.Broadcaster)
-                        {
-                            int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
-
-                            this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfiet at place #{place}");
-                        }
-
-                        player.Forfiet = true;
-
-                        this.Clients.SendPacket(new ForfietOutgoingMessage(session.SocketId));
-                    }
-
-                    if (leave)
-                    {
-                        player.Gone = true;
-                    }
-
-                    this.Clients.SendPacket(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                    this.DrawingUsers.Remove(session.SocketId);
                 }
+
+                lock (this.Players)
+                {
+                    this.Players.Remove(session.SocketId);
+                }
+            }
+            else if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
+            {
+                if (this.LevelData.Mode == LevelMode.HatAttack || this.LevelData.Mode == LevelMode.KingOfTheHat)
+                {
+                    while (player.Hats.Count > 0)
+                    {
+                        this.ForceDropHat(player, 15);
+                    }
+                }
+
+                //If player doesn't have finish time it should always be considered as forfeit
+                if (player.FinishTime == null)
+                {
+                    if (!player.Forfiet && this.Broadcaster)
+                    {
+                        int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
+
+                        this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfeit at place #{place}");
+                    }
+
+                    player.Forfiet = true;
+
+                    this.Clients.SendAsync(new ForfietOutgoingMessage(session.SocketId));
+                }
+
+                if (leave)
+                {
+                    player.Gone = true;
+                }
+
+                this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, this.Players.Values));
             }
 
             this.CheckGameState();
@@ -966,9 +991,14 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void Leave0(ClientSession session)
         {
-            this.Forfiet(session, true);
+            this.LeaveInternal(session);
+        }
 
-            foreach(ClientSession other in this.Clients.Values)
+        private void LeaveInternal(ClientSession session)
+        {
+            this.Forfeit(session, true);
+
+            foreach (ClientSession other in this.Clients.Sessions)
             {
                 other.UntrackUserInRoom(this.Name, session.SocketId);
             }
@@ -993,11 +1023,9 @@ namespace Platform_Racing_3_Server.Game.Match
             {
                 player.FinishTime = now;
 
-                this.Clients.SendPacket(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
-
                 ulong expEarned = ExpUtils.GetExpEarnedForFinishing(now);
 
-                List<object[]> expArray = new List<object[]>();
+                List<object[]> expArray = new();
                 if (this.LevelData.Mode == LevelMode.Race)
                 {
                     expArray.Add(new object[] { "Level completed", expEarned });
@@ -1063,6 +1091,8 @@ namespace Platform_Racing_3_Server.Game.Match
                         }
                     }
                 }
+
+                player.FinishPlace = place;
 
                 ulong baseExp = expEarned;
                 if (this.Prize != null && (!this.Prize.RewardsExpBonus || place == 1))
@@ -1159,11 +1189,10 @@ namespace Platform_Racing_3_Server.Game.Match
                     expEarned += (ulong)Math.Round(baseExp * 0.25F);
                     expArray.Add(new object[] { "LOTD bonus", "EXP X 1.25" });
                 }
-
-                ulong bonusExpDrained = 0;
+                
                 if (player.UserData.BonusExp > 0)
                 {
-                    bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
+	                ulong bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
                     if (bonusExpDrained > 0)
                     {
                         expEarned += bonusExpDrained;
@@ -1174,7 +1203,9 @@ namespace Platform_Racing_3_Server.Game.Match
                     }
                 }
 
-                session.SendPackets(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray));
+                this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+
+                session.SendPacket(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray, place));
 
                 uint oldRank = session.UserData.Rank;
 
@@ -1236,15 +1267,15 @@ namespace Platform_Racing_3_Server.Game.Match
 
         private void SendUseItem(ClientSession session, double[] pos, bool sendToSelf = false)
         {
-            UseItemOutgoingMessage packet = new UseItemOutgoingMessage(this.Name, session.SocketId, pos);
+            UseItemOutgoingMessage packet = new(this.Name, session.SocketId, pos);
 
             if (sendToSelf)
             {
-                this.Clients.SendPacket(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.SendPacket(packet, session);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -1252,60 +1283,60 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (message.StartsWith("/"))
             {
-                string[] args = message.Substring(1).Split(' ');
+                string[] args = message[1..].Split(' ');
 
-                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan().Slice(1, args.Length - 1)))
+                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(1, args.Length - 1)))
                 {
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }
             }
             else
             {
-                ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
+                ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
                 if (sendToSelf)
                 {
-                    this.Clients.SendPacket(packet);
+                    this.Clients.SendAsync(packet);
                 }
                 else
                 {
-                    this.Clients.SendPacket(packet, session);
+                    this.Clients.SendAsync(packet, session);
                 }
             }
         }
 
         private void SendChatMessage(string senderName, uint senderSocketId, uint senderUserId, Color senderNameColor, string message)
         {
-            ChatOutgoingMessage packet = new ChatOutgoingMessage(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
+            ChatOutgoingMessage packet = new(this.Name, message, senderSocketId, senderUserId, senderName, senderNameColor);
 
-            this.Clients.SendPacket(packet);
+            this.Clients.SendAsync(packet);
         }
 
         private void SendShatterBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
         {
-            ShatterBlockOutgoingMessage packet = new ShatterBlockOutgoingMessage(this.Name, tileY, tileX);
+            ShatterBlockOutgoingMessage packet = new(this.Name, tileY, tileX);
 
             if (sendToSelf)
             {
-                this.Clients.SendPacket(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.SendPacket(packet, session);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
         private void SendExplodeBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
         {
-            ExplodeBlockOutgoingMessage packet = new ExplodeBlockOutgoingMessage(this.Name, tileY, tileX);
+            ExplodeBlockOutgoingMessage packet = new(this.Name, tileY, tileX);
 
             if (sendToSelf)
             {
-                this.Clients.SendPacket(packet);
+                this.Clients.SendAsync(packet);
             }
             else
             {
-                this.Clients.SendPacket(packet, session);
+                this.Clients.SendAsync(packet, session);
             }
         }
 
@@ -1323,7 +1354,7 @@ namespace Platform_Racing_3_Server.Game.Match
             if (hat != null)
             {
                 this.DropHat(hat, x, y, velX, velY);
-                this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
             }
         }
 
@@ -1332,7 +1363,7 @@ namespace Platform_Racing_3_Server.Game.Match
         {
             if (this.DroppedHats.TryAdd(hat.Id, hat))
             {
-                this.Clients.SendPacket(new AddHatOutgoingMessage(hat, x, y, velX, velY));
+                this.Clients.SendAsync(new AddHatOutgoingMessage(hat, x, y, velX, velY));
             }
             else
             {
@@ -1350,8 +1381,8 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         player.AddHat(hat);
 
-                        this.Clients.SendPacket(new RemoveHatOutgoingMessage(id), session);
-                        this.Clients.SendPacket(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+                        this.Clients.SendAsync(new RemoveHatOutgoingMessage(id), session);
+                        this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
                     }
                 }
             }
@@ -1365,7 +1396,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 {
                     player.Coins = coins;
 
-                    this.Clients.SendPacket(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }
             }
         }
@@ -1378,7 +1409,7 @@ namespace Platform_Racing_3_Server.Game.Match
                 {
                     player.Dash = dash;
 
-                    this.Clients.SendPacket(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
                 }
             }
         }
@@ -1401,7 +1432,7 @@ namespace Platform_Racing_3_Server.Game.Match
                             mins = Math.Max(mins, 0);
                             secs = Math.Max(secs, 0);
 
-                            time = $"{mins}:{secs.ToString("00")}";
+                            time = $"{mins}:{secs:00}";
                         }
                     }
                     else
@@ -1412,14 +1443,14 @@ namespace Platform_Racing_3_Server.Game.Match
                     player.Koth = time;
 
                     //Coins packet does everything we want
-                    this.Clients.SendPacket(new CoinsOutgoingMessage(new MatchPlayer[] { player }));
+                    this.Clients.SendAsync(new CoinsOutgoingMessage(new MatchPlayer[] { player }));
                 }
             }
         }
 
         internal void SendPacket(IMessageOutgoing packet)
         {
-            this.Clients.SendPacket(packet);
+            this.Clients.SendAsync(packet);
         }
     }
 }

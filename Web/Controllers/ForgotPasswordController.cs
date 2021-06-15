@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Platform_Racing_3_Common.User;
 using System;
 using System.Collections.Generic;
@@ -10,11 +9,13 @@ using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("forgotpassword")]
-    public class ForgotPasswordController : Controller
+    public class ForgotPasswordController : ControllerBase
     {
         [HttpPost]
         public async Task<string> PostAsync([FromForm] string email)
@@ -61,12 +62,12 @@ namespace Platform_Racing_3_Web.Controllers
                     return "Something went wrong when trying to create the token! Try again!";
                 }
 
-                using (MailMessage mail = new MailMessage())
+                using (MailMessage mail = new())
                 {
                     mail.To.Add(email);
                     mail.Subject = $"Platform Racing 3 - {player.Username} - Password Reset";
                     mail.From = new MailAddress(Program.Config.SmtpUser);
-                    mail.Body = $"You have requested password reset for your {player.Username} account! Use the following link to reset your password! https://pr3hub.com/resetpassword?email={email}&token={Base64UrlEncoder.Encode(token)}";
+                    mail.Body = $"You have requested password reset for your {player.Username} account! Use the following link to reset your password! https://pr3hub.com/resetpassword?email={email}&token={WebEncoders.Base64UrlEncode(token)}";
 
                     Program.SmtpClient.Send(mail);
                 }

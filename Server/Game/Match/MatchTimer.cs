@@ -29,7 +29,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         public static MatchTimer StartNew(TimeSpan delay = default)
         {
-            MatchTimer timer = new MatchTimer();
+            MatchTimer timer = new();
             timer.Start(delay);
 
             return timer;

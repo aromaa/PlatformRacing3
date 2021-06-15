@@ -24,7 +24,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
         {
             this.RequestId = requestId;
 
-            List<IReadOnlyDictionary<string, object>> users = new List<IReadOnlyDictionary<string, object>>();
+            List<IReadOnlyDictionary<string, object>> users = new();
             foreach(ClientSession session in sessions)
             {
                 users.Add(session.GetVars("socketID", "userID", "userName", "rank", "hats", "status", "nameColor"));

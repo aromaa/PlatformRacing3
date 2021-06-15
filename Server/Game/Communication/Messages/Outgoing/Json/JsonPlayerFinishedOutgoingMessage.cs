@@ -3,6 +3,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Match;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -35,6 +36,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             [JsonProperty("finish_time", DefaultValueHandling = DefaultValueHandling.Ignore)]
             internal string FinishTime { get; set; }
 
+            [JsonProperty("finish_place", DefaultValueHandling = DefaultValueHandling.Ignore)]
+            internal int? FinishPlace { get; set; }
+
             [JsonProperty("coins", DefaultValueHandling = DefaultValueHandling.Ignore)]
             internal uint Coins { get; set; }
 
@@ -51,7 +55,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             {
                 this.SocketId = matchPlayer.SocketId;
                 this.Name = matchPlayer.UserData.Username;
-                this.FinishTime = matchPlayer.Forfiet ? "forfeit" : matchPlayer.FinishTime?.ToString().Replace(',', '.') ?? "";
+                this.FinishTime = matchPlayer.Forfiet ? "forfeit" : matchPlayer.FinishTime?.ToString(CultureInfo.InvariantCulture) ?? string.Empty;
+                this.FinishPlace = matchPlayer.FinishPlace;
                 this.Koth = matchPlayer.Koth;
                 this.Coins = matchPlayer.Coins;
                 this.Dash = matchPlayer.Dash;

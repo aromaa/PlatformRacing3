@@ -1,26 +1,69 @@
 ﻿using Newtonsoft.Json;
 using Platform_Racing_3_Common.Level;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
+using log4net.Util;
+using Platform_Racing_3_Common.User;
 
 namespace Platform_Racing_3_Common.Utils
 {
-    public class JsonUtils
+    public static class JsonUtils
     {
-        public static IReadOnlyDictionary<string, object> GetVars(object target, params string[] vars) => JsonUtils.GetVars(target, vars.ToHashSet());
-        public static IReadOnlyDictionary<string, object> GetVars(object target, HashSet<string> vars)
+        private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyAttribute, Func<object, object>>> CachedProperties = new();
+
+        private static Dictionary<JsonPropertyAttribute, Func<object, object>> GetProperties<T>()
         {
-            Dictionary<string, object> userVars = new Dictionary<string, object>();
-            foreach (PropertyInfo propertyInfo in target.GetType().GetRuntimeProperties())
+            Type type = typeof(T);
+            if (!JsonUtils.CachedProperties.TryGetValue(type, out Dictionary<JsonPropertyAttribute, Func<object, object>> info))
             {
-                JsonPropertyAttribute jsonProperty = propertyInfo.GetCustomAttribute<JsonPropertyAttribute>();
-                if (jsonProperty != null && (vars.Contains("*") || vars.Contains(jsonProperty.PropertyName)))
+                info = new Dictionary<JsonPropertyAttribute, Func<object, object>>();
+                foreach (PropertyInfo property in type.GetRuntimeProperties())
                 {
-                    object value = propertyInfo.GetValue(target);
+                    JsonPropertyAttribute jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
+                    if (jsonProperty != null)
+                    {
+                        ParameterExpression parameter = Expression.Parameter(type);
+                        MemberExpression expression = Expression.Property(parameter, property); 
+                        UnaryExpression convert = Expression.Convert(expression, typeof(object));
+
+                        info[jsonProperty] = Unsafe.As<Func<object, object>>(Expression.Lambda<Func<T, object>>(convert, parameter).Compile());
+                    }
+                }
+
+                JsonUtils.CachedProperties.TryAdd(type, info);
+            }
+
+            return info;
+        }
+
+        public static IReadOnlyDictionary<string, object> GetVars<T>(T target, params string[] vars) => JsonUtils.GetVars(target, vars.ToHashSet());
+        public static IReadOnlyDictionary<string, object> GetVars<T>(T target, HashSet<string> vars)
+        {
+            Dictionary<string, object> userVars = new();
+
+            JsonUtils.GetVars(target, vars, userVars);
+
+            return userVars;
+        }
+        public static void GetVars<T>(T target, HashSet<string> vars, Dictionary<string, object> to)
+        {
+            bool all = vars.Contains("*");
+
+            foreach (KeyValuePair<JsonPropertyAttribute, Func<object, object>> property in JsonUtils.GetProperties<T>())
+            {
+                JsonPropertyAttribute jsonAttribute = property.Key;
+                Func<object, object> getter = property.Value;
+
+                if (all || vars.Contains(jsonAttribute.PropertyName))
+                {
+                    object value = getter.Invoke(target);
                     if (value is Color color) //SPECIAL CASE OMG
                     {
                         value = color.ToArgb();
@@ -29,30 +72,12 @@ namespace Platform_Racing_3_Common.Utils
                     {
                         string mode = levelMode.ToString();
 
-                        value = Char.ToLowerInvariant(mode[0]) + mode.Substring(1);
+                        value = Char.ToLowerInvariant(mode[0]) + mode[1..];
                     }
 
-                    userVars.Add(jsonProperty.PropertyName, value);
+                    to[jsonAttribute.PropertyName] = value;
                 }
             }
-
-            return userVars;
-        }
-        
-        public static IReadOnlyDictionary<string, object> GetVars(List<object> targets, params string[] vars) => JsonUtils.GetVars(targets.ToArray(), vars.ToHashSet());
-        public static IReadOnlyDictionary<string, object> GetVars(object[] targets, params string[] vars) => JsonUtils.GetVars(targets, vars.ToHashSet());
-        public static IReadOnlyDictionary<string, object> GetVars(object[] targets, HashSet<string> vars)
-        {
-            Dictionary<string, object> userVars = new Dictionary<string, object>();
-            foreach(object target in targets)
-            {
-                foreach(KeyValuePair<string, object> vars_ in JsonUtils.GetVars(target, vars))
-                {
-                    userVars[vars_.Key] = vars_.Value;
-                }
-            }
-
-            return userVars;
         }
     }
 }

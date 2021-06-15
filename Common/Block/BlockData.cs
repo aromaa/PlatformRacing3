@@ -76,6 +76,6 @@ namespace Platform_Racing_3_Common.Block
             writer.WriteElementString("settings", this.Settings);
         }
 
-        public static BlockData GetDeletedBlock(uint id) => new BlockData(id);
+        public static BlockData GetDeletedBlock(uint id) => new(id);
     }
 }

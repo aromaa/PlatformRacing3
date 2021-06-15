@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Platform_Racing_3_Web.Controllers.DataAccess2;
 using Platform_Racing_3_Web.Middleware;
 
 namespace Platform_Racing_3_Web
@@ -34,16 +36,15 @@ namespace Platform_Racing_3_Web
 
                 options.Cookie.Name = "PR3-Auth";
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None; //Due to us accepting http and https
                 options.Cookie.SameSite = SameSiteMode.None; //None due to Chrome 71 breaking changes
-                options.Cookie.Expiration = TimeSpan.FromDays(7);
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
             services.AddMvc().AddXmlSerializerFormatters();
             services.AddCors();
         }
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             //Setup global stuff
             if (env.IsDevelopment())
@@ -52,17 +53,17 @@ namespace Platform_Racing_3_Web
             }
 
             app.UseMiddleware<CloudflareMiddleware>();
+            app.UseRouting();
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseCors(options =>
             {
                 options.WithOrigins("http://pr3hub.com", "https://pr3hub.com").AllowAnyMethod().AllowCredentials();
             });
 
-            app.UseMvc();
-
-            app.Run(async context =>
+            app.UseEndpoints(endpoints =>
             {
-                await context.Response.WriteAsync("I think you are lost...");
+                endpoints.MapControllers();
             });
         }
     }

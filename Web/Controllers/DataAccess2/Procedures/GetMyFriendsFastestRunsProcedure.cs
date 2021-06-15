@@ -23,7 +23,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                 {
                     uint levelId = (uint?)data.Element("p_level_id") ?? throw new DataAccessProcedureMissingData();
 
-                    DataAccessGetMyFriendsFastestRunsResponse response = new DataAccessGetMyFriendsFastestRunsResponse();
+                    DataAccessGetMyFriendsFastestRunsResponse response = new();
 
                     IReadOnlyDictionary<uint, (int Time, CampaignRun Run)> runs = await CampaignManager.GetFriendRunsAsync(userId, levelId);
                     if (runs != null)

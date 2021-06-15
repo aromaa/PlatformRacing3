@@ -32,7 +32,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
         private const uint BG_ID_MIN = 0;
         private const uint BG_ID_MAX = 11;
 
-        private static readonly HashSet<string> SupportedItems = new HashSet<string>()
+        private static readonly HashSet<string> SupportedItems = new()
         {
             "li",
             "r",
@@ -54,6 +54,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
             "sp",
             "h",
             "lc",
+			"gr",
         };
 
         public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
@@ -166,14 +167,16 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     {
                         return new DataAccessErrorResponse("Background image data dont start with 'BG'");
                     }
-                    else if (!uint.TryParse(bgImage.Substring(2), out uint bgImageId) || bgImageId < SaveLevel4Procedure.BG_ID_MIN || bgImageId > SaveLevel4Procedure.BG_ID_MAX)
+                    else if (!uint.TryParse(bgImage[2..], out uint bgImageId) || bgImageId < SaveLevel4Procedure.BG_ID_MIN || bgImageId > SaveLevel4Procedure.BG_ID_MAX)
                     {
                         return new DataAccessErrorResponse($"Background image id must be between of {SaveLevel4Procedure.BG_ID_MIN} and {SaveLevel4Procedure.BG_ID_MAX}");
                     }
 
                     string levelData = (string)data.Element("p_level_data") ?? throw new DataAccessProcedureMissingData();
 
-                    uint levelId = await LevelManager.SaveLevelAsync(userId, title, description, publish, songId, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, kingOfTheHat, bgImage, levelData);
+                    string lua = (string)data.Element("p_lua") ?? string.Empty;
+
+                    uint levelId = await LevelManager.SaveLevelAsync(userId, title, description, publish, songId, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, kingOfTheHat, bgImage, levelData, lua);
                     if (levelId > 0)
                     {
                         return new DataAccessSaveLevel4Response(levelId);

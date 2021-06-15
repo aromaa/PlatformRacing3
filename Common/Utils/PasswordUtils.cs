@@ -75,7 +75,7 @@ namespace Platform_Racing_3_Common.Utils
             {
                 byte[] md5Hash = md5.ComputeHash(bytes);
 
-                StringBuilder md5String = new StringBuilder();
+                StringBuilder md5String = new();
                 foreach(byte byte_ in md5Hash)
                 {
                     md5String.Append(byte_.ToString("x2"));

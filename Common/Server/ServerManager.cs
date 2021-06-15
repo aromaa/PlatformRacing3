@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.Server
 {
@@ -32,7 +33,7 @@ namespace Platform_Racing_3_Common.Server
         {
             await RedisConnection.GetConnectionMultiplexer().GetSubscriber().SubscribeAsync("ServerStatusUpdated", this.RedisServerStatusUpdate, CommandFlags.FireAndForget);
 
-            using (DatabaseConnection dbConnection = new DatabaseConnection())
+            using (DatabaseConnection dbConnection = new())
             {
                 await dbConnection.ReadDataAsync($"SELECT id, name, ip, port FROM base.servers ORDER BY id").ContinueWith(this.ParseSqlServers);
             }
@@ -66,15 +67,15 @@ namespace Platform_Racing_3_Common.Server
             }
         }
 
-        private IReadOnlyCollection<ServerDetails> ParseSqlServers(Task<DbDataReader> task)
+        private IReadOnlyCollection<ServerDetails> ParseSqlServers(Task<NpgsqlDataReader> task)
         {
-            List<ServerDetails> servers = new List<ServerDetails>();
+            List<ServerDetails> servers = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
                 while (reader?.Read() ?? false)
                 {
-                    ServerDetails server = new ServerDetails(reader);
+                    ServerDetails server = new(reader);
 
                     servers.Add(this.Servers.GetOrAdd(server.Id, new ServerDetails(reader)));
                 }
@@ -87,14 +88,14 @@ namespace Platform_Racing_3_Common.Server
             return servers;
         }
 
-        private void ParseSqlRedisFallback(Task<DbDataReader> task, object state)
+        private void ParseSqlRedisFallback(Task<NpgsqlDataReader> task, object state)
         {
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
                 if (reader?.Read() ?? false)
                 {
-                    ServerDetails server = new ServerDetails(reader);
+                    ServerDetails server = new(reader);
 
                     this.Servers.GetOrAdd(server.Id, server).SetStatus((string)state);
                 }

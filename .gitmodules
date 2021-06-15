@@ -1,0 +1,3 @@
+[submodule "Net"]
+	path = Net
+	url = https://github.com/isokissa3/Net

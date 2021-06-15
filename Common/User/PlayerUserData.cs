@@ -14,14 +14,12 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Text;
+using Platform_Racing_3_Common.Extensions;
 
 namespace Platform_Racing_3_Common.User
 {
     public class PlayerUserData : BaseUserData
     {
-        private static readonly Hat[] RestrictedHats = new Hat[] { Hat.Cowboy, Hat.Crown };
-        private static readonly Part[] RestrictedParts = new Part[] { Part.Invisible, Part.MEME };
-
         private const uint DAILY_LUCK = 5;
 
         public override bool IsGuest => false;
@@ -253,11 +251,11 @@ namespace Platform_Racing_3_Common.User
         {
             if (!this.HasPermissions("access_any_parts"))
             {
-                this._Hats.RemoveWhere((h) => PlayerUserData.RestrictedHats.Contains(h));
+                this._Hats.RemoveWhere((h) => h.IsStaffOnly());
 
-                this._Heads.RemoveWhere((p) => PlayerUserData.RestrictedParts.Contains(p));
-                this._Bodys.RemoveWhere((p) => PlayerUserData.RestrictedParts.Contains(p));
-                this._Feets.RemoveWhere((p) => PlayerUserData.RestrictedParts.Contains(p));
+                this._Heads.RemoveWhere((p) => p.IsStaffOnly());
+                this._Bodys.RemoveWhere((p) => p.IsStaffOnly());
+                this._Feets.RemoveWhere((p) => p.IsStaffOnly());
             }
         }
         
@@ -286,6 +284,13 @@ namespace Platform_Racing_3_Common.User
             this._Ignored = playerUserData._Ignored;
 
             //TODO: Load permissions
+            this._Permissions.Add("access_no_idle_kick");
+
+            if (this.PermissionRank >= 100)
+            {
+                this._Permissions.Add("access_bypass_chat_flood");
+                this._Permissions.Add("access_stamp_editor");
+            }
 
             this.CheckCampaignPrizes();
             this.RemoveRestrictedParts();

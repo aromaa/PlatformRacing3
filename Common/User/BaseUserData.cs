@@ -71,7 +71,7 @@ namespace Platform_Racing_3_Common.User
             this._Bodys = new HashSet<Part>(GuestUserData.DefaultBodys);
             this._Feets = new HashSet<Part>(GuestUserData.DefaultFeets);
 
-            Random random = new Random(); //By default randomize the look to make them look fancy :)
+            Random random = new(); //By default randomize the look to make them look fancy :)
 
             this.CurrentHat = Hat.None;
             this.CurrentHatColor = Color.Black;

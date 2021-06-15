@@ -21,24 +21,10 @@ namespace Platform_Racing_3_Web.Config
         [JsonProperty("database_name", Required = Required.Always)]
         public string DatabaseName { get; set; }
 
-        [JsonProperty("database_use_ssh")]
-        public bool DatabaseUseSsh { get; set; }
-        [JsonProperty("database_ssh_key")]
-        public string DatabaseSshKey { get; set; }
-        [JsonProperty("database_ssh_user")]
-        public string DatabaseSshUser { get; set; }
-
         [JsonProperty("redis_host", Required = Required.Always)]
         public string RedisHost { get; set; }
         [JsonProperty("redis_port", Required = Required.Always)]
         public uint RedisPort { get; set; }
-
-        [JsonProperty("redis_use_ssh")]
-        public bool RedisUseSsh { get; set; }
-        [JsonProperty("redis_ssh_key")]
-        public string RedisSshKey { get; set; }
-        [JsonProperty("redis_ssh_user")]
-        public string RedisSshUser { get; set; }
         
         [JsonProperty("smtp_host", Required = Required.Always)]
         public string SmtpHost { get; set; }
@@ -54,5 +40,8 @@ namespace Platform_Racing_3_Web.Config
         public string DiscordClientId { get; set; }
         [JsonProperty("discord_client_secret", Required = Required.Always)]
         public string DiscordClientSecret { get; set; }
+
+        [JsonProperty("game_path", Required = Required.Always)]
+        public string GamePath { get; set; }
     }
 }

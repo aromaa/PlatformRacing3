@@ -19,7 +19,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
                 ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[0]);
                 if (target != null)
                 {
-                    target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args.Slice(1).ToArray())));
+                    target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args[1..].ToArray())));
                 }
                 else
                 {

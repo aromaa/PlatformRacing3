@@ -31,7 +31,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Misc
                     }
                     else
                     {
-                        target.Disconnect(string.Join(' ', args.Slice(1).ToArray()));
+                        target.Disconnect(string.Join(' ', args[1..].ToArray()));
                     }
                 }
                 else

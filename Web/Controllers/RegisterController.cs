@@ -11,8 +11,9 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("register")]
-    public class RegisterController : Controller
+    public class RegisterController : ControllerBase
     {
         public const uint USERNAME_MIN_LENGTH = 1;
         public const uint USERNAME_MAX_LENGTH = 16;
@@ -21,7 +22,7 @@ namespace Platform_Racing_3_Web.Controllers
 
         public const uint EMAIL_MAX_LENGTH = 255;
 
-        private static readonly Regex UsernameRegex = new Regex("^[a-zA-Z0-9-_]+$", RegexOptions.Compiled);
+        private static readonly Regex UsernameRegex = new("^[a-zA-Z0-9-_]+$", RegexOptions.Compiled);
 
         [HttpPost]
         public async Task<string> RegisterAsync([FromForm] string username, [FromForm] string password, [FromForm(Name = "retype_password")] string retypePassword, [FromForm] string email)

@@ -1,5 +1,6 @@
 ﻿using Platform_Racing_3_Server.Core;
 using Platform_Racing_3_Server.Game.Client;
+using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server_API.Game.Commands;
 using System;
@@ -65,7 +66,10 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
                 matchSession.MatchPlayer.X += x * 40;
                 matchSession.MatchPlayer.Y -= y * 40;
 
-                matchSession.Match.SendPacket(matchSession.MatchPlayer.GetUpdatePacket());
+                if (matchSession.MatchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+                {
+                    matchSession.Match.SendPacket(packet);
+                }
             }
             else
             {

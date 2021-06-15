@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("crossdomain.xml")]
-    public class DefaultCrossdomainController
+    public class DefaultCrossdomainController : ControllerBase
     {
         [HttpGet]
         public string Get()

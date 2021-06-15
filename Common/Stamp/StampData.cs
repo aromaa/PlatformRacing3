@@ -71,6 +71,6 @@ namespace Platform_Racing_3_Common.Stamp
             writer.WriteElementString("art", this.Art);
         }
 
-        public static StampData GetDeletedStamp(uint id) => new StampData(id);
+        public static StampData GetDeletedStamp(uint id) => new(id);
     }
 }

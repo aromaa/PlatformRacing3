@@ -31,17 +31,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private uint GetNextMatchListingId() => (uint)Interlocked.Increment(ref this.NextMatchListingId);
 
-        internal Task<MatchListing> TryCreateMatchAsync(ClientSession session, LevelData levelData, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
-        {
-            return this.TryCreateMatchAsync(session, levelData.Id, levelData.Version, minRank, maxRank, maxMembers, onlyFriends, type);
-        }
-
-        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
+        internal MatchListing TryCreateMatch(ClientSession session, LevelData level, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
         {
             if (session.LobbySession.MatchListing == null)
             {
-                LevelData level = await LevelManager.GetLevelDataAsync(levelId, version);
-                if (level != null && level.Publish || (!session.IsGuest && level.AuthorUserId == session.UserData.Id) || session.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS))
+                if (level != null && (level.Publish || (!session.IsGuest && level.AuthorUserId == session.UserData.Id) || session.HasPermissions(Permissions.ACCESS_SEE_UNPUBLISHED_LEVELS)))
                 {
                     if (maxMembers < 1)
                     {
@@ -52,7 +46,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     //    maxMembers = 8;
                     //}
 
-                    MatchListing listing = new MatchListing(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
+                    MatchListing listing = new(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
 
                     if (this.MatchListings.TryAdd(listing.Name, listing))
@@ -61,7 +55,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     }
                     else
                     {
-                        listing.Leave(session, MatchListingLeaveReason.FailedJoin);
+                        listing.Leave(session);
                     }
                 }
             }
@@ -69,29 +63,39 @@ namespace Platform_Racing_3_Server.Game.Lobby
             return null;
         }
 
-        internal MatchListing Join(ClientSession session, string roomName, out MatchListingJoinStatus status)
+        internal async Task<MatchListing> TryCreateMatchAsync(ClientSession session, uint levelId, uint version, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends, MatchListingType type = MatchListingType.Normal)
         {
-            status = MatchListingJoinStatus.Failed;
+            LevelData level = await LevelManager.GetLevelDataAsync(levelId, version);
+
+            return this.TryCreateMatch(session, level, minRank, maxRank, maxMembers, onlyFriends, type);
+        }
+
+        internal MatchListing Join(ClientSession session, string roomName, out bool status)
+        {
+            status = false;
             
             if (this.MatchListings.TryGetValue(roomName, out MatchListing matchListing))
             {
                 if (session.LobbySession.MatchListing == null)
                 {
                     status = matchListing.Join(session);
-                    if (status == MatchListingJoinStatus.Success)
+                    if (status)
                     {
                         //Do quick join here bcs the client is a big mess
-                        uint spotsLeft = matchListing.SpotsLeft;
-                        foreach (ClientSession other in this.QuickJoinClients.Values)
+                        foreach (ClientSession other in this.QuickJoinClients.Sessions)
                         {
-                            if (spotsLeft > 0) //Can we fill it up even more
+                            if (matchListing.CanJoin(other) == MatchListingJoinStatus.Success)
                             {
-                                if (matchListing.CanJoin(other) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(other))
+                                if (!this.QuickJoinClients.TryRemove(session))
                                 {
-                                    other.SendPacket(new QuickJoinSuccessOutgoingMessage(matchListing));
-
-                                    spotsLeft--;
+                                    continue;
                                 }
+
+                                other.SendPacket(new QuickJoinSuccessOutgoingMessage(matchListing));
+                            }
+                            else
+                            {
+                                break;
                             }
                         }
 
@@ -100,7 +104,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 }
                 else if (session.LobbySession.MatchListing == matchListing)
                 {
-                    status = MatchListingJoinStatus.Success;
+                    status = true;
 
                     return matchListing;
                 }
@@ -113,7 +117,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
         {
             if (this.MatchListings.TryGetValue(roomName, out MatchListing matchListing) && session.LobbySession.MatchListing == matchListing)
             {
-                matchListing.Leave(session, MatchListingLeaveReason.Quit);
+                matchListing.Leave(session);
             }
         }
 
@@ -156,11 +160,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void StartQuickJoin(ClientSession session)
         {
-            this.QuickJoinClients.Add(session);
+            this.QuickJoinClients.TryAdd(session);
 
             foreach(MatchListing listing in this.MatchListings.Values)
             {
-                if (listing.Type == MatchListingType.Normal && listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.Remove(session))
+                if (listing.Type == MatchListingType.Normal && listing.CanJoin(session) == MatchListingJoinStatus.Success && this.QuickJoinClients.TryRemove(session))
                 {
                     session.SendPacket(new QuickJoinSuccessOutgoingMessage(listing));
                     break;
@@ -170,7 +174,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void StopQuickJoin(ClientSession session)
         {
-            this.QuickJoinClients.Remove(session);
+            this.QuickJoinClients.TryRemove(session);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Platform_Racing_3_Common.User;
 using System;
 using System.Collections.Generic;
@@ -7,11 +6,13 @@ using System.Linq;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("resetpassword")]
-    public class ResetPasswordController : Controller
+    public class ResetPasswordController : ControllerBase
     {
         [HttpPost]
         public async Task<string> PostAsync([FromForm] string email, [FromForm] string token, [FromForm] string password)
@@ -35,7 +36,7 @@ namespace Platform_Racing_3_Web.Controllers
             string hashedToken;
             using (SHA512 sha = SHA512.Create())
             {
-                hashedToken = Convert.ToBase64String(sha.ComputeHash(Base64UrlEncoder.DecodeBytes(token)));
+                hashedToken = Convert.ToBase64String(sha.ComputeHash(WebEncoders.Base64UrlDecode(token)));
             }
 
             uint userId = await UserManager.TryGetForgotPasswordToken(hashedToken);
@@ -49,7 +50,7 @@ namespace Platform_Racing_3_Web.Controllers
                 return "Error, try again";
             }
 
-            using (MailMessage mail = new MailMessage())
+            using (MailMessage mail = new())
             {
                 mail.To.Add(email);
                 mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";

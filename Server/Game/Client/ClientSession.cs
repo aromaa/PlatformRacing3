@@ -7,22 +7,25 @@ using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server.Net;
 using Platform_Racing_3_Server_API.Game.Commands;
 using Platform_Racing_3_Server_API.Net;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
+using Net.Sockets;
 
 namespace Platform_Racing_3_Server.Game.Client
 {
     internal class ClientSession : ICommandExecutor
     {
+        internal ISocket Connection { get; }
+
         private ClientStatus ClientStatus { get; set; }
-        private INetworkConnectionGame Connection { get; }
 
         internal UserData UserData { get; set; }
 
@@ -39,14 +42,10 @@ namespace Platform_Racing_3_Server.Game.Client
         private Dictionary<string, HashSet<uint>> TrackingUsersInRoom;
         private Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>> TrackingUserData;
 
-        private Lazy<object[]> VarsObject;
-
-        internal ClientSession(INetworkConnectionGame connection)
+        internal ClientSession(ISocket connection)
         {
-            this.ClientStatus = ClientStatus.None;
             this.Connection = connection;
-
-            this.OnDisconnect += this.OnDisconnect0;
+            this.ClientStatus = ClientStatus.None;
 
             this.LastPing = Stopwatch.StartNew();
 
@@ -55,13 +54,11 @@ namespace Platform_Racing_3_Server.Game.Client
             this.TrackingUsersInRoom = new Dictionary<string, HashSet<uint>>();
             this.TrackingUserData = new Dictionary<string, Dictionary<uint, Queue<IMessageOutgoing>>>();
 
-            this.VarsObject = new Lazy<object[]>(this.SetupVarsObject);
+            this.Connection.OnDisconnected += this.OnDisconnect0;
         }
 
-        private void OnDisconnect0(INetworkConnection networkConnection)
+        private void OnDisconnect0(ISocket connection)
         {
-            this.OnDisconnect -= this.OnDisconnect0;
-
             if (this.UserData != null)
             {
                 this.UserData.SetServer(null); //Race condition
@@ -74,10 +71,10 @@ namespace Platform_Racing_3_Server.Game.Client
             }
         }
 
-        internal bool Disconnected => this.Connection.Disconnected;
+        internal bool Disconnected => this.Connection.Closed;
         [JsonProperty("socketID")]
-        internal uint SocketId => this.Connection.SocketId;
-        internal IPAddress IPAddres => this.Connection.RemoteAddress;
+        internal uint SocketId => (uint)this.Connection.Id.GetHashCode(); //Relying on internal details, lmao, how bad
+        internal IPAddress IPAddres => (this.Connection.RemoteEndPoint as IPEndPoint).Address;
 
         internal bool IsLoggedIn => this.ClientStatus == ClientStatus.LoggedIn;
         internal bool IsGuest => this.UserData?.IsGuest ?? true;
@@ -86,22 +83,24 @@ namespace Platform_Racing_3_Server.Game.Client
 
         public uint PermissionRank => (this.UserData as PlayerUserData)?.PermissionRank ?? 0;
 
-        internal event NetworkEvents.OnDisconnect OnDisconnect
-        {
-            add => this.Connection.OnDisconnect += value;
-            remove => this.Connection.OnDisconnect -= value;
-        }
-
-        private LobbySession SetupLobbySession => new LobbySession(this);
+        private LobbySession SetupLobbySession => new(this);
         private object[] SetupVarsObject() => new object[] { this, this.UserData };
 
         public LobbySession LobbySession => this._LobbySession.Value;
 
-        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.SendPacket(messageOutgoing);
-        internal void SendPackets(IEnumerable<IMessageOutgoing> messagesOutgoing) => this.Connection.SendPackets(messagesOutgoing);
-        internal void SendPackets(params IMessageOutgoing[] messagesOutgoing) => this.Connection.SendPackets(messagesOutgoing);
+        internal void SendPacket(IMessageOutgoing messageOutgoing) => this.Connection.SendAsync(messageOutgoing);
 
-        internal void Disconnect(string reason = null) => this.Connection.Disconnect(reason);
+        internal void Disconnect(string reason = null)
+        {
+            _ = TriggerDisconnect(reason);
+
+            async Task TriggerDisconnect(string reason)
+            {
+                await this.Connection.SendAsync(new LogoutTriggerOutgoingMessage(reason));
+
+                this.Connection.Disconnect(reason);
+            }
+        }
 
         internal bool UpgradeClientStatus(ClientStatus clientStatus)
         {
@@ -202,8 +201,16 @@ namespace Platform_Racing_3_Server.Game.Client
             this.SendPacket(new AlertOutgoingMessage(message));
         }
 
-        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
-        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars) => JsonUtils.GetVars(this.VarsObject.Value, vars);
+        internal IReadOnlyDictionary<string, object> GetVars(params string[] vars) => this.GetVars(vars.ToHashSet());
+        internal IReadOnlyDictionary<string, object> GetVars(HashSet<string> vars)
+        {
+            Dictionary<string, object> userVars = new();
+
+            JsonUtils.GetVars(this.UserData, vars, userVars);
+            JsonUtils.GetVars(this, vars, userVars);
+
+            return userVars;
+        }
 
         public bool HasPermission(string permission) => this.UserData?.HasPermissions(permission) ?? false;
     }

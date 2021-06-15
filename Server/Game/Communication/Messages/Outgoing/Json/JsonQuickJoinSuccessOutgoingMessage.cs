@@ -54,7 +54,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             this.CreatorName = matchListing.CreatorName;
 
             string mode = matchListing.LevelMod.ToString();
-            this.LevelMod = Char.ToLowerInvariant(mode[0]) + mode.Substring(1);
+            this.LevelMod = Char.ToLowerInvariant(mode[0]) + mode[1..];
 
             this.Likes = matchListing.Likes;
             this.Dislikes = matchListing.Dislikes;

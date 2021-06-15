@@ -10,12 +10,12 @@ using Platform_Racing_3_Server.Config;
 using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Commands;
+using Platform_Racing_3_Server.Game.Communication.Handlers;
+using Platform_Racing_3_Server.Game.Communication.Managers;
+using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server.Net;
-using Platform_Racing_3_Server.Net.TCP;
 using Platform_Racing_3_Server_API.Core;
-using Renci.SshNet;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Net.Sockets.Listener;
+using Ninject;
 
 namespace Platform_Racing_3_Server.Core
 {
@@ -47,8 +49,10 @@ namespace Platform_Racing_3_Server.Core
 
         public static CampaignManager CampaignManager { get; private set; }
 
+        public static BytePacketManager BytePacketManager { get; private set; }
+        public static PacketManager PacketManager { get; private set; }
         public static ClientManager ClientManager { get; private set; }
-        public static NetworkManager NetworkManager { get; private set; }
+        public static IListener Listener { get; private set; }
 
         public static DiscordWebhookClient DiscordChatWebhook { get; private set; }
         public static DiscordWebhookClient DiscordNotificationsWebhook { get; private set; }
@@ -79,9 +83,14 @@ namespace Platform_Racing_3_Server.Core
                 PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();
                 PlatformRacing3Server.CampaignManager.LoadPrizesAsync().Wait();
 
+                PlatformRacing3Server.BytePacketManager = new BytePacketManager(new StandardKernel());
+                PlatformRacing3Server.PacketManager = new PacketManager();
                 PlatformRacing3Server.ClientManager = new ClientManager();
-                PlatformRacing3Server.NetworkManager = new NetworkManager();
-                PlatformRacing3Server.NetworkManager.AddListener(new NetworkListenerTCP(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), 100), true);
+                PlatformRacing3Server.Listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), socket =>
+                {
+                    socket.Pipeline.AddHandlerFirst(new SplitPacketHandler(new ClientSession(socket)));
+                    socket.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
+                });
 
                 if (PlatformRacing3Server.ServerConfig.DiscordChatWebhookId != 0)
                 {
@@ -120,7 +129,7 @@ namespace Platform_Racing_3_Server.Core
 
         public void Shutdown()
         {
-            PlatformRacing3Server.NetworkManager.Shutdown();
+            PlatformRacing3Server.Listener.Dispose();
 
             Environment.Exit(0);
         }

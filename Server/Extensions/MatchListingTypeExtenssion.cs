@@ -9,31 +9,25 @@ namespace Platform_Racing_3_Server.Extensions
     {
         public static string GetLobbyId(this MatchListingType type, uint id)
         {
-            switch(type)
-            {
-                case MatchListingType.Normal:
-                    return $"match-listing-{id}";
-                case MatchListingType.LevelOfTheDay:
-                    return $"lotd-{id}";
-                case MatchListingType.Tournament:
-                    return $"tournament-{id}";
-                default:
-                    throw new NotSupportedException(nameof(type));
-            }
-        }
+			return type switch
+			{
+				MatchListingType.Normal => $"match-listing-{id}",
+				MatchListingType.LevelOfTheDay => $"lotd-{id}",
+				MatchListingType.Tournament => $"tournament-{id}",
+
+				_ => throw new NotSupportedException(nameof(type)),
+			};
+		}
         public static string GetMatchId(this MatchListingType type, uint id)
         {
-            switch (type)
-            {
-                case MatchListingType.Normal:
-                    return $"match-{id}";
-                case MatchListingType.LevelOfTheDay:
-                    return $"lotd-{id}";
-                case MatchListingType.Tournament:
-                    return $"tournament-{id}";
-                default:
-                    throw new NotSupportedException(nameof(type));
-            }
-        }
+			return type switch
+			{
+				MatchListingType.Normal => $"match-{id}",
+				MatchListingType.LevelOfTheDay => $"lotd-{id}",
+				MatchListingType.Tournament => $"tournament-{id}",
+
+				_ => throw new NotSupportedException(nameof(type)),
+			};
+		}
     }
 }

@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("logout")]
-    public class LogoutController : Controller
+    public class LogoutController : ControllerBase
     {
         public async Task LogoutAsync()
         {

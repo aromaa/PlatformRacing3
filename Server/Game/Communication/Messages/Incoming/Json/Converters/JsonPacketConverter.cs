@@ -23,112 +23,45 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json.Con
             {
                 packetType = (string)t;
             }
+			
+            JsonPacket target = packetType switch //TODO: Umh...
+			{
+				"ping" => new JsonLegacyPingIncomingMessage(),
+				"login" => new JsonTokenLoginIncomingMessage(),
+				"token_login" => new JsonTokenLoginIncomingMessage(),
+				"mv" => new JsonManageVarsIncomingMessage(),
+				"set_account_settings" => new JsonSetAccountSettingsMessage(),
+				"get_level_list" => new JsonGetLevelListIncomingMessage(),
+				"jr" => new JsonJoinRoomIncomingMessage(),
+				"lr" => new JsonLeaveRoomIncomingMessage(),
+				"get_member_list" => new JsonGetMemberListIncomingMessage(),
+				"get_user_list" => new JsonGetUserListIncomingMessage(),
+				"get_user_page" => new JsonGetUserPageIncomingMessage(),
+				"sr" => new JsonSendToRoomIncomingMessage(),
+				"create_match" => new JsonCreateMatchIncomingMessage(),
+				"request_matches" => new JsonRequestMatchesIncomingMessage(),
+				"lose_hat" => new JsonLoseHatIncomingMessage(),
+				"get_hat" => new JsonGetHatIncomingMessage(),
+				"coins" => new JsonCoinsIncomingMessage(),
+				"get_pms" => new JsonGetPmsIncomingMessage(),
+				"get_pm" => new JsonGetPmIncomingMessage(),
+				"delete_pms" => new JsonDeletePmsIncomingMessage(),
+				"send_pm" => new JsonSendPmIncomingMessage(),
+				"edit_user_list" => new JsonEditUserListIncomingMessage(),
+				"kick" => new JsonKickFromMatchListingIncomingMessage(),
+				"ban" => new JsonBanFromMatchListingIncomingMessage(),
+				"rate_level" => new JsonRateLevelIncomingMessage(),
+				"send_thing" => new JsonSendThingIncomingMessage(),
+				"thingExits" => new JsonThingExistsIncomingMessage(),
+				"accept_thing_transfer" => new JsonAcceptThingTransferIncomingMessage(),
+				"report_pm" => new JsonReportPmIncomingMessage(),
+				"koth" => new JsonKothIncomingMessage(),
+				"dash" => new JsonDashIncomingMessage(),
+				"win_hat" => new JsonWinHatIncomingMessage(),
+				_ => new JsonPacket(),
+			};
 
-            JsonPacket target = null;
-            switch (packetType) //TODO: Umh...
-            {
-                case "ping":
-                    target = new JsonLegacyPingIncomingMessage();
-                    break;
-                case "login":
-                    target = new JsonTokenLoginIncomingMessage();
-                    break;
-                case "token_login":
-                    target = new JsonTokenLoginIncomingMessage();
-                    break;
-                case "mv":
-                    target = new JsonManageVarsIncomingMessage();
-                    break;
-                case "set_account_settings":
-                    target = new JsonSetAccountSettingsMessage();
-                    break;
-                case "get_level_list":
-                    target = new JsonGetLevelListIncomingMessage();
-                    break;
-                case "jr":
-                    target = new JsonJoinRoomIncomingMessage();
-                    break;
-                case "lr":
-                    target = new JsonLeaveRoomIncomingMessage();
-                    break;
-                case "get_member_list":
-                    target = new JsonGetMemberListIncomingMessage();
-                    break;
-                case "get_user_list":
-                    target = new JsonGetUserListIncomingMessage();
-                    break;
-                case "get_user_page":
-                    target = new JsonGetUserPageIncomingMessage();
-                    break;
-                case "sr":
-                    target = new JsonSendToRoomIncomingMessage();
-                    break;
-                case "create_match":
-                    target = new JsonCreateMatchIncomingMessage();
-                    break;
-                case "request_matches":
-                    target = new JsonRequestMatchesIncomingMessage();
-                    break;
-                case "lose_hat":
-                    target = new JsonLoseHatIncomingMessage();
-                    break;
-                case "get_hat":
-                    target = new JsonGetHatIncomingMessage();
-                    break;
-                case "coins":
-                    target = new JsonCoinsIncomingMessage();
-                    break;
-                case "get_pms":
-                    target = new JsonGetPmsIncomingMessage();
-                    break;
-                case "get_pm":
-                    target = new JsonGetPmIncomingMessage();
-                    break;
-                case "delete_pms":
-                    target = new JsonDeletePmsIncomingMessage();
-                    break;
-                case "send_pm":
-                    target = new JsonSendPmIncomingMessage();
-                    break;
-                case "edit_user_list":
-                    target = new JsonEditUserListIncomingMessage();
-                    break;
-                case "kick":
-                    target = new JsonKickFromMatchListingIncomingMessage();
-                    break;
-                case "ban":
-                    target = new JsonBanFromMatchListingIncomingMessage();
-                    break;
-                case "rate_level":
-                    target = new JsonRateLevelIncomingMessage();
-                    break;
-                case "send_thing":
-                    target = new JsonSendThingIncomingMessage();
-                    break;
-                case "thingExits":
-                    target = new JsonThingExistsIncomingMessage();
-                    break;
-                case "accept_thing_transfer":
-                    target = new JsonAcceptThingTransferIncomingMessage();
-                    break;
-                case "report_pm":
-                    target = new JsonReportPmIncomingMessage();
-                    break;
-                case "koth":
-                    target = new JsonKothIncomingMessage();
-                    break;
-                case "dash":
-                    target = new JsonDashIncomingMessage();
-                    break;
-                case "win_hat":
-                    target = new JsonWinHatIncomingMessage();
-                    break;
-                default:
-                    target = new JsonPacket();
-                    break;
-            }
-
-            serializer.Populate(item.CreateReader(), target);
+			serializer.Populate(item.CreateReader(), target);
 
             return target;
         }

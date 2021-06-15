@@ -6,6 +6,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.Stamp
 {
@@ -22,7 +23,7 @@ namespace Platform_Racing_3_Common.Stamp
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             //TODO: CACHE
@@ -38,11 +39,11 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category ILIKE {category.Substring("category-".Length)}";
+                query = $"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}";
             }
             else
             {
-                throw new ArgumentException(nameof(category));
+                throw new ArgumentException(null, nameof(category));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(StampManager.ParseSqlReadCountMyStamps));
@@ -52,7 +53,7 @@ namespace Platform_Racing_3_Common.Stamp
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT DISTINCT ON (lower(category)) category FROM base.stamps_titles WHERE author_user_id = {userId} AND category != '' ORDER BY lower(category)").ContinueWith(StampManager.ParseSqlGetStampCategories));
@@ -62,7 +63,7 @@ namespace Platform_Racing_3_Common.Stamp
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             FormattableString query;
@@ -76,11 +77,11 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category ILIKE {category.Substring("category-".Length)} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
             }
             else
             {
-                throw new ArgumentException(nameof(category));
+                throw new ArgumentException(null, nameof(category));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(StampManager.ParseSqlGetMyStamps));
@@ -90,7 +91,7 @@ namespace Platform_Racing_3_Common.Stamp
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH insertTitle AS (INSERT INTO base.stamps_titles(title, category, author_user_id) VALUES({title}, {category}, {userId}) ON CONFLICT(lower(title::text), lower(category::text), author_user_id) DO UPDATE SET title = stamps_titles.title RETURNING id) INSERT INTO base.stamps(id, version, description, art) SELECT (SELECT id FROM insertTitle), COALESCE(MAX(version) + 1, 1), {description}, {art} FROM base.stamps WHERE id = (SELECT id FROM insertTitle) RETURNING id").ContinueWith(StampManager.ParseSqlSaveStamp));
@@ -108,7 +109,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
         }
 
-        private static IList<StampData> ParseSqlGetStamps(Task<DbDataReader> task)
+        private static IList<StampData> ParseSqlGetStamps(Task<NpgsqlDataReader> task)
         {
             IList<StampData> stamps = new List<StampData>();
             if (task.IsCompletedSuccessfully)
@@ -127,7 +128,7 @@ namespace Platform_Racing_3_Common.Stamp
             return stamps;
         }
 
-        private static uint ParseSqlReadCountMyStamps(Task<DbDataReader> task)
+        private static uint ParseSqlReadCountMyStamps(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -145,7 +146,7 @@ namespace Platform_Racing_3_Common.Stamp
             return 0u;
         }
 
-        private static ISet<string> ParseSqlGetStampCategories(Task<DbDataReader> task)
+        private static ISet<string> ParseSqlGetStampCategories(Task<NpgsqlDataReader> task)
         {
             ISet<string> categories = new HashSet<string>();
             if (task.IsCompletedSuccessfully)
@@ -164,9 +165,9 @@ namespace Platform_Racing_3_Common.Stamp
             return categories;
         }
 
-        private static ISet<uint> ParseSqlGetMyStamps(Task<DbDataReader> task)
+        private static ISet<uint> ParseSqlGetMyStamps(Task<NpgsqlDataReader> task)
         {
-            HashSet<uint> stamps = new HashSet<uint>();
+            HashSet<uint> stamps = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
@@ -183,7 +184,7 @@ namespace Platform_Racing_3_Common.Stamp
             return stamps;
         }
 
-        private static bool ParseSqlSaveStamp(Task<DbDataReader> task)
+        private static bool ParseSqlSaveStamp(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -203,7 +204,7 @@ namespace Platform_Racing_3_Common.Stamp
             return false;
         }
 
-        private static bool ParseSqlDeleteStamp(Task<DbDataReader> task)
+        private static bool ParseSqlDeleteStamp(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

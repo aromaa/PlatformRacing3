@@ -1,4 +1,5 @@
-﻿using Platform_Racing_3_Server.Game.Client;
+﻿using Net.Collections;
+using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server_API.Net;
 using System;
@@ -6,107 +7,55 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Net.Sockets;
+using Platform_Racing_3_Server.Collections.Matcher;
 
 namespace Platform_Racing_3_Server.Collections
 {
     internal class ClientSessionCollection
     {
-        private ConcurrentDictionary<uint, ClientSession> Clients;
+        private readonly CriticalSocketCollection<ClientSession> SessionCollection;
+        private readonly ConcurrentDictionary<uint, ClientSession> SessionsBySocketId;
 
-        private Action<ClientSession> OnDisconnectCallback;
-        private Action OnDisconnectAction;
+        private readonly Action<ClientSession> AddCallback;
+        private readonly Action<ClientSession> RemoveCallback;
 
-        internal ClientSessionCollection()
+        internal ClientSessionCollection(Action<ClientSession> addCallback = null, Action<ClientSession> removeCallback = null)
         {
-            this.Clients = new ConcurrentDictionary<uint, ClientSession>();
+            this.SessionCollection = new CriticalSocketCollection<ClientSession>(this.OnAdded, this.OnRemoved);
+            this.SessionsBySocketId = new ConcurrentDictionary<uint, ClientSession>();
+
+            this.AddCallback = addCallback;
+            this.RemoveCallback = removeCallback;
         }
 
-        internal ClientSessionCollection(Action<ClientSession> callback)
-        {
-            this.Clients = new ConcurrentDictionary<uint, ClientSession>();
+        internal int Count => this.Sessions.Count;
 
-            this.OnDisconnectCallback = callback;
+        internal ICollection<ClientSession> Sessions => this.SessionsBySocketId.Values;
+
+        internal virtual bool TryAdd(ClientSession session) => this.SessionCollection.TryAdd(session.Connection, session, callEvent: true);
+        internal virtual bool TryRemove(ClientSession session, bool callEvent = true) => this.SessionCollection.TryRemove(session.Connection, out _, callEvent);
+
+        internal bool Contains(ClientSession session) => this.SessionCollection.Contains(session.Connection);
+
+        internal bool TryGetValue(uint id, out ClientSession session) => this.SessionsBySocketId.TryGetValue(id, out session);
+
+        internal Task SendAsync<TPacket>(in TPacket packet) => this.SessionCollection.SendAsync(packet);
+        internal Task SendAsync<TPacket>(in TPacket packet, ClientSession session) => this.SessionCollection.SendAsync(packet, new ExcludeSocketMatcher(session.Connection));
+
+        protected virtual void OnAdded(ISocket socket, ref ClientSession session)
+        {
+            this.SessionsBySocketId.TryAdd(session.SocketId, session);
+
+            this.AddCallback?.Invoke(session);
         }
 
-        public ClientSessionCollection(Action onDisconnect)
+        protected virtual void OnRemoved(ISocket socket, ref ClientSession session)
         {
-            this.OnDisconnectAction = onDisconnect;
-        }
+            this.SessionsBySocketId.TryRemove(session.SocketId, out _);
 
-        internal uint Count => (uint)this.Clients.Count;
-        internal ICollection<ClientSession> Values => this.Clients.Values;
-
-        public bool Add(ClientSession session)
-        {
-            if (this.Clients.TryAdd(session.SocketId, session))
-            {
-                session.OnDisconnect += this.OnDisconnect;
-                if (session.Disconnected)
-                {
-                    this.Remove(session);
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void OnDisconnect(INetworkConnection networkConnection)
-        {
-            if (this.Remove(networkConnection.SocketId, out ClientSession session))
-            {
-                this.OnDisconnectCallback?.Invoke(session);
-            }
-        }
-
-        public bool Remove(ClientSession session)
-        {
-            session.OnDisconnect -= this.OnDisconnect;
-
-            return this.Clients.TryRemove(session.SocketId, out _);
-        }
-
-        public bool Remove(uint socketId, out ClientSession session)
-        {
-            if (this.Clients.TryRemove(socketId, out session))
-            {
-                session.OnDisconnect -= this.OnDisconnect;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool Contains(uint socketId) => this.Clients.ContainsKey(socketId);
-        public bool Contains(ClientSession session) => this.Clients.ContainsKey(session.SocketId);
-        public bool TryGetClientSession(uint socketId, out ClientSession session) => this.Clients.TryGetValue(socketId, out session);
-
-        public void SendPacket(IMessageOutgoing packet)
-        {
-            foreach(ClientSession session in this.Clients.Values)
-            {
-                session.SendPacket(packet);
-            }
-        }
-
-        public void SendPacket(IMessageOutgoing packet, params ClientSession[] ignore)
-        {
-            foreach (ClientSession session in this.Clients.Values.Except(ignore))
-            {
-                session.SendPacket(packet);
-            }
-        }
-
-        public void SendPackets(params IMessageOutgoing[] packets)
-        {
-            foreach (ClientSession session in this.Clients.Values)
-            {
-                session.SendPackets(packets);
-            }
+            this.RemoveCallback?.Invoke(session);
         }
     }
 }

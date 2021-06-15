@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Npgsql;
 
 namespace Platform_Racing_3_Common.User
 {
@@ -32,13 +33,13 @@ namespace Platform_Racing_3_Common.User
         //Yeah, I'm lazy bastard at doing this properly at the moment
 
         private static readonly TimeSpan UserCacheTime = TimeSpan.FromDays(1);
-        private static readonly MemoryCache Users = new MemoryCache(new MemoryCacheOptions()
+        private static readonly MemoryCache Users = new(new MemoryCacheOptions()
         {
             ExpirationScanFrequency = TimeSpan.FromHours(1),
         });
 
         private static readonly TimeSpan UserIdsCacheTime = TimeSpan.FromDays(7);
-        private static readonly MemoryCache UserIds = new MemoryCache(new MemoryCacheOptions()
+        private static readonly MemoryCache UserIds = new(new MemoryCacheOptions()
         {
             ExpirationScanFrequency = TimeSpan.FromDays(1),
         });
@@ -47,7 +48,7 @@ namespace Platform_Racing_3_Common.User
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             if (allowCached)
@@ -120,7 +121,7 @@ namespace Platform_Racing_3_Common.User
         {
             if (username == null)
             {
-                throw new ArgumentException(nameof(username));
+                throw new ArgumentException(null, nameof(username));
             }
 
             username = username.ToUpperInvariant(); //Hmh.... Case insetivity needed here
@@ -182,7 +183,7 @@ namespace Platform_Racing_3_Common.User
         {
             if (email == null)
             {
-                throw new ArgumentException(nameof(email));
+                throw new ArgumentException(null, nameof(email));
             }
 
             return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.email ILIKE {email} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
@@ -192,8 +193,8 @@ namespace Platform_Racing_3_Common.User
 
         public static Task<uint> TryAuthenicateAsync(string identifier, string password)
         {
-            Task<DbDataReader> userDataTask = null;
-            DatabaseConnection dbConnection = new DatabaseConnection();
+            Task<NpgsqlDataReader> userDataTask = null;
+            DatabaseConnection dbConnection = new();
 
             try
             {
@@ -334,7 +335,7 @@ namespace Platform_Racing_3_Common.User
                 RedisValue[] results = task.Result;
                 if (results?.All(v => v.HasValue) ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(results);
+                    PlayerUserData playerUserData = new(results);
                     return UserManager.CachePlayerUserData(playerUserData, true);
                 }
             }
@@ -346,14 +347,14 @@ namespace Platform_Racing_3_Common.User
             return null;
         }
 
-        private static PlayerUserData ParseSqlUserData(Task<DbDataReader> task)
+        private static PlayerUserData ParseSqlUserData(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
                 if (reader?.Read() ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(reader);
+                    PlayerUserData playerUserData = new(reader);
                     return UserManager.CachePlayerUserData(playerUserData);
                 }
             }
@@ -404,15 +405,15 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static IReadOnlyCollection<PlayerUserData> ParseSqlMultipleUserData(Task<DbDataReader> task)
+        private static IReadOnlyCollection<PlayerUserData> ParseSqlMultipleUserData(Task<NpgsqlDataReader> task)
         {
-            List<PlayerUserData> users = new List<PlayerUserData>();
+            List<PlayerUserData> users = new();
             if (task.IsCompletedSuccessfully)
             {
                 DbDataReader reader = task.Result;
                 while (reader?.Read() ?? false)
                 {
-                    PlayerUserData playerUserData = new PlayerUserData(reader);
+                    PlayerUserData playerUserData = new(reader);
                     users.Add(UserManager.CachePlayerUserData(playerUserData));
                 }
             }
@@ -424,7 +425,7 @@ namespace Platform_Racing_3_Common.User
             return users;
         }
 
-        private static IReadOnlyDictionary<uint, int> ParseSqlCampaignRuns(Task<DbDataReader> task)
+        private static IReadOnlyDictionary<uint, int> ParseSqlCampaignRuns(Task<NpgsqlDataReader> task)
         {
             IDictionary<uint, int> runs = new Dictionary<uint, int>();
 
@@ -457,7 +458,7 @@ namespace Platform_Racing_3_Common.User
             return (IReadOnlyDictionary<uint, int>)runs;
         }
 
-        private static uint ParseSqlMyFriendsCount(Task<DbDataReader> task)
+        private static uint ParseSqlMyFriendsCount(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -475,7 +476,7 @@ namespace Platform_Racing_3_Common.User
             return 0;
         }
 
-        private static uint ParseSqlMyIgnoredCount(Task<DbDataReader> task)
+        private static uint ParseSqlMyIgnoredCount(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -493,7 +494,7 @@ namespace Platform_Racing_3_Common.User
             return 0;
         }
 
-        private static void ParseSqlAddExp(Task<DbDataReader> task)
+        private static void ParseSqlAddExp(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -512,7 +513,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlBonusExpUpdate(Task<DbDataReader> task)
+        private static void ParseSqlBonusExpUpdate(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -531,7 +532,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlAddHat(Task<DbDataReader> task)
+        private static void ParseSqlAddHat(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -550,7 +551,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlAddHead(Task<DbDataReader> task)
+        private static void ParseSqlAddHead(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -569,7 +570,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlAddBody(Task<DbDataReader> task)
+        private static void ParseSqlAddBody(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -588,7 +589,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static void ParseSqlAddFeet(Task<DbDataReader> task)
+        private static void ParseSqlAddFeet(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -607,7 +608,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
         
-        private static bool ParseSqlInsertPasswordReset(Task<DbDataReader> task)
+        private static bool ParseSqlInsertPasswordReset(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -625,7 +626,7 @@ namespace Platform_Racing_3_Common.User
             return false;
         }
 
-        private static bool ParseSqlCanSendPasswordToken(Task<DbDataReader> task)
+        private static bool ParseSqlCanSendPasswordToken(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -647,7 +648,7 @@ namespace Platform_Racing_3_Common.User
             return true;
         }
 
-        private static uint ParseSqlGetPasswordToken(Task<DbDataReader> task)
+        private static uint ParseSqlGetPasswordToken(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -667,7 +668,7 @@ namespace Platform_Racing_3_Common.User
             return 0;
         }
 
-        private static bool ParseSqlConsumePasswordToken(Task<DbDataReader> task)
+        private static bool ParseSqlConsumePasswordToken(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -685,7 +686,7 @@ namespace Platform_Racing_3_Common.User
             return false;
         }
 
-        private static void ParseSqlDrainLuck(Task<DbDataReader> task)
+        private static void ParseSqlDrainLuck(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -705,7 +706,7 @@ namespace Platform_Racing_3_Common.User
             }
         }
 
-        private static bool ParseSqlInsertDiscordLink(Task<DbDataReader> task)
+        private static bool ParseSqlInsertDiscordLink(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {
@@ -723,7 +724,7 @@ namespace Platform_Racing_3_Common.User
             return false;
         }
 
-        private static uint ParseSqlGetDiscordLink(Task<DbDataReader> task)
+        private static uint ParseSqlGetDiscordLink(Task<NpgsqlDataReader> task)
         {
             if (task.IsCompletedSuccessfully)
             {

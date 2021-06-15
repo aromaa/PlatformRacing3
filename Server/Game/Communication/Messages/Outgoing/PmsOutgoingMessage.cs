@@ -11,7 +11,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
     internal class PmsOutgoingMessage : JsonOutgoingMessage
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings();
+        private static readonly JsonSerializerSettings JsonSerializerSettings = new();
 
         static PmsOutgoingMessage()
         {

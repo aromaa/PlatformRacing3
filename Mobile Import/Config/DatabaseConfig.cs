@@ -19,12 +19,5 @@ namespace Mobile_Import.Config
         public string DatabasePass { get; set; }
         [JsonProperty("database_name", Required = Required.Always)]
         public string DatabaseName { get; set; }
-
-        [JsonProperty("database_use_ssh")]
-        public bool DatabaseUseSsh { get; set; }
-        [JsonProperty("database_ssh_key")]
-        public string DatabaseSshKey { get; set; }
-        [JsonProperty("database_ssh_user")]
-        public string DatabaseSshUser { get; set; }
     }
 }

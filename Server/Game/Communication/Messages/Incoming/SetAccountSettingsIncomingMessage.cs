@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
     internal class SetAccountSettingsIncomingMessage : MessageIncomingJson<JsonSetAccountSettingsMessage>
     {
-        private static readonly HashSet<string> SendResponseVars = new HashSet<string>()
+        private static readonly HashSet<string> SendResponseVars = new()
         {
             "hat",
             "hatColor",

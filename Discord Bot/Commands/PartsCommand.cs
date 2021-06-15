@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Platform_Racing_3_Common.Customization;
+using Platform_Racing_3_Common.Extensions;
 using Platform_Racing_3_Common.User;
 using System;
 using System.Collections.Generic;
@@ -29,113 +30,161 @@ namespace Discord_Bot.Commands
 
                 PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId);
 
-                StringBuilder hats = new StringBuilder();
+                (int Count, int Max) hats = default;
+
+                StringBuilder hatsWriter = new();
                 foreach (Hat hat in Enum.GetValues(typeof(Hat)))
                 {
-                    if (hat == Hat.None)
+                    if (hat == Hat.None || hat.IsStaffOnly())
                     {
                         continue;
                     }
 
-                    hats.Append(hat.ToString());
-                    hats.Append(" ");
+                    hats.Max++;
+
+                    hatsWriter.Append(hat.ToString());
+                    hatsWriter.Append(" ");
 
                     if (userData.HasHat(hat))
                     {
-                        hats.Append("✓");
+                        hatsWriter.Append("✓");
+
+                        hats.Count++;
                     }
                     else
                     {
-                        hats.Append("✕");
+                        hatsWriter.Append("✕");
                     }
 
-                    hats.AppendLine();
+                    hatsWriter.AppendLine();
                 }
 
-                StringBuilder heads = new StringBuilder();
-                StringBuilder bodies = new StringBuilder();
-                StringBuilder feets = new StringBuilder();
+                (int Head, int Body, int Feet, int Max) parts = default;
+                (int Head, int Body, int Feet, int Max) tournieParts = default;
+
+                (StringBuilder Head, StringBuilder Body, StringBuilder Feet) partWriters = (new StringBuilder(), new StringBuilder(), new StringBuilder());
+                (StringBuilder Head, StringBuilder Body, StringBuilder Feet) tourniePartWriters = (new StringBuilder(), new StringBuilder(), new StringBuilder());
+
                 foreach (Part part in Enum.GetValues(typeof(Part)))
                 {
-                    if (part == Part.None)
+                    if (part == Part.None || part.IsStaffOnly())
                     {
                         continue;
                     }
 
-                    AppendToAll(part.ToString());
-                    AppendToAll(" ");
+                    bool isTournie = part.IsTournamentPrize();
 
-                    if (userData.HasHead(part))
+                    CountTo(ref !isTournie ? ref partWriters : ref tourniePartWriters, ref !isTournie ? ref parts : ref tournieParts);
+
+                    void CountTo(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers, ref (int Head, int Body, int Feet, int Max) partCounter)
                     {
-                        heads.Append("✓");
-                    }
-                    else
-                    {
-                        heads.Append("✕");
+                        partCounter.Max++;
+
+                        AppendToAll(ref writers, part.ToString());
+                        AppendToAll(ref writers, " ");
+
+                        if (userData.HasHead(part))
+                        {
+                            writers.Head.Append("✓");
+
+                            partCounter.Head++;
+                        }
+                        else
+                        {
+                            writers.Head.Append("✕");
+                        }
+
+                        if (userData.HasBody(part))
+                        {
+                            writers.Body.Append("✓");
+
+                            partCounter.Body++;
+                        }
+                        else
+                        {
+                            writers.Body.Append("✕");
+                        }
+
+                        if (userData.HasFeet(part))
+                        {
+                            writers.Feet.Append("✓");
+
+                            partCounter.Feet++;
+                        }
+                        else
+                        {
+                            writers.Feet.Append("✕");
+                        }
+
+                        BreakAll(ref writers);
                     }
 
-                    if (userData.HasBody(part))
+                    void AppendToAll(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers, string value)
                     {
-                        bodies.Append("✓");
-                    }
-                    else
-                    {
-                        bodies.Append("✕");
+                        writers.Head.Append(value);
+                        writers.Body.Append(value);
+                        writers.Feet.Append(value);
                     }
 
-                    if (userData.HasFeet(part))
+                    void BreakAll(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers)
                     {
-                        feets.Append("✓");
-                    }
-                    else
-                    {
-                        feets.Append("✕");
-                    }
-
-                    BreakAll();
-
-                    void AppendToAll(string value)
-                    {
-                        heads.Append(value);
-                        bodies.Append(value);
-                        feets.Append(value);
-                    }
-
-                    void BreakAll()
-                    {
-                        heads.AppendLine();
-                        bodies.AppendLine();
-                        feets.AppendLine();
+                        writers.Head.AppendLine();
+                        writers.Body.AppendLine();
+                        writers.Feet.AppendLine();
                     }
                 }
 
-                EmbedBuilder embed = new EmbedBuilder();
+                EmbedBuilder embed = new();
                 embed.AddField(new EmbedFieldBuilder()
                 {
-                    Name = "Hats",
-                    Value = hats.ToString()
+                    Name = $"Hats ({hats.Count}/{hats.Max})",
+                    Value = hatsWriter.ToString()
                 });
 
                 embed.AddField(new EmbedFieldBuilder()
                 {
-                    Name = "Heads",
-                    Value = heads.ToString(),
+                    Name = $"Heads ({parts.Head}/{parts.Max})",
+                    Value = partWriters.Head.ToString(),
 
                     IsInline = true
                 });
 
                 embed.AddField(new EmbedFieldBuilder()
                 {
-                    Name = "Bodies",
-                    Value = bodies.ToString(),
+                    Name = $"Bodies ({parts.Body}/{parts.Max})",
+                    Value = partWriters.Body.ToString(),
 
                     IsInline = true
                 });
 
                 embed.AddField(new EmbedFieldBuilder()
                 {
-                    Name = "Feets",
-                    Value = feets.ToString(),
+                    Name = $"Feets ({parts.Feet}/{parts.Max})",
+                    Value = partWriters.Feet.ToString(),
+
+                    IsInline = true
+                });
+
+                embed.AddField(new EmbedFieldBuilder()
+                {
+                    Name = $"Tournie Heads ({tournieParts.Head}/{tournieParts.Max})",
+                    Value = tourniePartWriters.Head.ToString(),
+
+                    IsInline = true
+                });
+
+                embed.AddField(new EmbedFieldBuilder()
+                {
+                    Name = $"Tournie Bodies ({tournieParts.Body}/{tournieParts.Max})",
+                    Value = tourniePartWriters.Body.ToString(),
+
+                    IsInline = true
+                });
+
+                embed.AddField(new EmbedFieldBuilder()
+                {
+                    Name = $"Tournie Feets ({tournieParts.Feet}/{tournieParts.Max})",
+                    Value = tourniePartWriters.Feet.ToString(),
 
                     IsInline = true
                 });

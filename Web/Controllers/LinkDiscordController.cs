@@ -11,13 +11,15 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
 {
+    [ApiController]
     [Route("linkdiscord")]
-    public class LinkDiscordController : Controller
+    public class LinkDiscordController : ControllerBase
     {
-        private const string DISCORD_API_TOKEN = "https://discordapp.com/api/v6/oauth2/token";
-        private const string DISCORD_API_ME = "https://discordapp.com/api/v6/users/@me";
+        private const string DISCORD_API_TOKEN = "https://discord.com/api/v6/oauth2/token";
+        private const string DISCORD_API_ME = "https://discord.com/api/v6/users/@me";
 
         [HttpGet]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] //Dynamic get
         public async Task<ContentResult> GetAsync([FromQuery] string code)
         {
             uint userId = this.HttpContext.IsAuthenicatedPr3User();
@@ -69,7 +71,7 @@ namespace Platform_Racing_3_Web.Controllers
 
                     async Task<DiscordUserResponse> GetUser()
                     {
-                        using (HttpClient httpClient = new HttpClient())
+                        using (HttpClient httpClient = new())
                         {
                             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(tokenResponse.TokenType, tokenResponse.AccessToken);
 
@@ -91,9 +93,9 @@ namespace Platform_Racing_3_Web.Controllers
                             { "scope", "identify" },
                         };
 
-                        using (HttpClient httpClient = new HttpClient())
+                        using (HttpClient httpClient = new())
                         {
-                            using (FormUrlEncodedContent content = new FormUrlEncodedContent(values))
+                            using (FormUrlEncodedContent content = new(values))
                             {
                                 using (HttpResponseMessage message = await httpClient.PostAsync(LinkDiscordController.DISCORD_API_TOKEN, content))
                                 {

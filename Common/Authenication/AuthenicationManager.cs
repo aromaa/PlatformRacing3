@@ -19,7 +19,7 @@ namespace Platform_Racing_3_Common.Authenication
         {
             if (userId == 0)
             {
-                throw new ArgumentException(nameof(userId));
+                throw new ArgumentException(null, nameof(userId));
             }
 
             byte[] bytes = new byte[4]; //Four bytes should so it can be converted to int
@@ -28,9 +28,9 @@ namespace Platform_Racing_3_Common.Authenication
                 rng.GetBytes(bytes);
             }
 
-            Random random = new Random(BitConverter.ToInt32(bytes, 0)); //Secure random
+            Random random = new(BitConverter.ToInt32(bytes, 0)); //Secure random
 
-            string token = new string(Enumerable.Repeat(AuthenicationManager.TOKEN_CHARS, (int)AuthenicationManager.TOKEN_LENGTH).Select(s => s[random.Next(s.Length)]).ToArray());
+            string token = new(Enumerable.Repeat(AuthenicationManager.TOKEN_CHARS, (int)AuthenicationManager.TOKEN_LENGTH).Select(s => s[random.Next(s.Length)]).ToArray());
 
             RedisConnection.GetDatabase().StringSet($"logintoken:{token}", userId, TimeSpan.FromSeconds(30));
 

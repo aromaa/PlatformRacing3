@@ -36,7 +36,7 @@ namespace Platform_Racing_3_Web.Extensions
             //Third party sites
             "http://jiggmin2.com",
             "https://jiggmin2.com",
-            "https://discordapp.com",
+            "https://discord.com",
         };
 
         internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
@@ -91,7 +91,7 @@ namespace Platform_Racing_3_Web.Extensions
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    ClaimsIdentity identity = new ClaimsIdentity(HttpContextExtensions.AUTHENICATION_TYPE);
+                    ClaimsIdentity identity = new(HttpContextExtensions.AUTHENICATION_TYPE);
                     identity.AddClaim(new Claim(ClaimTypes.Name, HttpContextExtensions.AUTHENICATION_IDENTITY));
                     identity.AddClaim(new Claim(ClaimTypes.Sid, userId.ToString(), ClaimValueTypes.UInteger32));
 
