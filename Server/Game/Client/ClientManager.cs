@@ -55,7 +55,7 @@ namespace Platform_Racing_3_Server.Game.Client
         {
             if (!session.IsGuest)
             {
-                this.ClientsByUserId.TryRemove(session.UserData.Id, out _);
+                this.ClientsByUserId.TryRemove(new KeyValuePair<uint, ClientSession>(session.UserData.Id, session));
             }
         }
 
