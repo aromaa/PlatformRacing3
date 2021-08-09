@@ -6,6 +6,7 @@ namespace Platform_Racing_3_Common.Customization
 {
     public enum Hat : uint
     {
+        Undefined = 0,
         None = 1,
         BaseballCap = 2,
         Propeller = 3,

@@ -494,7 +494,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
                         bool CheckEventPartDrop()
                         {
-                            Part specialPartId = Part.None;
+                            Part specialPartId = Part.Undefined;
                             if (random.Next(2) == 0) //50% chance to get special part
                             {
                                 DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -512,7 +512,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
                             }
 
-                            if (specialPartId != Part.None)
+                            if (specialPartId != Part.Undefined)
                             {
                                 uint headsCount = 0;
                                 uint bodysCount = 0;
@@ -666,7 +666,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
 
                                 Part part = selectFrom.FirstOrDefault();
-                                if (part != Part.None)
+                                if (part != Part.Undefined)
                                 {
                                     this.Prize = new MatchPrize("body", (uint)part);
 
@@ -684,7 +684,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
 
                                 Part part = selectFrom.FirstOrDefault();
-                                if (part != Part.None)
+                                if (part != Part.Undefined)
                                 {
                                     this.Prize = new MatchPrize("head", (uint)part);
 
@@ -702,7 +702,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
 
                                 Part part = selectFrom.FirstOrDefault();
-                                if (part != Part.None)
+                                if (part != Part.Undefined)
                                 {
                                     this.Prize = new MatchPrize("feet", (uint)part);
 
@@ -720,7 +720,7 @@ namespace Platform_Racing_3_Server.Game.Match
                                 }
 
                                 Hat hat = selectFrom.FirstOrDefault();
-                                if (hat != Hat.None)
+                                if (hat != Hat.Undefined)
                                 {
                                     this.Prize = new MatchPrize("hat", (uint)hat);
 

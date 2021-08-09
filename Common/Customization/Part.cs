@@ -6,7 +6,7 @@ namespace Platform_Racing_3_Common.Customization
 {
     public enum Part : uint
     {
-        None = 0,
+	    Undefined = 0,
         Alien = 1,
         Bigfoot = 2,
         Bird = 3,
