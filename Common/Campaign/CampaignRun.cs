@@ -58,7 +58,7 @@ namespace Platform_Racing_3_Common.Campaign
             public string Position { get; set; }
 
             [JsonPropertyName("s")]
-            public int ScaleX { get; set; }
+            public int? ScaleX { get; set; }
 
             [JsonPropertyName("t")]
             public string State { get; set; }
@@ -67,7 +67,7 @@ namespace Platform_Racing_3_Common.Campaign
             public string Item { get; set; }
 
             [JsonPropertyName("r")]
-            public string Rotation { get; set; }
+            public float? Rotation { get; set; }
         }
 
         public static CampaignRun FromCompressed(Stream stream)
