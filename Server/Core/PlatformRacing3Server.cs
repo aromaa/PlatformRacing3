@@ -27,6 +27,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Net.Sockets.Listener;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Server.Core
 {
@@ -34,13 +35,9 @@ namespace Platform_Racing_3_Server.Core
     {
         public const uint PROTOCOL_VERSION = 24;
 
-        private readonly IServiceProvider serviceProvider;
-
         private static Stopwatch StartTime { get; set; }
 
         public static ServerConfig ServerConfig { get; set; }
-
-        public static ServerManager ServerManager { get; private set; }
         public static ChatRoomManager ChatRoomManager { get; private set; }
 
         public static CampaignManager CampaignManager { get; private set; }
@@ -54,14 +51,22 @@ namespace Platform_Racing_3_Server.Core
 
         public static Timer StatusTimer { get; private set; }
 
-        public PlatformRacing3Server(IServiceProvider serviceProvider, ChatRoomManager chatRoomManager)
+        private readonly IServiceProvider serviceProvider;
+
+        private readonly ServerManager serverManager;
+
+        public PlatformRacing3Server(ILoggerFactory loggerFactory, IServiceProvider serviceProvider, ServerManager serverManager, ChatRoomManager chatRoomManager)
         {
+            LoggerUtil.LoggerFactory = loggerFactory;
+
             this.serviceProvider = serviceProvider;
+
+            this.serverManager = serverManager;
             
             PlatformRacing3Server.ChatRoomManager = chatRoomManager;
         }
 
-        internal void Init()
+        internal async Task Init()
         {
             PlatformRacing3Server.StartTime = Stopwatch.StartNew();
 
@@ -70,8 +75,7 @@ namespace Platform_Racing_3_Server.Core
             RedisConnection.Init(PlatformRacing3Server.ServerConfig);
             DatabaseConnection.Init(PlatformRacing3Server.ServerConfig);
 
-            PlatformRacing3Server.ServerManager = new ServerManager();
-            PlatformRacing3Server.ServerManager.LoadServersAsync().Wait();
+            await this.serverManager.LoadServersAsync();
 
             PlatformRacing3Server.CampaignManager = new CampaignManager();
             PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();

@@ -1,5 +1,4 @@
-﻿using log4net;
-using Npgsql;
+﻿using Npgsql;
 using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
@@ -7,12 +6,14 @@ using System.Data.Common;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.Block
 {
-    public static class BlockManager
+    public sealed class BlockManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILogger<BlockManager> logger = LoggerUtil.LoggerFactory.CreateLogger<BlockManager>();
 
         public static Task<BlockData> GetBlockAsync(uint blockId)
         {
@@ -141,7 +142,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error($"Failed to load {nameof(BlockData)} from sql", task.Exception);
+                BlockManager.logger.LogError(EventIds.BlockLoadFailed, task.Exception, $"Failed to load {nameof(BlockData)} from sql");
             }
 
             return null;
@@ -160,7 +161,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error($"Failed to load {nameof(BlockData)} from sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockLoadFailed, task.Exception, $"Failed to load {nameof(BlockData)} from sql");
             }
 
             return blocks;
@@ -178,7 +179,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed to count users block count from sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockLoadFailed, task.Exception, "Failed to count users block count from sql");
             }
 
             return 0u;
@@ -197,7 +198,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed to load users block categories from sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockLoadFailed, task.Exception, "Failed to load users block categories from sql");
             }
 
             return categories;
@@ -216,7 +217,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed to load user blocks from sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockLoadFailed, task.Exception, "Failed to load user blocks from sql");
             }
 
             return blocks;
@@ -236,7 +237,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed to save block to sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockSaveFailed, task.Exception, "Failed to save block to sql");
             }
 
             return false;
@@ -256,7 +257,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed to delete block from sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockSaveFailed, task.Exception, "Failed to delete block from sql");
             }
 
             return false;
@@ -274,7 +275,7 @@ namespace Platform_Racing_3_Common.Block
             }
             else if (task.IsFaulted)
             {
-                BlockManager.Logger.Error("Failed transfer block as sql", task.Exception);
+	            BlockManager.logger.LogError(EventIds.BlockSaveFailed, task.Exception, "Failed transfer block as sql");
             }
 
             return 0;

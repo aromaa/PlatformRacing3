@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging.Abstractions;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Server;
 using StackExchange.Redis;
@@ -43,7 +44,7 @@ namespace Discord_Bot.Core
         {
             if (this.Services == null)
             {
-                ServerManager serverManager = new();
+                ServerManager serverManager = new(new NullLogger<ServerManager>());
                 serverManager.LoadServersAsync().GetAwaiter().GetResult();
 
                 this.Services = new ServiceCollection().AddSingleton(serverManager).BuildServiceProvider();

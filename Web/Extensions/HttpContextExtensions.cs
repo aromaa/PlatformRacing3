@@ -1,5 +1,4 @@
-﻿using log4net;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
@@ -11,13 +10,13 @@ using System.Reflection;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Web.Extensions
 {
     internal static class HttpContextExtensions
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private const string AUTHENICATION_TYPE = "Login";
         private const string AUTHENICATION_IDENTITY = "PlatformRacing3Identity";
 
@@ -102,7 +101,8 @@ namespace Platform_Racing_3_Web.Extensions
                 }
                 else if (task.IsFaulted)
                 {
-                    HttpContextExtensions.Logger.Error("Failed to insert login", task.Exception);
+                    //TODO: Should fallback the exception
+                    //HttpContextExtensions.Logger.Error("Failed to insert login", task.Exception);
                 }
             }));
         }

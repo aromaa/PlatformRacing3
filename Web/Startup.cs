@@ -13,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Platform_Racing_3_Common.Campaign;
+using Platform_Racing_3_Common.Server;
+using Platform_Racing_3_Common.Utils;
 using Platform_Racing_3_Web.Controllers.DataAccess2;
 using Platform_Racing_3_Web.Middleware;
 
@@ -42,6 +45,9 @@ namespace Platform_Racing_3_Web
 
             services.AddMvc().AddXmlSerializerFormatters();
             services.AddCors();
+
+            services.AddSingleton<ServerManager>();
+            services.AddSingleton<CampaignManager>();
         }
         
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -51,6 +57,13 @@ namespace Platform_Racing_3_Web
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            LoggerUtil.LoggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
+
+            //TODO: Eh...
+            app.ApplicationServices.GetRequiredService<ServerManager>().LoadServersAsync().Wait();
+            app.ApplicationServices.GetRequiredService<CampaignManager>().LoadCampaignTimesAsync().Wait();
+            app.ApplicationServices.GetRequiredService<CampaignManager>().LoadPrizesAsync().Wait();
 
             app.UseMiddleware<CloudflareMiddleware>();
             app.UseRouting();

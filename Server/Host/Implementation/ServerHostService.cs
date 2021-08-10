@@ -18,11 +18,9 @@ namespace Platform_Racing_3_Server.Host.Implementation
 			this.server = server;
 		}
 
-		public Task StartAsync(CancellationToken cancellationToken)
+		public async Task StartAsync(CancellationToken cancellationToken)
 		{
-			this.server.Init();
-
-			return Task.CompletedTask;
+			await this.server.Init();
 		}
 
 		public Task StopAsync(CancellationToken cancellationToken)

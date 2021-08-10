@@ -1,5 +1,4 @@
-﻿using log4net;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures;
 using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps;
 using Platform_Racing_3_Web.Responses;
@@ -18,10 +17,13 @@ using System.Xml.Linq;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Web.Extensions;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Web.Config;
+using Platform_Racing_3_Web.Utils;
 
 namespace Platform_Racing_3_Web.Controllers.DataAccess2
 {
@@ -30,42 +32,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
     [Produces("text/xml")]
     public class DataAccess2 : ControllerBase
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static readonly byte[] DEFAULT_KEY = Encoding.UTF8.GetBytes("012345678910ABCD");
-        private static readonly IReadOnlyDictionary<string, IProcedure> Procedures = new Dictionary<string, IProcedure>()
-        {
-            { "GetServers2", new GetServers2Procedure() },
-            { "GetLoginToken2", new GetLoginToken2Procedure() },
-            { "SaveLevel4",  new SaveLevel4Procedure() },
-            { "CountMyLevels2", new CountMyLevels2Procedure() },
-            { "GetMyLevels2", new GetMyLevels2Procedure() },
-            { "GetLevel2", new GetLevel2Procedure() },
-            { "DeleteLevel2", new DeleteLevel2Procedure() },
-            { "SaveBlock4", new SaveBlock4Procedure() },
-            { "GetMyBlockCategorys", new GetMyBlockCategorysProcedure() },
-            { "CountMyBlocks2", new CountMyBlocks2Procedure() },
-            { "GetMyBlocks2", new GetMyBlocks2Procedure() },
-            { "GetBlock2", new GetBlock2Procedure() },
-            { "GetManyBlocks", new GetManyBlocksProcedure() },
-            { "DeleteBlock2", new DeleteBlock2Procedure() },
-            { "CountMyFriends", new CountMyFriendsProcedure() },
-            { "GetMyFriends", new GetMyFriendsProcedure() },
-            { "CountMyIgnored", new CountMyIgnoredProcedure() },
-            { "GetMyIgnored", new GetMyIgnoredProcedure() },
-            { "SearchUsers2", new SearchUsers2Procedure() },
-            { "SearchLevels3", new SearchLevels3Procedure() },
-            { "GetLockedLevel", new GetLockedLevelProcedure() },
-            { "SaveCampaignRun3", new SaveCampaignRun3Procedure() },
-            { "GetMyFriendsFastestRuns", new GetMyFriendsFastestRunsProcedure() },
-            { "GetCampaignRun3", new GetCampaignRun3Procedure() },
-            { "GetMyStampCategorys", new GetMyStampCategoriesProcedure() },
-            { "CountMyStamps", new CountMyStampsProcedure() },
-            { "GetMyStamps", new GetMyStampsProcedure() },
-            { "SaveStamp", new SaveStampProcedure() },
-            { "GetManyStamps", new GetManyStampsProcedure() },
-            { "DeleteStamp", new DeleteStampProcedure() },
-        };
 
         private static readonly IReadOnlyDictionary<string, ConcurrentDictionary<byte[], byte>> KEYS = new Dictionary<string, ConcurrentDictionary<byte[], byte>>()
         {
@@ -212,7 +179,50 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
         }
 
         private static int IntOrZero(char c) => char.IsNumber(c) ? int.Parse(c.ToString()) : 0;
-        
+
+        private readonly ILogger<DataAccess2> logger;
+
+        private readonly IReadOnlyDictionary<string, IProcedure> Procedures;
+
+        public DataAccess2(ServerManager serverManager, ILogger<DataAccess2> logger)
+        {
+            this.logger = logger;
+
+            this.Procedures = new Dictionary<string, IProcedure>()
+            {
+	            { "GetServers2", new GetServers2Procedure(serverManager) },
+	            { "GetLoginToken2", new GetLoginToken2Procedure() },
+	            { "SaveLevel4",  new SaveLevel4Procedure() },
+	            { "CountMyLevels2", new CountMyLevels2Procedure() },
+	            { "GetMyLevels2", new GetMyLevels2Procedure() },
+	            { "GetLevel2", new GetLevel2Procedure() },
+	            { "DeleteLevel2", new DeleteLevel2Procedure() },
+	            { "SaveBlock4", new SaveBlock4Procedure() },
+	            { "GetMyBlockCategorys", new GetMyBlockCategorysProcedure() },
+	            { "CountMyBlocks2", new CountMyBlocks2Procedure() },
+	            { "GetMyBlocks2", new GetMyBlocks2Procedure() },
+	            { "GetBlock2", new GetBlock2Procedure() },
+	            { "GetManyBlocks", new GetManyBlocksProcedure() },
+	            { "DeleteBlock2", new DeleteBlock2Procedure() },
+	            { "CountMyFriends", new CountMyFriendsProcedure() },
+	            { "GetMyFriends", new GetMyFriendsProcedure() },
+	            { "CountMyIgnored", new CountMyIgnoredProcedure() },
+	            { "GetMyIgnored", new GetMyIgnoredProcedure() },
+	            { "SearchUsers2", new SearchUsers2Procedure() },
+	            { "SearchLevels3", new SearchLevels3Procedure() },
+	            { "GetLockedLevel", new GetLockedLevelProcedure() },
+	            { "SaveCampaignRun3", new SaveCampaignRun3Procedure() },
+	            { "GetMyFriendsFastestRuns", new GetMyFriendsFastestRunsProcedure() },
+	            { "GetCampaignRun3", new GetCampaignRun3Procedure() },
+	            { "GetMyStampCategorys", new GetMyStampCategoriesProcedure() },
+	            { "CountMyStamps", new CountMyStampsProcedure() },
+	            { "GetMyStamps", new GetMyStampsProcedure() },
+	            { "SaveStamp", new SaveStampProcedure() },
+	            { "GetManyStamps", new GetManyStampsProcedure() },
+	            { "DeleteStamp", new DeleteStampProcedure() },
+            };
+        }
+
         [HttpPost]
         public async Task<object> DataAccessAsync([FromQuery] uint id, [FromForm] uint dataRequestID, [FromForm(Name = "gameId")] string gameIdEncoded, [FromForm(Name = "storedProcID")] string storedProcIdEncoded, [FromForm(Name = "storedProcedureName")] string storedProcedureNameEncoded, [FromForm(Name = "parametersXML")] string parametersXmlEncoded, [FromForm(Name = "platform")] string platform, [FromForm(Name = "playerType")] string playerType)
         {
@@ -225,7 +235,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                     if (key != null)
                     {
                         string storedProcedureName = this.DecryptData(storedProcedureNameEncoded, storedProcId, key);
-                        if (DataAccess2.Procedures.TryGetValue(storedProcedureName, out IProcedure procedure))
+                        if (this.Procedures.TryGetValue(storedProcedureName, out IProcedure procedure))
                         {
                             XDocument xml = XDocument.Parse(this.DecryptData(parametersXmlEncoded, storedProcId, key));
 
@@ -241,7 +251,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
                             }
                             catch (Exception ex)
                             {
-                                DataAccess2.Logger.Error("Failed to execute procedure", ex);
+                                this.logger.LogError(EventIds.DataAccess2Failed, ex, "Failed to execute procedure");
 
                                 return new DataAccessErrorResponse(dataRequestID, "Critical error while executing procedure");
                             }

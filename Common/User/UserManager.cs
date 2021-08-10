@@ -1,5 +1,4 @@
-﻿using log4net;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Extensions;
 using Platform_Racing_3_Common.Redis;
@@ -19,13 +18,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace Platform_Racing_3_Common.User
 {
-    public class UserManager
+    public sealed class UserManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILogger<UserManager> logger = LoggerUtil.LoggerFactory.CreateLogger<UserManager>();
 
         //TODO: Player caching is kinda... ehhh... mess, we should have some kinda version number so we can decide what request should be thrown away
         //This is kinda complicated as the this class is supposed to be able to handle concurrency without issues also some kinda redis events should be implemented
@@ -235,7 +235,7 @@ namespace Platform_Racing_3_Common.User
                     }
                     else if (task.IsFaulted)
                     {
-                        UserManager.Logger.Error("Failed to authenicate user", task.Exception);
+	                    UserManager.logger.LogError(EventIds.UserAuthenticationFailed, task.Exception, "Failed to authenicate user");
                     }
 
                     return 0u;
@@ -341,7 +341,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load {nameof(PlayerUserData)} from redis", task.Exception);
+                UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to load {nameof(PlayerUserData)} from redis");
             }
 
             return null;
@@ -360,7 +360,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load {nameof(PlayerUserData)} from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to load {nameof(PlayerUserData)} from sql");
             }
 
             return null;
@@ -419,7 +419,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load multipl {nameof(PlayerUserData)} from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to load multiple {nameof(PlayerUserData)} from sql");
             }
 
             return users;
@@ -452,7 +452,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load campaign runs from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserCampaignDataLoadFailed, task.Exception, "Failed to load campaign runs from sql");
             }
 
             return (IReadOnlyDictionary<uint, int>)runs;
@@ -470,7 +470,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load my friends count from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserFriendsLoadFailed, task.Exception, "Failed to load my friends count from sql");
             }
 
             return 0;
@@ -488,7 +488,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to load my ignored count from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserIgnoredLoadFailed, task.Exception, "Failed to load my ignored count from sql");
             }
 
             return 0;
@@ -509,7 +509,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to update total exp to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to update total exp to sql");
             }
         }
 
@@ -528,7 +528,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to update total exp to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to update total exp to sql");
             }
         }
 
@@ -547,7 +547,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to add user hat to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to add user hat to sql");
             }
         }
 
@@ -566,7 +566,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to add user head to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to add user head to sql");
             }
         }
 
@@ -585,7 +585,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to add user body to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to add user body to sql");
             }
         }
 
@@ -604,7 +604,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to add user feet to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to add user feet to sql");
             }
         }
         
@@ -620,7 +620,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to insert password reset token to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to insert password reset token to sql");
             }
 
             return false;
@@ -640,7 +640,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to check if password reset token can be send again from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to check if password reset token can be send again from sql");
 
                 return false;
             }
@@ -662,7 +662,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to get password token from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to get password token from sql");
             }
 
             return 0;
@@ -680,7 +680,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to consume password reset token from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to consume password reset token from sql");
             }
 
             return false;
@@ -702,7 +702,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to drawin luck from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to drawin luck from sql");
             }
         }
 
@@ -718,7 +718,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to insert discord linkage to sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to insert discord linkage to sql");
             }
 
             return false;
@@ -738,7 +738,7 @@ namespace Platform_Racing_3_Common.User
             }
             else if (task.IsFaulted)
             {
-                UserManager.Logger.Error($"Failed to get discord linkage from sql", task.Exception);
+                UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to get discord linkage from sql");
             }
 
             return  0;

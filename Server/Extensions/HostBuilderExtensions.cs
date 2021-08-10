@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Server.Core;
 using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Commands;
@@ -36,6 +37,7 @@ namespace Platform_Racing_3_Server.Extensions
 					services.AddSingleton<ChatRoomManager>();
 					services.AddSingleton<MatchListingManager>();
 					services.AddSingleton<PacketManager>();
+					services.AddSingleton<ServerManager>();
 				});
 
 				configure(hostBuilder);

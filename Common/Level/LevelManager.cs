@@ -1,5 +1,4 @@
-﻿using log4net;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.User;
 using System;
 using System.Collections.Generic;
@@ -7,13 +6,15 @@ using System.Data.Common;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.Level
 {
-    public class LevelManager
+    public sealed class LevelManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+	    private static readonly ILogger<LevelManager> logger = LoggerUtil.LoggerFactory.CreateLogger<LevelManager>();
 
         //TODO: Implement caching, this is not done here yet due to the pure complexity, it should be done at once and not left half way done (Like user caching, lol)
 
@@ -298,7 +299,7 @@ namespace Platform_Racing_3_Common.Level
                 }
                 else if (task.IsFaulted)
                 {
-                    LevelManager.Logger.Error("Failed to get delete levels from sql", task.Exception);
+                    LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, "Failed to get delete levels from sql");
                 }
 
                 return levels;
@@ -319,7 +320,7 @@ namespace Platform_Racing_3_Common.Level
                 }
                 else if (task.IsFaulted)
                 {
-                    LevelManager.Logger.Error("Failed to restore deleted level from sql", task.Exception);
+                    LevelManager.logger.LogError(EventIds.LevelSaveFailed, task.Exception, "Failed to restore deleted level from sql");
 
                     return null;
                 }
@@ -344,7 +345,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error("Failed to delete level from sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelSaveFailed, task.Exception, "Failed to delete level from sql");
             }
 
             return false;
@@ -362,7 +363,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error("Failed to count users level from sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, "Failed to count users level from sql");
             }
 
             return 0u;
@@ -380,7 +381,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error($"Failed to load {nameof(LevelData)} from sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, $"Failed to load {nameof(LevelData)} from sql");
             }
 
             return null;
@@ -398,7 +399,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error("Failed to to save level to sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelSaveFailed, task.Exception, "Failed to to save level to sql");
             }
 
             return 0u;
@@ -417,7 +418,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error($"Failed to load {nameof(LevelData)} from sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, $"Failed to load {nameof(LevelData)} from sql");
             }
 
             return levels;
@@ -442,7 +443,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error($"Failed to load {nameof(LevelData)} from sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, $"Failed to load {nameof(LevelData)} from sql");
             }
 
             return (results, levels);
@@ -460,7 +461,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error($"Failed to update levels play count to sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelSaveFailed, task.Exception, "Failed to update levels play count to sql");
             }
 
             return (0, 0);
@@ -478,7 +479,7 @@ namespace Platform_Racing_3_Common.Level
             }
             else if (task.IsFaulted)
             {
-                LevelManager.Logger.Error($"Failed to save transfer level to sql", task.Exception);
+	            LevelManager.logger.LogError(EventIds.LevelSaveFailed, task.Exception, "Failed to save transfer level to sql");
             }
 
             return 0;

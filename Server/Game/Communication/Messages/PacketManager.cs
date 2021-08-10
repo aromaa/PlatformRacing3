@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 
@@ -12,13 +13,13 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
     {
         private Dictionary<string, IMessageIncomingJson> IncomingPacketsJSON;
 
-        public PacketManager(MatchListingManager matchListingManager, MatchManager matchManager, ILoggerFactory loggerFactory)
+        public PacketManager(ServerManager serverManager, MatchListingManager matchListingManager, MatchManager matchManager, ILoggerFactory loggerFactory)
         {
             this.IncomingPacketsJSON = new Dictionary<string, IMessageIncomingJson>()
             {
                 { "confirm_connection", new ConfirmConnectionIncomingMessage() },
-                { "token_login", new TokenLoginIncomingMessage(loggerFactory.CreateLogger<TokenLoginIncomingMessage>()) },
-                { "guest_login", new GuestLoginIncomingMessage(loggerFactory.CreateLogger<GuestLoginIncomingMessage>()) },
+                { "token_login", new TokenLoginIncomingMessage(serverManager, loggerFactory.CreateLogger<TokenLoginIncomingMessage>()) },
+                { "guest_login", new GuestLoginIncomingMessage(serverManager, loggerFactory.CreateLogger<GuestLoginIncomingMessage>()) },
                 { "ping", new LegacyPingIncomingMessage() },
                 { "mv", new ManageVarsIncomingMessage() },
                 { "set_account_settings", new SetAccountSettingsIncomingMessage() },

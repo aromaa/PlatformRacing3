@@ -1,5 +1,4 @@
-﻿using log4net;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,13 +7,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.PrivateMessage
 {
-    public static class PrivateMessageManager
+    public sealed class PrivateMessageManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILogger<PrivateMessageManager> logger = LoggerUtil.LoggerFactory.CreateLogger<PrivateMessageManager>();
 
         public static Task<(uint Results, IReadOnlyList<IPrivateMessage> PMs)> GetUserPMsAsync(uint userId, uint start = 0, uint count = uint.MaxValue)
         {
@@ -75,7 +76,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             }
             else if (task.IsFaulted)
             {
-                PrivateMessageManager.Logger.Error($"Failed to load {nameof(IPrivateMessage)} from sql", task.Exception);
+                PrivateMessageManager.logger.LogError(EventIds.PrivateMessageLoadFailed, task.Exception, $"Failed to load {nameof(IPrivateMessage)} from sql");
             }
 
             return (results, pms);
@@ -93,7 +94,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             }
             else if (task.IsFaulted)
             {
-                PrivateMessageManager.Logger.Error($"Failed to load {nameof(IPrivateMessage)} from sql", task.Exception);
+                PrivateMessageManager.logger.LogError(EventIds.PrivateMessageLoadFailed, task.Exception, $"Failed to load {nameof(IPrivateMessage)} from sql");
             }
 
             return null;
@@ -135,7 +136,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             }
             else if (task.IsFaulted)
             {
-                PrivateMessageManager.Logger.Error($"Failed to parse deleted pms from sql", task.Exception);
+                PrivateMessageManager.logger.LogError(EventIds.PrivateMessageLoadFailed, task.Exception, "Failed to parse deleted pms from sql");
             }
 
             return pms;
@@ -153,7 +154,7 @@ namespace Platform_Racing_3_Common.PrivateMessage
             }
             else if (task.IsFaulted)
             {
-                PrivateMessageManager.Logger.Error($"Failed to insert text pm to sql", task.Exception);
+                PrivateMessageManager.logger.LogError(EventIds.PrivateMessageSendFailed, task.Exception, "Failed to insert text pm to sql");
             }
 
             return 0;

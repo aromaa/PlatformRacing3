@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using log4net.Util;
 using Platform_Racing_3_Common.User;
 
 namespace Platform_Racing_3_Common.Utils

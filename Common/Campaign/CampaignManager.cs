@@ -1,5 +1,4 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using log4net;
 using Newtonsoft.Json;
 using Platform_Racing_3_Common.Database;
 using System;
@@ -7,17 +6,20 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Customization;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.Campaign
 {
-    public class CampaignManager
+    public sealed class CampaignManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILogger<CampaignManager> logger = LoggerUtil.LoggerFactory.CreateLogger<CampaignManager>();
 
         /// <summary>
         /// Jiggmin
@@ -178,7 +180,7 @@ namespace Platform_Racing_3_Common.Campaign
             }
             else if (task.IsFaulted)
             {
-                CampaignManager.Logger.Error($"Failed to load friends runs from sql", task.Exception);
+	            CampaignManager.logger.LogError(EventIds.CampaignDataLoadFailed, task.Exception, "Failed to load friends runs from sql");
             }
 
             return null;
@@ -195,7 +197,7 @@ namespace Platform_Racing_3_Common.Campaign
             }
             else if (task.IsFaulted)
             {
-                CampaignManager.Logger.Error($"Failed to load raw run from sql", task.Exception);
+                CampaignManager.logger.LogError(EventIds.CampaignDataLoadFailed, task.Exception, "Failed to load raw run from sql");
             }
 
             return null;

@@ -1,18 +1,19 @@
-﻿using log4net;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.Stamp
 {
-    public static class StampManager
+    public sealed class StampManager
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILogger<StampManager> logger = LoggerUtil.LoggerFactory.CreateLogger<StampManager>();
 
         public static Task<IList<StampData>> GetStampsAsync(params uint[] stampIds)
         {
@@ -122,7 +123,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error($"Failed to load {nameof(StampData)} from sql", task.Exception);
+                StampManager.logger.LogError(EventIds.StampLoadFailed, task.Exception, $"Failed to load {nameof(StampData)} from sql");
             }
 
             return stamps;
@@ -140,7 +141,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error("Failed to count users stamp count from sql", task.Exception);
+	            StampManager.logger.LogError(EventIds.StampLoadFailed, task.Exception, "Failed to count users stamp count from sql");
             }
 
             return 0u;
@@ -159,7 +160,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error("Failed to load users stamp categories from sql", task.Exception);
+	            StampManager.logger.LogError(EventIds.StampLoadFailed, task.Exception, "Failed to load users stamp categories from sql");
             }
 
             return categories;
@@ -178,7 +179,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error("Failed to load user stamps from sql", task.Exception);
+	            StampManager.logger.LogError(EventIds.StampLoadFailed, task.Exception, "Failed to load user stamps from sql");
             }
 
             return stamps;
@@ -198,7 +199,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error("Failed to save stamp to sql", task.Exception);
+	            StampManager.logger.LogError(EventIds.StampSaveFailed, task.Exception, "Failed to save stamp to sql");
             }
 
             return false;
@@ -218,7 +219,7 @@ namespace Platform_Racing_3_Common.Stamp
             }
             else if (task.IsFaulted)
             {
-                StampManager.Logger.Error("Failed to delete stamp from sql", task.Exception);
+	            StampManager.logger.LogError(EventIds.StampSaveFailed, task.Exception, "Failed to delete stamp from sql");
             }
 
             return false;

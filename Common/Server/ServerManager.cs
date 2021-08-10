@@ -1,5 +1,4 @@
-﻿using log4net;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using StackExchange.Redis;
@@ -11,21 +10,25 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Npgsql;
+using Platform_Racing_3_Common.Utils;
 
 namespace Platform_Racing_3_Common.Server
 {
-    public class ServerManager
+    public sealed class ServerManager
     {
-        public const uint SERVER_STATUS_TIMEOUT = 3;
+	    public const uint SERVER_STATUS_TIMEOUT = 3;
         public const string SERVER_STATUS_TIMEOUT_MESSAGE = "Offline";
 
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
+        private readonly ILogger<ServerManager> logger;
+        
         private ConcurrentDictionary<uint, ServerDetails> Servers;
 
-        public ServerManager()
+        public ServerManager(ILogger<ServerManager> logger)
         {
+            this.logger = logger;
+
             this.Servers = new ConcurrentDictionary<uint, ServerDetails>();
         }
 
@@ -82,7 +85,7 @@ namespace Platform_Racing_3_Common.Server
             }
             else if (task.IsFaulted)
             {
-                ServerManager.Logger.Error("Failed to load servers from sql", task.Exception);
+                this.logger.LogError(EventIds.ServerLoadFailed, task.Exception, "Failed to load servers from sql");
             }
 
             return servers;
@@ -102,7 +105,7 @@ namespace Platform_Racing_3_Common.Server
             }
             else if (task.IsFaulted)
             {
-                ServerManager.Logger.Error("Failed to load server from sql", task.Exception);
+	            this.logger.LogError(EventIds.ServerLoadFailed, task.Exception, "Failed to load server from sql");
             }
         }
     }
