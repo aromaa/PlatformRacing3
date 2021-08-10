@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.Customization;
 using Platform_Racing_3_Common.Utils;
@@ -795,99 +794,99 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (this.LevelData.Data.StartsWith("v2 | "))
                 {
-                    //JObject levelData = JsonSerializer.Deserialize<JObject>(this.LevelData.Data[5..]);
-                    //if (levelData.TryGetValue("blockStr", out JToken jsonBlockStr))
-                    //{
-                    //    string blockStr = (string)jsonBlockStr;
-                    //    if (!string.IsNullOrWhiteSpace(blockStr))
-                    //    {
-                    //        uint blockId = 0;
-                    //        int x = 0;
-                    //        int y = 0;
+	                using JsonDocument levelData = JsonDocument.Parse(this.LevelData.Data[5..]);
+					if (levelData.RootElement.TryGetProperty("blockStr", out JsonElement jsonBlockStr))
+					{
+						string blockStr = jsonBlockStr.GetString();
+						if (!string.IsNullOrWhiteSpace(blockStr))
+						{
+							uint blockId = 0;
+							int x = 0;
+							int y = 0;
 
-                    //        HashSet<uint> blockIds = new();
-                    //        Dictionary<Point, uint> blocks = new();
-                    //        foreach (string block in blockStr.Split(','))
-                    //        {
-                    //            if (block[0] == 'b')
-                    //            {
-                    //                blockId = uint.Parse(block[1..]);
-                    //                blockIds.Add(blockId);
-                    //            }
-                    //            else
-                    //            {
-                    //                string[] coords = block.Split(':');
+							HashSet<uint> blockIds = new();
+							Dictionary<Point, uint> blocks = new();
+							foreach (string block in blockStr.Split(','))
+							{
+								if (block[0] == 'b')
+								{
+									blockId = uint.Parse(block[1..]);
+									blockIds.Add(blockId);
+								}
+								else
+								{
+									string[] coords = block.Split(':');
 
-                    //                x += int.Parse(coords[0]);
-                    //                y += int.Parse(coords[1]);
+									x += int.Parse(coords[0]);
+									y += int.Parse(coords[1]);
 
-                    //                blocks[new Point(x, y)] = blockId;
-                    //            }
-                    //        }
+									blocks[new Point(x, y)] = blockId;
+								}
+							}
 
-                    //        HashSet<uint> finishBlocks = new();
-                    //        foreach (uint blockId_ in blockIds.ToList())
-                    //        {
-                    //            if (blockId_ < 700)
-                    //            {
-                    //                if (blockId_ % 100 == 7)
-                    //                {
-                    //                    finishBlocks.Add(blockId_);
-                    //                }
+							HashSet<uint> finishBlocks = new();
+							foreach (uint blockId_ in blockIds.ToList())
+							{
+								if (blockId_ < 700)
+								{
+									if (blockId_ % 100 == 7)
+									{
+										finishBlocks.Add(blockId_);
+									}
 
-                    //                blockIds.Remove(blockId_); //Known block, no need to load from db
-                    //            }
-                    //        }
+									blockIds.Remove(blockId_); //Known block, no need to load from db
+								}
+							}
 
-                    //        //Not found in cached blocks
-                    //        if (blockIds.Count > 0)
-                    //        {
-                    //            using (DatabaseConnection dbConnection = new())
-                    //            {
-                    //                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
-                    //                while (reader?.Read() ?? false)
-                    //                {
-                    //                    uint id = (uint)(int)reader["id"];
-                    //                    string settings = (string)reader["settings"];
-                    //                    if (settings.StartsWith("v2 | "))
-                    //                    {
-                    //                        JObject blockData = JsonSerializer.Deserialize<object>(settings[5..]);
-                    //                        if (blockData.TryGetValue("left", out JToken sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                    //                        {
-                    //                            finishBlocks.Add(id);
-                    //                        }
-                    //                        else if (blockData.TryGetValue("right", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                    //                        {
-                    //                            finishBlocks.Add(id);
-                    //                        }
-                    //                        else if (blockData.TryGetValue("top", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                    //                        {
-                    //                            finishBlocks.Add(id);
-                    //                        }
-                    //                        else if (blockData.TryGetValue("bottom", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                    //                        {
-                    //                            finishBlocks.Add(id);
-                    //                        }
-                    //                        else if (blockData.TryGetValue("bump", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                    //                        {
-                    //                            finishBlocks.Add(id);
-                    //                        }
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
+							//Not found in cached blocks
+							if (blockIds.Count > 0)
+							{
+								using (DatabaseConnection dbConnection = new())
+								{
+									DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
+									while (reader?.Read() ?? false)
+									{
+										uint id = (uint)(int)reader["id"];
+										string settings = (string)reader["settings"];
+										if (settings.StartsWith("v2 | "))
+										{
+											using JsonDocument blockData = JsonDocument.Parse(settings[5..]);
+											if (blockData.RootElement.TryGetProperty("left", out JsonElement sideSettings) && this.ReadBlockSideSettings(sideSettings))
+											{
+												finishBlocks.Add(id);
+											}
+											else if (blockData.RootElement.TryGetProperty("right", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+											{
+												finishBlocks.Add(id);
+											}
+											else if (blockData.RootElement.TryGetProperty("top", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+											{
+												finishBlocks.Add(id);
+											}
+											else if (blockData.RootElement.TryGetProperty("bottom", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+											{
+												finishBlocks.Add(id);
+											}
+											else if (blockData.RootElement.TryGetProperty("bump", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+											{
+												finishBlocks.Add(id);
+											}
+										}
+									}
+								}
+							}
 
-                    //        //We loaded everything
-                    //        foreach (KeyValuePair<Point, uint> block in blocks)
-                    //        {
-                    //            if (finishBlocks.Contains(block.Value))
-                    //            {
-                    //                this.FinishBlocks.Add(block.Key);
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                }
+							//We loaded everything
+							foreach (KeyValuePair<Point, uint> block in blocks)
+							{
+								if (finishBlocks.Contains(block.Value))
+								{
+									this.FinishBlocks.Add(block.Key);
+								}
+							}
+						}
+					}
+				}
             }
             catch (Exception ex)
             {
