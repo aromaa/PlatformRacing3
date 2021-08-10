@@ -1,5 +1,4 @@
-﻿using CryptSharp;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,12 +54,10 @@ namespace Platform_Racing_3_Common.Utils
         [Obsolete("This is legacy code")]
         internal static bool VerifyPasswordLegacy(string password, string hash)
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(password);
-
             //TEST PHP BCRYPT
             try
             {
-                if (Crypter.CheckPassword(bytes, hash))
+                if (BCrypt.Net.BCrypt.Verify(password, hash))
                 {
                     return true;
                 }
@@ -69,6 +66,8 @@ namespace Platform_Racing_3_Common.Utils
             {
 
             }
+
+            byte[] bytes = Encoding.UTF8.GetBytes(password);
 
             //MD5 (Don't worry, this was only for few months, was accidentally left after localhost testing)
             using (MD5 md5 = MD5.Create())
