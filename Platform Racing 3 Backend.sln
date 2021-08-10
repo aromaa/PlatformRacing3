@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{A065B957-2C2A-4DF7-B81C-0D81F07913EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnsafeHelpers", "UnsafeHelpers\UnsafeHelpers.csproj", "{FAECFDFF-027E-4FFA-AF4D-EC041840F822}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mobile Import", "Mobile Import\Mobile Import.csproj", "{F41CB226-6D10-4E78-A62D-021C4365F8DF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord Bot", "Discord Bot\Discord Bot.csproj", "{134CC557-96E8-4FE4-84DF-C8258019C648}"
@@ -47,10 +45,6 @@ Global
 		{A065B957-2C2A-4DF7-B81C-0D81F07913EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A065B957-2C2A-4DF7-B81C-0D81F07913EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A065B957-2C2A-4DF7-B81C-0D81F07913EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FAECFDFF-027E-4FFA-AF4D-EC041840F822}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F41CB226-6D10-4E78-A62D-021C4365F8DF}.Release|Any CPU.ActiveCfg = Release|Any CPU

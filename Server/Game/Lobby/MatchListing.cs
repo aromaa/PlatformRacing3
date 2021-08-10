@@ -9,7 +9,6 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server.Game.User.Identifiers;
 using Platform_Racing_3_Server_API.Net;
-using Platform_Racing_3_UnsafeHelpers.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -204,7 +203,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
             }
 
             uint currentHost = this._HostSocketId;
-            if (this.Type == MatchListingType.Normal && (currentHost == session.SocketId || (currentHost == 0 && InterlockedExtansions.CompareExchange(ref this._HostSocketId, session.SocketId, currentHost) == currentHost)))
+            if (this.Type == MatchListingType.Normal && (currentHost == session.SocketId || (currentHost == 0 && Interlocked.CompareExchange(ref this._HostSocketId, session.SocketId, currentHost) == currentHost)))
             {
                 session.SendPacket(new MatchOwnerOutgoingMessage(this.Name, true, true, true));
             }
@@ -280,7 +279,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                             ClientSession other = this._Clients.Sessions.FirstOrDefault();
                             if (other != null)
                             {
-                                if (InterlockedExtansions.CompareExchange(ref this._HostSocketId, other.SocketId, currentHost) == currentHost)
+                                if (Interlocked.CompareExchange(ref this._HostSocketId, other.SocketId, currentHost) == currentHost)
                                 {
                                     other.SendPacket(new MatchOwnerOutgoingMessage(this.Name, true, true, true));
                                     break;

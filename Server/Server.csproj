@@ -17,7 +17,6 @@
     <ProjectReference Include="..\Net\Net.Communication\Net.Communication.csproj" />
     <ProjectReference Include="..\Net\Net\Net.csproj" />
     <ProjectReference Include="..\Server API\Server API.csproj" />
-    <ProjectReference Include="..\UnsafeHelpers\UnsafeHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>
