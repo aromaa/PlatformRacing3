@@ -12,18 +12,23 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Platform_Racing_3_Server.Game.Match;
 
 namespace Platform_Racing_3_Server.Game.Lobby
 {
-    internal class MatchListingManager
+    internal sealed class MatchListingManager
     {
+        private readonly MatchManager matchManager;
+
         private int NextMatchListingId;
         private ConcurrentDictionary<string, MatchListing> MatchListings;
 
         private ClientSessionCollection QuickJoinClients;
 
-        internal MatchListingManager()
+        public MatchListingManager(MatchManager matchManager)
         {
+            this.matchManager = matchManager;
+
             this.MatchListings = new ConcurrentDictionary<string, MatchListing>();
 
             this.QuickJoinClients = new ClientSessionCollection();
@@ -46,7 +51,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                     //    maxMembers = 8;
                     //}
 
-                    MatchListing listing = new(type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
+                    MatchListing listing = new(this, this.matchManager, type, session, level, type.GetLobbyId(this.GetNextMatchListingId()), minRank, maxRank, maxMembers, onlyFriends);
                     session.SendPacket(new MatchCreatedOutgoingMessage(listing));
 
                     if (this.MatchListings.TryAdd(listing.Name, listing))
@@ -141,7 +146,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                 {
                     LevelData random = levels.ElementAt(new Random().Next(0, levels.Count));
 
-                    listing = new MatchListing(MatchListingType.LevelOfTheDay, null, random, MatchListingType.LevelOfTheDay.GetLobbyId(this.GetNextMatchListingId()), 0, uint.MaxValue, 4, false);
+                    listing = new MatchListing(this, this.matchManager, MatchListingType.LevelOfTheDay, null, random, MatchListingType.LevelOfTheDay.GetLobbyId(this.GetNextMatchListingId()), 0, uint.MaxValue, 4, false);
 
                     if (!this.MatchListings.TryAdd(listing.Name, listing))
                     {

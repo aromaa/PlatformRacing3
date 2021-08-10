@@ -1,27 +1,34 @@
-﻿using Platform_Racing_3_Server.Game.Client;
+﻿using Platform_Racing_3_Server.Core;
+using Platform_Racing_3_Server.Game.Client;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using Platform_Racing_3_Server.Game.Commands;
 
 namespace Platform_Racing_3_Server.Game.Chat
 {
-    internal class ChatRoomManager
+    internal sealed class ChatRoomManager
     {
+        private readonly CommandManager commandManager;
+
         private ConcurrentDictionary<string, ChatRoom> ChatRooms;
 
-        internal ChatRoomManager()
+        public ChatRoomManager(CommandManager commandManager)
         {
+            this.commandManager = commandManager;
+
             this.ChatRooms = new ConcurrentDictionary<string, ChatRoom>();
+
             this.TryCreate(ChatRoomType.System, 1, "chat-Home", "", "Join our offical Discord server! https://discord.gg/xYTvAGP", out _); //User id 1 is isokissa3
         }
 
         internal ICollection<ChatRoom> Rooms => this.ChatRooms.Values;
 
         //Dont really like these methods tho I can't come up with better names and funcitonaly
-        internal bool TryCreate(ChatRoomType type, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(type, name, pass, note));
-        internal bool TryCreate(ChatRoomType type, uint creatorUserId, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(type, creatorUserId, name, pass, note));
+        internal bool TryCreate(ChatRoomType type, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this.commandManager, type, name, pass, note));
+        internal bool TryCreate(ChatRoomType type, uint creatorUserId, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this.commandManager, type, creatorUserId, name, pass, note));
 
         internal bool TryGet(string name, out ChatRoom chatRoom) => this.ChatRooms.TryGetValue(name, out chatRoom);
 
@@ -35,7 +42,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                 {
                     if (!session.IsGuest)
                     {
-                        chat = new ChatRoom(ChatRoomType.UserCreated, session.UserData.Id, name, pass, note); //Create chat room with the user already listed in as member
+                        chat = new ChatRoom(this.commandManager, ChatRoomType.UserCreated, session.UserData.Id, name, pass, note); //Create chat room with the user already listed in as member
 
                         status = chat.Join(session, chatId); //Initial join on create should NEVER fail
 

@@ -30,6 +30,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
+using Platform_Racing_3_Server.Game.Commands;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
@@ -81,6 +82,9 @@ namespace Platform_Racing_3_Server.Game.Match
             Hat.Halo,
         };
 
+        private readonly MatchManager matchManager;
+        private readonly CommandManager commandManager;
+
         private readonly ILogger<MultiplayerMatch> logger;
 
         internal MatchListingType Type { get; }
@@ -107,8 +111,11 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal bool Broadcaster { get; set; }
 
-        internal MultiplayerMatch(ILogger<MultiplayerMatch> logger, MatchListingType type, string name, LevelData levelData)
+        internal MultiplayerMatch(MatchManager matchManager, CommandManager commandManager, ILogger<MultiplayerMatch> logger, MatchListingType type, string name, LevelData levelData)
         {
+            this.matchManager = matchManager;
+	        this.commandManager = commandManager;
+
             this.logger = logger;
 
             this.Type = type;
@@ -335,7 +342,7 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         if (InterlockedExtansions.CompareExchange(ref this._Status, MultiplayerMatchStatus.Died, MultiplayerMatchStatus.Ended) == MultiplayerMatchStatus.Ended)
                         {
-                            PlatformRacing3Server.MatchManager.Die(this);
+                            this.matchManager.Die(this);
                         }
                     }
                     else
@@ -1287,7 +1294,7 @@ namespace Platform_Racing_3_Server.Game.Match
             {
                 string[] args = message[1..].Split(' ');
 
-                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(1, args.Length - 1)))
+                if (!this.commandManager.Execte(session, args[0], args.AsSpan(1, args.Length - 1)))
                 {
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }

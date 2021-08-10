@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Platform_Racing_3_Common.Redis;
+using Platform_Racing_3_Server.Game.Commands;
 using StackExchange.Redis;
 
 namespace Platform_Racing_3_Server.Game.Chat
@@ -22,6 +23,8 @@ namespace Platform_Racing_3_Server.Game.Chat
     internal class ChatRoom
     {
         private const uint MAX_RECENT_MESSAGES = 25;
+
+        private readonly CommandManager commandManager;
 
         internal ChatRoomType Type { get; }
 
@@ -44,12 +47,14 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private ConcurrentQueue<ChatOutgoingMessage> RecentMessages;
 
-        internal ChatRoom(ChatRoomType type, string name, string pass, string note) : this(type, 0, name, pass, note)
+        internal ChatRoom(CommandManager commandManager, ChatRoomType type, string name, string pass, string note) : this(commandManager, type, 0, name, pass, note)
         {
         }
 
-        internal ChatRoom(ChatRoomType type, uint creatorUserId, string name, string pass, string note)
+        internal ChatRoom(CommandManager commandManager, ChatRoomType type, uint creatorUserId, string name, string pass, string note)
         {
+            this.commandManager = commandManager;
+
             this.Clients = new ClientSessionCollection(removeCallback: this.Leave0);
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
 
@@ -141,7 +146,7 @@ namespace Platform_Racing_3_Server.Game.Chat
             {
                 string[] args = message[1..].Split(' ');
 
-                if (!PlatformRacing3Server.CommandManager.Execte(session, args[0], args.AsSpan(start: 1, length: args.Length - 1)))
+                if (!this.commandManager.Execte(session, args[0], args.AsSpan(start: 1, length: args.Length - 1)))
                 {
                     session.SendPacket(new AlertOutgoingMessage("Unknown command"));
                 }

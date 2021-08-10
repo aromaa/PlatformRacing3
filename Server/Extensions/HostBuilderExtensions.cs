@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Platform_Racing_3_Server.Core;
+using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Commands;
 using Platform_Racing_3_Server.Game.Communication.Messages;
+using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 using Platform_Racing_3_Server.Host;
 using Platform_Racing_3_Server.Host.Implementation;
@@ -30,6 +32,9 @@ namespace Platform_Racing_3_Server.Extensions
 					services.AddSingleton<PlatformRacing3Server>();
 					services.AddSingleton<CommandManager>();
 					services.AddSingleton<MatchManager>();
+					services.AddSingleton<PacketManager>();
+					services.AddSingleton<ChatRoomManager>();
+					services.AddSingleton<MatchListingManager>();
 					services.AddSingleton<PacketManager>();
 				});
 

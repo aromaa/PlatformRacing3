@@ -40,10 +40,7 @@ namespace Platform_Racing_3_Server.Core
         public static ServerConfig ServerConfig { get; set; }
 
         public static ServerManager ServerManager { get; private set; }
-        public static CommandManager CommandManager { get; private set; }
         public static ChatRoomManager ChatRoomManager { get; private set; }
-        public static MatchListingManager MatchListingManager { get; private set; }
-        public static MatchManager MatchManager { get; private set; }
 
         public static CampaignManager CampaignManager { get; private set; }
 
@@ -57,11 +54,10 @@ namespace Platform_Racing_3_Server.Core
 
         public static Timer StatusTimer { get; private set; }
 
-        public PlatformRacing3Server(CommandManager commandManager, MatchManager matchManager, PacketManager packetManager)
+        public PlatformRacing3Server(PacketManager packetManager, ChatRoomManager chatRoomManager)
         {
-            PlatformRacing3Server.CommandManager = commandManager;
-            PlatformRacing3Server.MatchManager = matchManager;
             PlatformRacing3Server.PacketManager = packetManager;
+            PlatformRacing3Server.ChatRoomManager = chatRoomManager;
         }
 
         internal void Init()
@@ -75,8 +71,6 @@ namespace Platform_Racing_3_Server.Core
 
             PlatformRacing3Server.ServerManager = new ServerManager();
             PlatformRacing3Server.ServerManager.LoadServersAsync().Wait();
-            PlatformRacing3Server.ChatRoomManager = new ChatRoomManager();
-            PlatformRacing3Server.MatchListingManager = new MatchListingManager();
 
             PlatformRacing3Server.CampaignManager = new CampaignManager();
             PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();

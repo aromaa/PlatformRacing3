@@ -26,6 +26,9 @@ namespace Platform_Racing_3_Server.Game.Lobby
         private const int SPOTS_LEFT_GAME_STARTED = int.MinValue;
         private const int SPOTS_LEFT_DIED = int.MinValue + 1;
 
+        private readonly MatchListingManager matchListingManager;
+        private readonly MatchManager matchManager;
+
         internal LevelData LevelData { get; }
 
         internal MatchListingType Type { get; }
@@ -73,8 +76,11 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private volatile int UsersReady;
 
-        internal MatchListing(MatchListingType type, ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
+        internal MatchListing(MatchListingManager matchListingManager, MatchManager matchManager, MatchListingType type, ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
         {
+            this.matchListingManager = matchListingManager;
+            this.matchManager = matchManager;
+
             this._Clients = new ClientSessionCollectionLimited((int)maxMembers, this.Leave0);
             this.LobbyClients = new ClientSessionCollection();
             this.BannedClients = new ConcurrentBag<IUserIdentifier>();
@@ -104,7 +110,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         private void OnCreatorDisconnectEarly(ISocket connection)
         {
-            PlatformRacing3Server.MatchListingManager.Die(this); //We can pull the plug no biggie
+            this.matchListingManager.Die(this); //We can pull the plug no biggie
         }
 
         internal MatchListingJoinStatus CanJoin(ClientSession session)
@@ -298,7 +304,7 @@ namespace Platform_Racing_3_Server.Game.Lobby
                         other.LobbySession.RemoveMatch(this);
                     }
 
-                    PlatformRacing3Server.MatchListingManager.Die(this);
+                    this.matchListingManager.Die(this);
                 }
             }
         }
@@ -318,9 +324,9 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal void Start()
         {
-            PlatformRacing3Server.MatchListingManager.Die(this); //Kill us :(
+            this.matchListingManager.Die(this); //Kill us :(
 
-            MultiplayerMatch match = PlatformRacing3Server.MatchManager.CreateMultiplayerMatch(this);
+            MultiplayerMatch match = this.matchManager.CreateMultiplayerMatch(this);
 
             Random random = new();
 

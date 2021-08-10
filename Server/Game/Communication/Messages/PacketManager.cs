@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Server.Game.Lobby;
+using Platform_Racing_3_Server.Game.Match;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages
 {
@@ -10,7 +12,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
     {
         private Dictionary<string, IMessageIncomingJson> IncomingPacketsJSON;
 
-        public PacketManager(ILoggerFactory loggerFactory)
+        public PacketManager(MatchListingManager matchListingManager, MatchManager matchManager, ILoggerFactory loggerFactory)
         {
             this.IncomingPacketsJSON = new Dictionary<string, IMessageIncomingJson>()
             {
@@ -21,18 +23,18 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "mv", new ManageVarsIncomingMessage() },
                 { "set_account_settings", new SetAccountSettingsIncomingMessage() },
                 { "get_level_list", new GetLevelListIncomingMessage() },
-                { "jr", new JoinRoomIncomingMessage() },
-                { "get_lotd", new GetLevelOfTheDayIncomingMessage() },
-                { "get_tournament", new GetTournamentIncomingMessage() },
-                { "request_matches", new RequestMatchesIncominggMessage() },
+                { "jr", new JoinRoomIncomingMessage(matchListingManager, matchManager) },
+                { "get_lotd", new GetLevelOfTheDayIncomingMessage(matchListingManager) },
+                { "get_tournament", new GetTournamentIncomingMessage(matchListingManager, matchManager) },
+                { "request_matches", new RequestMatchesIncominggMessage(matchListingManager) },
                 { "gr", new GetRoomsIncomingMessage() },
-                { "lr", new LeaveRoomIncomingMessage() },
+                { "lr", new LeaveRoomIncomingMessage(matchListingManager, matchManager) },
                 { "leave_lobby", new LeaveLobbyIncomingMessage() },
                 { "get_member_list", new GetMemberListIncomingMessage() },
                 { "get_user_list", new GetUserListIncomingMessage() },
                 { "get_user_page", new GetUserPageIncomingMessage() },
                 { "sr", new SendToRoomIncomingMessage() },
-                { "create_match", new CreateMatchIncomingMessage() },
+                { "create_match", new CreateMatchIncomingMessage(matchListingManager) },
                 { "force_start", new ForceStartIncomingMessage() },
                 { "finish_drawing", new FinishDrawingIncomingMessage() },
                 { "forfiet", new ForfietIncomingMessage() },
@@ -47,8 +49,8 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "edit_user_list", new EditUserListIncomingMessage() },
                 { "kick", new KickFromMatchListingIncomingMessage() },
                 { "ban", new BanFromMatchListingIncomingMessage() },
-                { "start_quick_join", new StartQucikJoinIncomingMessage() },
-                { "stop_quick_join", new StopQuickJoinIncomingMessage() },
+                { "start_quick_join", new StartQucikJoinIncomingMessage(matchListingManager) },
+                { "stop_quick_join", new StopQuickJoinIncomingMessage(matchListingManager) },
                 { "rate_level", new RateLevelIncomingMessage() },
                 { "send_thing", new SendThingIncomingMessage() },
                 { "thingExits", new ThingExistsIncomingMessage() },
@@ -56,7 +58,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
                 { "report_pm", new ReportPmIncomingMessage() },
                 { "koth", new KothIncomingMessage() },
 				{ "dash", new DashIncomingMessage() },
-                { "join_tournament", new JoinTournamentIncomingMessage() },
+                { "join_tournament", new JoinTournamentIncomingMessage(matchListingManager, matchManager) },
                 { "win_hat", new WinHatIncomingMessage() },
             };
         }

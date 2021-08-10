@@ -6,11 +6,21 @@ using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Lobby;
+using Platform_Racing_3_Server.Game.Match;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class JoinTournamentIncomingMessage : IMessageIncomingJson
+    internal sealed class JoinTournamentIncomingMessage : IMessageIncomingJson
     {
+	    private readonly MatchListingManager matchListingManager;
+        private readonly MatchManager matchManager;
+
+        public JoinTournamentIncomingMessage(MatchListingManager matchListingManager, MatchManager matchManager)
+        {
+	        this.matchListingManager = matchListingManager;
+            this.matchManager = matchManager;
+        }
+
         public void Handle(ClientSession session, JsonPacket message)
         {
             if (!session.IsLoggedIn)
@@ -18,12 +28,12 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                 return;
             }
 
-            MatchListing matchListing = PlatformRacing3Server.MatchListingManager.GetTournament(session);
+            MatchListing matchListing = this.matchListingManager.GetTournament(session);
             if (matchListing != null)
             {
                 session.SendPacket(new ForceMatchOutgoingMessage(matchListing));
             }
-            else if (PlatformRacing3Server.MatchManager.HasOngoingTournaments)
+            else if (this.matchManager.HasOngoingTournaments)
             {
                 session.SendMessage("Tournament is running, spectate coming \"soon\"!");
             }

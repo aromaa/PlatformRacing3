@@ -8,11 +8,21 @@ using Platform_Racing_3_Server.Game.Lobby;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Platform_Racing_3_Server.Game.Match;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class JoinRoomIncomingMessage : MessageIncomingJson<JsonJoinRoomIncomingMessage>
+    internal sealed class JoinRoomIncomingMessage : MessageIncomingJson<JsonJoinRoomIncomingMessage>
     {
+        private readonly MatchListingManager matchListingManager;
+        private readonly MatchManager matchManager;
+
+        public JoinRoomIncomingMessage(MatchListingManager matchListingManager, MatchManager matchManager)
+        {
+	        this.matchListingManager = matchListingManager;
+            this.matchManager = matchManager;
+        }
+
         internal override void Handle(ClientSession session, JsonJoinRoomIncomingMessage message)
         {
             if (!session.IsLoggedIn)
@@ -29,7 +39,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     break;
                 case "match_listing":
                     {
-                        MatchListing listing = PlatformRacing3Server.MatchListingManager.Join(session, message.RoomName, out bool status);
+                        MatchListing listing = this.matchListingManager.Join(session, message.RoomName, out bool status);
                         if (listing == null)
                         {
                             session.SendPacket(new UserJoinRoomOutgoingMessage(message.RoomName, session.SocketId, session.UserData.Id, session.UserData.Username, session.GetVars("userName", "rank", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor", "socketID", "ping")));
@@ -44,7 +54,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     break;
                 case "game":
                     {
-                        PlatformRacing3Server.MatchManager.JoinMultiplayerMatch(session, message.RoomName);
+                        this.matchManager.JoinMultiplayerMatch(session, message.RoomName);
                     }
                     break;
             }

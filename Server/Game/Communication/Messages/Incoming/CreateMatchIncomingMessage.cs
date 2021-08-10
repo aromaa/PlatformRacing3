@@ -11,8 +11,15 @@ using Platform_Racing_3_Common.Level;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class CreateMatchIncomingMessage : MessageIncomingJson<JsonCreateMatchIncomingMessage>
+    internal sealed class CreateMatchIncomingMessage : MessageIncomingJson<JsonCreateMatchIncomingMessage>
     {
+        private readonly MatchListingManager matchListingManager;
+
+        public CreateMatchIncomingMessage(MatchListingManager matchListingManager)
+        {
+            this.matchListingManager = matchListingManager;
+        }
+
         internal override void Handle(ClientSession session, JsonCreateMatchIncomingMessage message)
         {
             if (!session.IsLoggedIn)
@@ -29,11 +36,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                 {
                     LevelData level = await LevelManager.GetLevelDataAsync(message.LevelId);
 
-                    listing = PlatformRacing3Server.MatchListingManager.TryCreateMatch(session, level, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
+                    listing = this.matchListingManager.TryCreateMatch(session, level, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
                 }
                 else
                 {
-                    listing = await PlatformRacing3Server.MatchListingManager.TryCreateMatchAsync(session, message.LevelId, message.Version, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
+                    listing = await this.matchListingManager.TryCreateMatchAsync(session, message.LevelId, message.Version, message.MinRank, message.MaxRank, message.MaxMembers, message.OnlyFriends, session.HostTournament ? MatchListingType.Tournament : MatchListingType.Normal);
                 }
 
                 if (listing == null)
