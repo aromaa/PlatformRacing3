@@ -29,15 +29,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
             //We haven't read the next packet length, wait for it
             if (this.CurrentPacketLength == 0 && !reader.TryReadUInt16(out this.CurrentPacketLength))
             {
-                reader.MarkPartial();
-
                 return;
             }
 
             if (reader.Remaining < this.CurrentPacketLength)
             {
-                reader.MarkPartial();
-
                 return;
             }
 

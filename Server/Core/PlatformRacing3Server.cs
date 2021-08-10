@@ -27,14 +27,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Net.Sockets.Listener;
-using Ninject;
 
 namespace Platform_Racing_3_Server.Core
 {
     internal sealed class PlatformRacing3Server : PlatformRacing3
     {
         public const uint PROTOCOL_VERSION = 24;
-        
+
+        private readonly IServiceProvider serviceProvider;
+
         private static Stopwatch StartTime { get; set; }
 
         public static ServerConfig ServerConfig { get; set; }
@@ -45,7 +46,6 @@ namespace Platform_Racing_3_Server.Core
         public static CampaignManager CampaignManager { get; private set; }
 
         public static BytePacketManager BytePacketManager { get; private set; }
-        public static PacketManager PacketManager { get; private set; }
         public static ClientManager ClientManager { get; private set; }
         public static IListener Listener { get; private set; }
 
@@ -54,9 +54,10 @@ namespace Platform_Racing_3_Server.Core
 
         public static Timer StatusTimer { get; private set; }
 
-        public PlatformRacing3Server(PacketManager packetManager, ChatRoomManager chatRoomManager)
+        public PlatformRacing3Server(IServiceProvider serviceProvider, ChatRoomManager chatRoomManager)
         {
-            PlatformRacing3Server.PacketManager = packetManager;
+            this.serviceProvider = serviceProvider;
+            
             PlatformRacing3Server.ChatRoomManager = chatRoomManager;
         }
 
@@ -76,7 +77,7 @@ namespace Platform_Racing_3_Server.Core
             PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();
             PlatformRacing3Server.CampaignManager.LoadPrizesAsync().Wait();
 
-            PlatformRacing3Server.BytePacketManager = new BytePacketManager(new StandardKernel());
+            PlatformRacing3Server.BytePacketManager = new BytePacketManager(this.serviceProvider);
             PlatformRacing3Server.ClientManager = new ClientManager();
             PlatformRacing3Server.Listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), socket =>
             {
