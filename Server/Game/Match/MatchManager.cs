@@ -9,17 +9,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
-    internal class MatchManager
+    internal sealed class MatchManager
     {
+        private readonly ILoggerFactory loggerFactory;
+
         internal ConcurrentDictionary<string, MultiplayerMatch> MultiplayerMatches;
 
         private volatile int NextMatchId;
 
-        internal MatchManager()
+        public MatchManager(ILoggerFactory loggerFactory)
         {
+            this.loggerFactory = loggerFactory;
+
             this.MultiplayerMatches = new ConcurrentDictionary<string, MultiplayerMatch>();
         }
 
@@ -27,7 +32,7 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal MultiplayerMatch CreateMultiplayerMatch(MatchListing matchListing)
         {
-            MultiplayerMatch match = new(matchListing.Type, matchListing.Type.GetMatchId(this.GetNextMatchId()), matchListing.LevelData);
+            MultiplayerMatch match = new(this.loggerFactory.CreateLogger<MultiplayerMatch>(), matchListing.Type, matchListing.Type.GetMatchId(this.GetNextMatchId()), matchListing.LevelData);
             if (this.MultiplayerMatches.TryAdd(match.Name, match))
             {
                 return match;

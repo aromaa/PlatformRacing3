@@ -2,20 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages
 {
-    internal class PacketManager
+    internal sealed class PacketManager
     {
         private Dictionary<string, IMessageIncomingJson> IncomingPacketsJSON;
 
-        internal PacketManager()
+        public PacketManager(ILoggerFactory loggerFactory)
         {
             this.IncomingPacketsJSON = new Dictionary<string, IMessageIncomingJson>()
             {
                 { "confirm_connection", new ConfirmConnectionIncomingMessage() },
-                { "token_login", new TokenLoginIncomingMessage() },
-                { "guest_login", new GuestLoginIncomingMessage() },
+                { "token_login", new TokenLoginIncomingMessage(loggerFactory.CreateLogger<TokenLoginIncomingMessage>()) },
+                { "guest_login", new GuestLoginIncomingMessage(loggerFactory.CreateLogger<GuestLoginIncomingMessage>()) },
                 { "ping", new LegacyPingIncomingMessage() },
                 { "mv", new ManageVarsIncomingMessage() },
                 { "set_account_settings", new SetAccountSettingsIncomingMessage() },

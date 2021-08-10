@@ -26,17 +26,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
-using log4net;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace Platform_Racing_3_Server.Game.Match
 {
-    internal class MultiplayerMatch
+    internal sealed class MultiplayerMatch
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private static readonly IReadOnlyList<Part> WINNABLE_PARTS = new Part[]
         {
             Part.Brain,
@@ -83,6 +81,8 @@ namespace Platform_Racing_3_Server.Game.Match
             Hat.Halo,
         };
 
+        private readonly ILogger<MultiplayerMatch> logger;
+
         internal MatchListingType Type { get; }
         internal string Name { get; }
 
@@ -107,8 +107,10 @@ namespace Platform_Racing_3_Server.Game.Match
 
         internal bool Broadcaster { get; set; }
 
-        internal MultiplayerMatch(MatchListingType type, string name, LevelData levelData)
+        internal MultiplayerMatch(ILogger<MultiplayerMatch> logger, MatchListingType type, string name, LevelData levelData)
         {
+            this.logger = logger;
+
             this.Type = type;
 
             this._Status = MultiplayerMatchStatus.PreparingForStart;
@@ -882,7 +884,7 @@ namespace Platform_Racing_3_Server.Game.Match
             }
             catch (Exception ex)
             {
-                MultiplayerMatch.Logger.Error(ex);
+                this.logger.LogError(EventIds.MatchServerDrawingFailed, ex, "Failed to draw the level on server");
 
                 this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"Server side drawing failed");
             }

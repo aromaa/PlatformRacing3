@@ -8,6 +8,7 @@
   
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Ninject" Version="3.3.4" />
   </ItemGroup>
 
@@ -21,9 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="log4net.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

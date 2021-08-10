@@ -4,16 +4,24 @@ using Platform_Racing_3_Server_API.Game.Commands;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Hosting;
 
 namespace Platform_Racing_3_Server.Game.Commands.Misc
 {
-    internal class ShutdownCommand : ICommand
+    internal sealed class ShutdownCommand : ICommand
     {
+        private readonly IHostApplicationLifetime applicationLifetime;
+
+        public ShutdownCommand(IHostApplicationLifetime applicationLifetime)
+        {
+            this.applicationLifetime = applicationLifetime;
+        }
+
         public string Permission => "command.shutdown.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
-            Program.Shutdown();
+            this.applicationLifetime.StopApplication();
         }
     }
 }

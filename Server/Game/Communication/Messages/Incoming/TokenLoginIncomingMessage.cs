@@ -1,5 +1,4 @@
-﻿using log4net;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Common.User;
@@ -13,12 +12,19 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Server.Utils;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class TokenLoginIncomingMessage : MessageIncomingJson<JsonTokenLoginIncomingMessage>
+    internal sealed class TokenLoginIncomingMessage : MessageIncomingJson<JsonTokenLoginIncomingMessage>
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ILogger<TokenLoginIncomingMessage> logger;
+
+        public TokenLoginIncomingMessage(ILogger<TokenLoginIncomingMessage> logger)
+        {
+            this.logger = logger;
+        }
 
         internal override void Handle(ClientSession session, JsonTokenLoginIncomingMessage message)
         {
@@ -56,7 +62,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                                             }
                                             else if (task__.IsFaulted)
                                             {
-                                                TokenLoginIncomingMessage.Logger.Error($"Failed to insert login", task.Exception);
+                                                this.logger.LogError(EventIds.TokenLoginFailed, task__.Exception, "Failed to insert login");
 
                                                 session.SendPacket(new LoginErrorOutgoingMessage("Critical error"));
                                             }
@@ -69,9 +75,9 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                                 }
                                 else if (task_.IsFaulted)
                                 {
-                                    session.SendPacket(new LoginErrorOutgoingMessage("Critical error while trying to load user data"));
+	                                this.logger.LogError(EventIds.TokenLoginFailed, task_.Exception, "Failed to load user data");
 
-                                    TokenLoginIncomingMessage.Logger.Error("Failed to load user data", task_.Exception);
+                                    session.SendPacket(new LoginErrorOutgoingMessage("Critical error while trying to load user data"));
                                 }
                                 else
                                 {
@@ -86,9 +92,10 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     }
                     else if (task.IsFaulted)
                     {
+	                    this.logger.LogError(EventIds.TokenLoginFailed, task.Exception, "Failed to retrieve login token");
+
                         session.SendPacket(new LoginErrorOutgoingMessage("Critical error while trying to retrieve login token information"));
 
-                        TokenLoginIncomingMessage.Logger.Error("Failed to retieve login token", task.Exception);
                     }
                     else
                     {

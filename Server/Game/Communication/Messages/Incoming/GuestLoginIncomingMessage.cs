@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Reflection;
-using System.Text;
-using log4net;
+using Microsoft.Extensions.Logging;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Common.User;
@@ -12,12 +11,18 @@ using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
+using Platform_Racing_3_Server.Utils;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class GuestLoginIncomingMessage : IMessageIncomingJson
+    internal sealed class GuestLoginIncomingMessage : IMessageIncomingJson
     {
-        private static readonly ILog Logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private readonly ILogger<GuestLoginIncomingMessage> logger;
+
+        public GuestLoginIncomingMessage(ILogger<GuestLoginIncomingMessage> logger)
+        {
+            this.logger = logger;
+        }
 
         public void Handle(ClientSession session, JsonPacket message)
         {
@@ -49,7 +54,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     }
                     else if (task.IsFaulted)
                     {
-                        GuestLoginIncomingMessage.Logger.Error($"Failed to insert login", task.Exception);
+                        this.logger.LogError(EventIds.GuestLoginFailed, task.Exception, "Failed to log login");
 
                         session.SendPacket(new LoginErrorOutgoingMessage("Critical error"));
                     }

@@ -67,7 +67,7 @@ namespace Discord_Bot.Commands
 
                 foreach (Part part in Enum.GetValues(typeof(Part)))
                 {
-                    if (part == Part.None || part.IsStaffOnly())
+                    if (part == Part.Undefined || part.IsStaffOnly())
                     {
                         continue;
                     }
