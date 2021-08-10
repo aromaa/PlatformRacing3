@@ -1,9 +1,10 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Platform_Racing_3_Common.Database;
+﻿using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -160,18 +161,10 @@ namespace Platform_Racing_3_Common.Campaign
                 DbDataReader reader = task.Result;
                 while (reader?.Read() ?? false)
                 {
-                    CampaignRun campaignRun;
-                    using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String((string)reader["recorded_run"])))
+	                CampaignRun campaignRun;
+                    using (Stream recordedRun = reader.GetStream("recorded_run"))
                     {
-                        using (InflaterInputStream inflater = new(compressedMemoryStream))
-                        {
-                            using (MemoryStream uncompressedMemoryStream = new())
-                            {
-                                inflater.CopyTo(uncompressedMemoryStream);
-
-                                campaignRun = JsonSerializer.Deserialize<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
-                            }
-                        }
+	                    campaignRun = CampaignRun.FromCompressed(recordedRun);
                     }
 
                     runs.Add((uint)(int)reader["user_id"], ((int)reader["finish_time"], campaignRun));

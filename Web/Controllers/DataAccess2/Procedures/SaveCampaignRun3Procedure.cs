@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Microsoft.AspNetCore.Http;
 using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.User;
@@ -32,19 +31,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                     string recordRun = (string)data.Element("p_recorded_run") ?? throw new DataAccessProcedureMissingData();
                     int finishTime = (int?)data.Element("p_finish_time") ?? throw new DataAccessProcedureMissingData();
 
-                    CampaignRun campaignRun = null;
-                    using (MemoryStream compressedMemoryStream = new(Convert.FromBase64String(recordRun)))
-                    {
-                        using (InflaterInputStream inflater = new(compressedMemoryStream))
-                        {
-                            using (MemoryStream uncompressedMemoryStream = new())
-                            {
-                                inflater.CopyTo(uncompressedMemoryStream);
-
-                                campaignRun = JsonSerializer.Deserialize<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
-                            }
-                        }
-                    }
+                    CampaignRun campaignRun = CampaignRun.FromCompressed(recordRun);
 
                     if (campaignRun != null)
                     {

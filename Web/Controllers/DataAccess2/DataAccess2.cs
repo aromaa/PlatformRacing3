@@ -7,6 +7,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -14,7 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
-using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
@@ -117,7 +117,10 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2
         {
             using (MemoryStream memoryStream = new(span[5..].ToArray()))
             {
-                using (InflaterInputStream val = new(memoryStream))
+	            //TODO: Read zlib header, .NET 6 has ZlibStream, switch to that and remove this workaround
+                memoryStream.Position = 2;
+
+                using (DeflateStream val = new(memoryStream, CompressionMode.Decompress))
                 {
                     using (MemoryStream memoryStream2 = new())
                     {
