@@ -14,12 +14,16 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
     internal sealed class JoinRoomIncomingMessage : MessageIncomingJson<JsonJoinRoomIncomingMessage>
     {
+        private readonly ChatRoomManager chatRoomManager;
+
         private readonly MatchListingManager matchListingManager;
         private readonly MatchManager matchManager;
 
-        public JoinRoomIncomingMessage(MatchListingManager matchListingManager, MatchManager matchManager)
+        public JoinRoomIncomingMessage(ChatRoomManager chatRoomManager, MatchListingManager matchListingManager, MatchManager matchManager)
         {
-	        this.matchListingManager = matchListingManager;
+            this.chatRoomManager = chatRoomManager;
+
+            this.matchListingManager = matchListingManager;
             this.matchManager = matchManager;
         }
 
@@ -34,7 +38,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
             {
                 case "chat":
                     {
-                        PlatformRacing3Server.ChatRoomManager.JoinOrCreate(session, message.RoomName, message.Pass, message.Note, out bool status, message.ChatId);
+                        this.chatRoomManager.JoinOrCreate(session, message.RoomName, message.Pass, message.Note, out bool status, message.ChatId);
                     }
                     break;
                 case "match_listing":

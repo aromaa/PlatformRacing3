@@ -7,15 +7,22 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.Misc
 {
-    internal class KickCommand : ICommand
+    internal sealed class KickCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public KickCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.kick.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
             if (args.Length >= 1)
             {
-                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[0]);
+                ClientSession target = this.clientManager.GetClientSessionByUsername(args[0]);
                 if (target != null)
                 {
                     if (target.PermissionRank > executor.PermissionRank)

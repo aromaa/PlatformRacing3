@@ -10,17 +10,22 @@ using Net.Buffers;
 using Net.Sockets.Pipeline.Handler;
 using Net.Sockets.Pipeline.Handler.Incoming;
 using Net.Sockets.Pipeline.Handler.Outgoing;
+using Platform_Racing_3_Server.Game.Communication.Managers;
 
 namespace Platform_Racing_3_Server.Game.Communication.Handlers
 {
     internal sealed class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
     {
+        private readonly BytePacketManager bytePacketManager;
+
         private ushort CurrentPacketLength;
 
         private ClientSession Session;
 
-        internal SplitPacketHandler(ClientSession session)
+        internal SplitPacketHandler(BytePacketManager bytePacketManager, ClientSession session)
         {
+            this.bytePacketManager = bytePacketManager;
+
             this.Session = session;
         }
 
@@ -48,7 +53,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Handlers
         {
             ushort header = reader.ReadUInt16();
 
-            PlatformRacing3Server.BytePacketManager.HandleIncomingData(header, this.Session, context, ref reader);
+            this.bytePacketManager.HandleIncomingData(header, this.Session, context, ref reader);
 
             if (reader.Remaining > 0)
             {

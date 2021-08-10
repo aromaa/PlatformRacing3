@@ -20,12 +20,14 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
     internal sealed class TokenLoginIncomingMessage : MessageIncomingJson<JsonTokenLoginIncomingMessage>
     {
         private readonly ServerManager serverManager;
+        private readonly ClientManager clientManager;
 
         private readonly ILogger<TokenLoginIncomingMessage> logger;
 
-        public TokenLoginIncomingMessage(ServerManager serverManager, ILogger<TokenLoginIncomingMessage> logger)
+        public TokenLoginIncomingMessage(ServerManager serverManager, ClientManager clientManager, ILogger<TokenLoginIncomingMessage> logger)
         {
             this.serverManager = serverManager;
+            this.clientManager = clientManager;
 
             this.logger = logger;
         }
@@ -56,7 +58,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                                                 session.SendPacket(new LoginSuccessOutgoingMessage(session.SocketId, result_.Id, result_.Username, result_.Permissions, result_.GetVars("*")));
                                                 session.SendPacket(new FriendsAndIgnoredOutgoingMessage(result_.Friends, result_.Ignored));
 
-                                                PlatformRacing3Server.ClientManager.Add(session);
+                                                this.clientManager.Add(session);
 
                                                 //Race condition
                                                 if (this.serverManager.TryGetServer(PlatformRacing3Server.ServerConfig.ServerId, out ServerDetails server))

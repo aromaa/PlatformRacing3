@@ -9,8 +9,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.User
 {
-    internal class GiveHatCommand : ICommand
+    internal sealed class GiveHatCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public GiveHatCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.givehat.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
@@ -36,7 +43,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                         bool.TryParse(args[2], out temp);
                     }
 
-                    if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                    if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                     {
                         session.UserData.GiveHat(hat, temp);
                     }

@@ -9,8 +9,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.Match
 {
-    internal class TeleportCommand : ICommand
+    internal sealed class TeleportCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public TeleportCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.teleport.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
@@ -39,7 +46,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
             MultiplayerMatchSession matchSession;
             if (args.Length >= 3)
             {
-                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[2]);
+                ClientSession target = this.clientManager.GetClientSessionByUsername(args[2]);
                 if (target == null)
                 {
                     executor.SendMessage("The target was not found");

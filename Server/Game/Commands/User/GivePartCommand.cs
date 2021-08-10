@@ -9,8 +9,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.User
 {
-    internal class GivePartCommand : ICommand
+    internal sealed class GivePartCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public GivePartCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.givepart.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
@@ -40,7 +47,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                     {
                         case "head":
                             {
-                                if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                                if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                                 {
                                     session.UserData.GiveHead(part, temp);
                                 }
@@ -52,7 +59,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                             break;
                         case "body":
                             {
-                                if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                                if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                                 {
                                     session.UserData.GiveBody(part, temp);
                                 }
@@ -64,7 +71,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                             break;
                         case "feet":
                             {
-                                if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                                if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                                 {
                                     session.UserData.GiveFeet(part, temp);
                                 }
@@ -76,7 +83,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                             break;
                         case "set":
                             {
-                                if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                                if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                                 {
                                     session.UserData.GiveSet(part, temp);
                                 }

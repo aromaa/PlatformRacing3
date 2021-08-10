@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Utils;
 
 namespace Platform_Racing_3_Server.Game.Commands
@@ -18,7 +19,7 @@ namespace Platform_Racing_3_Server.Game.Commands
 
         private Dictionary<string, ICommand> Commands;
 
-        public CommandManager(ILogger<CommandManager> logger, IHostApplicationLifetime applicationLifetime)
+        public CommandManager(ClientManager clientManager, ILogger<CommandManager> logger, IHostApplicationLifetime applicationLifetime)
         {
             this.logger = logger;
 
@@ -26,20 +27,20 @@ namespace Platform_Racing_3_Server.Game.Commands
             {
                 { "hello", new HelloCommand() },
                 { "shutdown", new ShutdownCommand(applicationLifetime) },
-                { "givepart", new GivePartCommand() },
-                { "givehat", new GiveHatCommand() },
-                { "broadcast", new BroadcastCommand() },
-                { "kick", new KickCommand() },
-                { "alert", new AlertCommand() },
+                { "givepart", new GivePartCommand(clientManager) },
+                { "givehat", new GiveHatCommand(clientManager) },
+                { "broadcast", new BroadcastCommand(clientManager) },
+                { "kick", new KickCommand(clientManager) },
+                { "alert", new AlertCommand(clientManager) },
                 { "addhat", new AddHatCommand() },
                 { "fakeprize", new FakePrizeCommand() },
                 { "spawnaliens", new SpawnAliensCommand() },
-                { "teleport", new TeleportCommand() },
+                { "teleport", new TeleportCommand(clientManager) },
                 { "tournament", new TournamentCommand() },
                 { "broadcaster", new BroadcasterCommand() },
-                { "givebonusexp", new GiveBonusExpCommand() },
-                { "life", new LifeCommand() },
-                { "item", new ItemCommand() }
+                { "givebonusexp", new GiveBonusExpCommand(clientManager) },
+                { "life", new LifeCommand(clientManager) },
+                { "item", new ItemCommand(clientManager) }
             };
         }
 

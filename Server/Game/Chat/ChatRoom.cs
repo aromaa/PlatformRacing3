@@ -24,6 +24,7 @@ namespace Platform_Racing_3_Server.Game.Chat
     {
         private const uint MAX_RECENT_MESSAGES = 25;
 
+        private readonly ChatRoomManager chatRoomManager;
         private readonly CommandManager commandManager;
 
         internal ChatRoomType Type { get; }
@@ -47,12 +48,13 @@ namespace Platform_Racing_3_Server.Game.Chat
 
         private ConcurrentQueue<ChatOutgoingMessage> RecentMessages;
 
-        internal ChatRoom(CommandManager commandManager, ChatRoomType type, string name, string pass, string note) : this(commandManager, type, 0, name, pass, note)
+        internal ChatRoom(ChatRoomManager chatRoomManager, CommandManager commandManager, ChatRoomType type, string name, string pass, string note) : this(chatRoomManager, commandManager, type, 0, name, pass, note)
         {
         }
 
-        internal ChatRoom(CommandManager commandManager, ChatRoomType type, uint creatorUserId, string name, string pass, string note)
+        internal ChatRoom(ChatRoomManager chatRoomManager, CommandManager commandManager, ChatRoomType type, uint creatorUserId, string name, string pass, string note)
         {
+            this.chatRoomManager = chatRoomManager;
             this.commandManager = commandManager;
 
             this.Clients = new ClientSessionCollection(removeCallback: this.Leave0);
@@ -116,7 +118,7 @@ namespace Platform_Racing_3_Server.Game.Chat
 
             if (this.Clients.Count <= 0)
             {
-                PlatformRacing3Server.ChatRoomManager.Die(this);
+                this.chatRoomManager.Die(this);
             }
         }
 

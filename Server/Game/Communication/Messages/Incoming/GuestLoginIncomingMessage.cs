@@ -18,12 +18,14 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
     internal sealed class GuestLoginIncomingMessage : IMessageIncomingJson
     {
         private readonly ServerManager serverManager;
+        private readonly ClientManager clientManager;
 
         private readonly ILogger<GuestLoginIncomingMessage> logger;
 
-        public GuestLoginIncomingMessage(ServerManager serverManager, ILogger<GuestLoginIncomingMessage> logger)
+        public GuestLoginIncomingMessage(ServerManager serverManager, ClientManager clientManager, ILogger<GuestLoginIncomingMessage> logger)
         {
             this.serverManager = serverManager;
+            this.clientManager = clientManager;
 
             this.logger = logger;
         }
@@ -49,7 +51,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                                 session.UserData.SetServer(server);
                             }
 
-                            PlatformRacing3Server.ClientManager.Add(session);
+                            this.clientManager.Add(session);
                         }
                         else
                         {

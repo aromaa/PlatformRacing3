@@ -27,8 +27,8 @@ namespace Platform_Racing_3_Server.Game.Chat
         internal ICollection<ChatRoom> Rooms => this.ChatRooms.Values;
 
         //Dont really like these methods tho I can't come up with better names and funcitonaly
-        internal bool TryCreate(ChatRoomType type, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this.commandManager, type, name, pass, note));
-        internal bool TryCreate(ChatRoomType type, uint creatorUserId, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this.commandManager, type, creatorUserId, name, pass, note));
+        internal bool TryCreate(ChatRoomType type, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this, this.commandManager, type, name, pass, note));
+        internal bool TryCreate(ChatRoomType type, uint creatorUserId, string name, string pass, string note, out ChatRoom room) => this.ChatRooms.TryAdd(name, room = new ChatRoom(this, this.commandManager, type, creatorUserId, name, pass, note));
 
         internal bool TryGet(string name, out ChatRoom chatRoom) => this.ChatRooms.TryGetValue(name, out chatRoom);
 
@@ -42,7 +42,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                 {
                     if (!session.IsGuest)
                     {
-                        chat = new ChatRoom(this.commandManager, ChatRoomType.UserCreated, session.UserData.Id, name, pass, note); //Create chat room with the user already listed in as member
+                        chat = new ChatRoom(this, this.commandManager, ChatRoomType.UserCreated, session.UserData.Id, name, pass, note); //Create chat room with the user already listed in as member
 
                         status = chat.Join(session, chatId); //Initial join on create should NEVER fail
 

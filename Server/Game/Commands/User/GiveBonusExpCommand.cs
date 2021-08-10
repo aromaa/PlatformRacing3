@@ -8,8 +8,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.User
 {
-    internal class GiveBonusExpCommand : ICommand
+    internal sealed class GiveBonusExpCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public GiveBonusExpCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.givebonusexp.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
@@ -26,7 +33,7 @@ namespace Platform_Racing_3_Server.Game.Commands.User
                         return;
                     }
                     
-                    if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
+                    if (this.clientManager.TryGetClientSessionByUserId(playerUserData.Id, out ClientSession session) && session.UserData != null)
                     {
                         session.UserData.GiveBonusExp(amount);
                     }

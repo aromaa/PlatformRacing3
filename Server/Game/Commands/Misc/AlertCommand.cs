@@ -8,15 +8,22 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.Misc
 {
-    internal class AlertCommand : ICommand
+    internal sealed class AlertCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public AlertCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.alert.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
         {
             if (args.Length >= 2)
             {
-                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[0]);
+                ClientSession target = this.clientManager.GetClientSessionByUsername(args[0]);
                 if (target != null)
                 {
                     target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args[1..].ToArray())));

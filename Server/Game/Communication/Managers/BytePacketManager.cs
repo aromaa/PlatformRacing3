@@ -15,7 +15,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Managers
 {
     internal sealed class BytePacketManager : PacketManager<uint>
     {
-        internal BytePacketManager(IServiceProvider serviceProvider) : base(serviceProvider)
+        public BytePacketManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {
 
         }

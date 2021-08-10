@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace Platform_Racing_3_Server.Host.Implementation
@@ -17,9 +18,9 @@ namespace Platform_Racing_3_Server.Host.Implementation
 			this.builder = builder;
 		}
 
-		public IServerHostBuilder ConfigureServices(Action<IServiceCollection> configureServices)
+		public IServerHostBuilder ConfigureServices(Action<IConfiguration, IServiceCollection> configureServices)
 		{
-			this.builder.ConfigureServices((context, services) => configureServices(services));
+			this.builder.ConfigureServices((context, services) => configureServices(context.Configuration, services));
 
 			return this;
 		}

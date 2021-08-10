@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Platform_Racing_3_Common.Server;
+using Platform_Racing_3_Server.Game.Chat;
+using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Lobby;
 using Platform_Racing_3_Server.Game.Match;
 
@@ -13,28 +15,28 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages
     {
         private Dictionary<string, IMessageIncomingJson> IncomingPacketsJSON;
 
-        public PacketManager(ServerManager serverManager, MatchListingManager matchListingManager, MatchManager matchManager, ILoggerFactory loggerFactory)
+        public PacketManager(ServerManager serverManager, ClientManager clientManager, ChatRoomManager chatRoomManager, MatchListingManager matchListingManager, MatchManager matchManager, ILoggerFactory loggerFactory)
         {
             this.IncomingPacketsJSON = new Dictionary<string, IMessageIncomingJson>()
             {
                 { "confirm_connection", new ConfirmConnectionIncomingMessage() },
-                { "token_login", new TokenLoginIncomingMessage(serverManager, loggerFactory.CreateLogger<TokenLoginIncomingMessage>()) },
-                { "guest_login", new GuestLoginIncomingMessage(serverManager, loggerFactory.CreateLogger<GuestLoginIncomingMessage>()) },
+                { "token_login", new TokenLoginIncomingMessage(serverManager, clientManager, loggerFactory.CreateLogger<TokenLoginIncomingMessage>()) },
+                { "guest_login", new GuestLoginIncomingMessage(serverManager, clientManager, loggerFactory.CreateLogger<GuestLoginIncomingMessage>()) },
                 { "ping", new LegacyPingIncomingMessage() },
                 { "mv", new ManageVarsIncomingMessage() },
                 { "set_account_settings", new SetAccountSettingsIncomingMessage() },
                 { "get_level_list", new GetLevelListIncomingMessage() },
-                { "jr", new JoinRoomIncomingMessage(matchListingManager, matchManager) },
+                { "jr", new JoinRoomIncomingMessage(chatRoomManager, matchListingManager, matchManager) },
                 { "get_lotd", new GetLevelOfTheDayIncomingMessage(matchListingManager) },
                 { "get_tournament", new GetTournamentIncomingMessage(matchListingManager, matchManager) },
                 { "request_matches", new RequestMatchesIncominggMessage(matchListingManager) },
-                { "gr", new GetRoomsIncomingMessage() },
-                { "lr", new LeaveRoomIncomingMessage(matchListingManager, matchManager) },
+                { "gr", new GetRoomsIncomingMessage(chatRoomManager) },
+                { "lr", new LeaveRoomIncomingMessage(chatRoomManager, matchListingManager, matchManager) },
                 { "leave_lobby", new LeaveLobbyIncomingMessage() },
-                { "get_member_list", new GetMemberListIncomingMessage() },
-                { "get_user_list", new GetUserListIncomingMessage() },
-                { "get_user_page", new GetUserPageIncomingMessage() },
-                { "sr", new SendToRoomIncomingMessage() },
+                { "get_member_list", new GetMemberListIncomingMessage(chatRoomManager) },
+                { "get_user_list", new GetUserListIncomingMessage(clientManager) },
+                { "get_user_page", new GetUserPageIncomingMessage(clientManager) },
+                { "sr", new SendToRoomIncomingMessage(chatRoomManager) },
                 { "create_match", new CreateMatchIncomingMessage(matchListingManager) },
                 { "force_start", new ForceStartIncomingMessage() },
                 { "finish_drawing", new FinishDrawingIncomingMessage() },

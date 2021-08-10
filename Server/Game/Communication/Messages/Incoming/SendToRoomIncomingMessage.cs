@@ -9,8 +9,15 @@ using Platform_Racing_3_Server.Game.Match;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class SendToRoomIncomingMessage : MessageIncomingJson<JsonSendToRoomIncomingMessage>
+    internal sealed class SendToRoomIncomingMessage : MessageIncomingJson<JsonSendToRoomIncomingMessage>
     {
+        private readonly ChatRoomManager chatRoomManager;
+
+        public SendToRoomIncomingMessage(ChatRoomManager chatRoomManager)
+        {
+            this.chatRoomManager = chatRoomManager;
+        }
+
         internal override void Handle(ClientSession session, JsonSendToRoomIncomingMessage message)
         {
             if (!session.IsLoggedIn)
@@ -24,7 +31,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
                     {
                         if (session.MultiplayerMatchSession?.Match.Name != message.RoomName)
                         {
-                            if (PlatformRacing3Server.ChatRoomManager.TryGet(message.RoomName, out ChatRoom chatRoom))
+                            if (this.chatRoomManager.TryGet(message.RoomName, out ChatRoom chatRoom))
                             {
                                 chatRoom.HandleData(session, message.Data, message.SendToSelf);
                             }

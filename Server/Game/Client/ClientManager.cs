@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace Platform_Racing_3_Server.Game.Client
 {
-    internal class ClientManager
+    internal sealed class ClientManager
     {
         private const uint TimeoutTime = 10;
 
@@ -17,7 +17,7 @@ namespace Platform_Racing_3_Server.Game.Client
 
         private Timer LastPingCheckTimer;
 
-        internal ClientManager()
+        public ClientManager()
         {
             this.ClientsBySocketId = new ClientSessionCollection(this.OnAdded, this.OnRemoved);
             this.ClientsByUserId = new ConcurrentDictionary<uint, ClientSession>();

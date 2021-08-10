@@ -9,8 +9,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Commands.Match
 {
-    internal class ItemCommand : ICommand
+    internal sealed class ItemCommand : ICommand
     {
+        private readonly ClientManager clientManager;
+
+        public ItemCommand(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         public string Permission => "command.item.use";
 
         public void OnCommand(ICommandExecutor executor, string label, ReadOnlySpan<string> args)
@@ -25,7 +32,7 @@ namespace Platform_Racing_3_Server.Game.Commands.Match
             MultiplayerMatchSession matchSession;
             if (args.Length >= 2)
             {
-                ClientSession target = PlatformRacing3Server.ClientManager.GetClientSessionByUsername(args[1]);
+                ClientSession target = this.clientManager.GetClientSessionByUsername(args[1]);
                 if (target == null)
                 {
                     executor.SendMessage("The target was not found");

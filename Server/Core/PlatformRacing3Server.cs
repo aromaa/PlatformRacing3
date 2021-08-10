@@ -27,6 +27,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Net.Sockets.Listener;
 using Platform_Racing_3_Common.Utils;
 
@@ -39,32 +40,31 @@ namespace Platform_Racing_3_Server.Core
         private static Stopwatch StartTime { get; set; }
 
         public static ServerConfig ServerConfig { get; set; }
-        public static ChatRoomManager ChatRoomManager { get; private set; }
-
-        public static CampaignManager CampaignManager { get; private set; }
-
-        public static BytePacketManager BytePacketManager { get; private set; }
-        public static ClientManager ClientManager { get; private set; }
-        public static IListener Listener { get; private set; }
-
+        
         public static DiscordWebhookClient DiscordChatWebhook { get; private set; }
         public static DiscordWebhookClient DiscordNotificationsWebhook { get; private set; }
-
-        public static Timer StatusTimer { get; private set; }
 
         private readonly IServiceProvider serviceProvider;
 
         private readonly ServerManager serverManager;
+        private readonly ClientManager clientManager;
 
-        public PlatformRacing3Server(ILoggerFactory loggerFactory, IServiceProvider serviceProvider, ServerManager serverManager, ChatRoomManager chatRoomManager)
+        private readonly CampaignManager campaignManager;
+
+        private IListener listener;
+
+        private Timer statusTimer;
+
+        public PlatformRacing3Server(ILoggerFactory loggerFactory, IServiceProvider serviceProvider, ServerManager serverManager, ClientManager clientManager, CampaignManager campaignManager)
         {
             LoggerUtil.LoggerFactory = loggerFactory;
 
             this.serviceProvider = serviceProvider;
 
             this.serverManager = serverManager;
-            
-            PlatformRacing3Server.ChatRoomManager = chatRoomManager;
+            this.clientManager = clientManager;
+
+            this.campaignManager = campaignManager;
         }
 
         internal async Task Init()
@@ -77,42 +77,43 @@ namespace Platform_Racing_3_Server.Core
             DatabaseConnection.Init(PlatformRacing3Server.ServerConfig);
 
             await this.serverManager.LoadServersAsync();
+            
+            await this.campaignManager.LoadCampaignTimesAsync();
+	        await this.campaignManager.LoadPrizesAsync();
 
-            PlatformRacing3Server.CampaignManager = new CampaignManager();
-            PlatformRacing3Server.CampaignManager.LoadCampaignTimesAsync().Wait();
-            PlatformRacing3Server.CampaignManager.LoadPrizesAsync().Wait();
+	        if (PlatformRacing3Server.ServerConfig.DiscordChatWebhookId != 0)
+	        {
+		        PlatformRacing3Server.DiscordChatWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordChatWebhookId, PlatformRacing3Server.ServerConfig.DiscordChatWebhookToken);
+	        }
 
-            PlatformRacing3Server.BytePacketManager = new BytePacketManager(this.serviceProvider);
-            PlatformRacing3Server.ClientManager = new ClientManager();
-            PlatformRacing3Server.Listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), socket =>
+	        if (PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId != 0)
+	        {
+		        PlatformRacing3Server.DiscordNotificationsWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId, PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookToken);
+	        }
+
+            BytePacketManager bytePacketManager = new(this.serviceProvider);
+
+            this.listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), socket =>
             {
-                socket.Pipeline.AddHandlerFirst(new SplitPacketHandler(new ClientSession(socket)));
+                socket.Pipeline.AddHandlerFirst(new SplitPacketHandler(bytePacketManager, new ClientSession(socket)));
                 socket.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
             }, this.serviceProvider);
 
-            if (PlatformRacing3Server.ServerConfig.DiscordChatWebhookId != 0)
-            {
-                PlatformRacing3Server.DiscordChatWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordChatWebhookId, PlatformRacing3Server.ServerConfig.DiscordChatWebhookToken);
-            }
-
-            if (PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId != 0)
-            {
-                PlatformRacing3Server.DiscordNotificationsWebhook = new DiscordWebhookClient(PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookId, PlatformRacing3Server.ServerConfig.DiscordNotificationsWebhookToken);
-            }
-
-            PlatformRacing3Server.StatusTimer = new Timer(this.UpdateStatus, null, 1000, 1000);
+            this.statusTimer = new Timer(this.UpdateStatus, null, 1000, 1000);
         }
 
         private void UpdateStatus(object state)
         {
             //Kinda look bulky but two of them is requrired
-            RedisConnection.GetDatabase().StringSetAsync($"server-status:{PlatformRacing3Server.ServerConfig.ServerId}", $"{PlatformRacing3Server.ClientManager.Count} online", TimeSpan.FromSeconds(3), When.Always, CommandFlags.FireAndForget);
-            RedisConnection.GetDatabase().PublishAsync("ServerStatusUpdated", $"{PlatformRacing3Server.ServerConfig.ServerId}\0{PlatformRacing3Server.ClientManager.Count} online");
+            RedisConnection.GetDatabase().StringSetAsync($"server-status:{PlatformRacing3Server.ServerConfig.ServerId}", $"{this.clientManager.Count} online", TimeSpan.FromSeconds(3), When.Always, CommandFlags.FireAndForget);
+            RedisConnection.GetDatabase().PublishAsync("ServerStatusUpdated", $"{PlatformRacing3Server.ServerConfig.ServerId}\0{this.clientManager.Count} online");
         }
 
         public void Shutdown()
         {
-            PlatformRacing3Server.Listener.Dispose();
+            this.listener.Dispose();
+
+            this.statusTimer.Dispose();
         }
         
         public static TimeSpan Uptime => PlatformRacing3Server.StartTime.Elapsed;

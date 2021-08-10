@@ -9,17 +9,24 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
 {
-    internal class GetUserPageIncomingMessage : MessageIncomingJson<JsonGetUserPageIncomingMessage>
+    internal sealed class GetUserPageIncomingMessage : MessageIncomingJson<JsonGetUserPageIncomingMessage>
     {
+        private readonly ClientManager clientManager;
+
+        public GetUserPageIncomingMessage(ClientManager clientManager)
+        {
+            this.clientManager = clientManager;
+        }
+
         internal override void Handle(ClientSession session, JsonGetUserPageIncomingMessage message)
         {
-            if (message.SocketId > 0 && PlatformRacing3Server.ClientManager.TryGetClientSessionBySocketId(message.SocketId, out ClientSession target))
+            if (message.SocketId > 0 && this.clientManager.TryGetClientSessionBySocketId(message.SocketId, out ClientSession target))
             {
                 this.SendUserPage(session, target.UserData, true);
             }
             else if (message.UserId > 0)
             {
-                if (PlatformRacing3Server.ClientManager.TryGetClientSessionByUserId(message.UserId, out target))
+                if (this.clientManager.TryGetClientSessionByUserId(message.UserId, out target))
                 {
                     this.SendUserPage(session, target.UserData, true);
                 }
