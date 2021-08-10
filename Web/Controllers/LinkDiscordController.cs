@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Web.Extensions;
 using System;
@@ -7,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Controllers
@@ -77,7 +78,7 @@ namespace Platform_Racing_3_Web.Controllers
 
                             using (HttpResponseMessage message = await httpClient.GetAsync(LinkDiscordController.DISCORD_API_ME))
                             {
-                                return JsonConvert.DeserializeObject<DiscordUserResponse>(await message.Content.ReadAsStringAsync());
+                                return JsonSerializer.Deserialize<DiscordUserResponse>(await message.Content.ReadAsStringAsync());
                             }
                         }
                     }
@@ -99,7 +100,7 @@ namespace Platform_Racing_3_Web.Controllers
                             {
                                 using (HttpResponseMessage message = await httpClient.PostAsync(LinkDiscordController.DISCORD_API_TOKEN, content))
                                 {
-                                    return JsonConvert.DeserializeObject<DiscordTokenResponse>(await message.Content.ReadAsStringAsync());
+                                    return JsonSerializer.Deserialize<DiscordTokenResponse>(await message.Content.ReadAsStringAsync());
                                 }
                             }
                         }
@@ -114,28 +115,28 @@ namespace Platform_Racing_3_Web.Controllers
 
         private class DiscordTokenResponse
         {
-            [JsonProperty("access_token")]
+            [JsonPropertyName("access_token")]
             public string AccessToken { get; set; }
 
-            [JsonProperty("token_type")]
+            [JsonPropertyName("token_type")]
             public string TokenType { get; set; }
 
-            [JsonProperty("error")]
+            [JsonPropertyName("error")]
             public string Error { get; set; }
 
-            [JsonProperty("error_description")]
+            [JsonPropertyName("error_description")]
             public string ErrorReason { get; set; }
         }
 
         private class DiscordUserResponse
         {
-            [JsonProperty("id")]
+            [JsonPropertyName("id")]
             public ulong Id { get; set; }
 
-            [JsonProperty("code")]
+            [JsonPropertyName("code")]
             public uint? Code { get; set; }
 
-            [JsonProperty("message")]
+            [JsonPropertyName("message")]
             public string Message { get; set; }
         }
     }

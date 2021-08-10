@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class VersionOutgoingMessage : JsonOutgoingMessage
+    internal class VersionOutgoingMessage : JsonOutgoingMessage<JsonVersionOutgoingMessage>
     {
         internal VersionOutgoingMessage(uint version) : base(new JsonVersionOutgoingMessage(version))
         {

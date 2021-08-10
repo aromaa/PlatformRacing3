@@ -1,71 +1,80 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json.Converters
 {
-    internal class JsonPacketConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType) => typeof(JsonPacket).IsAssignableFrom(objectType);
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            string packetType = null;
-
-            JObject item = JObject.Load(reader);
-            if (item.TryGetValue("type", out JToken type))
-            {
-                packetType = (string)type;
-            }
-            else if (item.TryGetValue("t", out JToken t))
-            {
-                packetType = (string)t;
-            }
-			
-            JsonPacket target = packetType switch //TODO: Umh...
+	internal sealed class JsonPacketConverter : JsonConverter<JsonPacket>
+	{
+		private static readonly Dictionary<string, Type> packets = new()
+		{
+			{ "ping", typeof(JsonLegacyPingIncomingMessage) },
+			{ "token_login", typeof(JsonTokenLoginIncomingMessage) },
+			{ "mv", typeof(JsonManageVarsIncomingMessage) },
+			{ "set_account_settings", typeof(JsonSetAccountSettingsMessage) },
+			{ "get_level_list", typeof(JsonGetLevelListIncomingMessage) },
+			{ "jr", typeof(JsonJoinRoomIncomingMessage) },
+			{ "lr", typeof(JsonLeaveRoomIncomingMessage) },
+			{ "get_member_list", typeof(JsonGetMemberListIncomingMessage) },
+			{ "get_user_list", typeof(JsonGetUserListIncomingMessage) },
+			{ "get_user_page", typeof(JsonGetUserPageIncomingMessage) },
+			{ "sr", typeof(JsonSendToRoomIncomingMessage) },
+			{ "create_match", typeof(JsonCreateMatchIncomingMessage) },
+			{ "request_matches", typeof(JsonRequestMatchesIncomingMessage) },
+			{ "lose_hat", typeof(JsonLoseHatIncomingMessage) },
+			{ "get_hat", typeof(JsonGetHatIncomingMessage) },
+			{ "coins", typeof(JsonCoinsIncomingMessage) },
+			{ "get_pms", typeof(JsonGetPmsIncomingMessage) },
+			{ "get_pm", typeof(JsonGetPmIncomingMessage) },
+			{ "delete_pms", typeof(JsonDeletePmsIncomingMessage) },
+			{ "send_pm", typeof(JsonSendPmIncomingMessage) },
+			{ "edit_user_list", typeof(JsonEditUserListIncomingMessage) },
+			{ "kick", typeof(JsonKickFromMatchListingIncomingMessage) },
+			{ "ban", typeof(JsonBanFromMatchListingIncomingMessage) },
+			{ "rate_level", typeof(JsonRateLevelIncomingMessage) },
+			{ "send_thing", typeof(JsonSendThingIncomingMessage) },
+			{ "thingExits", typeof(JsonThingExistsIncomingMessage) },
+			{ "accept_thing_transfer", typeof(JsonAcceptThingTransferIncomingMessage) },
+			{ "report_pm", typeof(JsonReportPmIncomingMessage) },
+			{ "koth", typeof(JsonKothIncomingMessage) },
+			{ "dash", typeof(JsonDashIncomingMessage) },
+			{ "win_hat", typeof(JsonWinHatIncomingMessage) }
+		};
+		
+		public override JsonPacket Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+		{
+			//Work on copy of the data so we can deserialize later on
+			Utf8JsonReader documentReader = reader;
+			if (!JsonDocument.TryParseValue(ref documentReader, out JsonDocument document))
 			{
-				"ping" => new JsonLegacyPingIncomingMessage(),
-				"login" => new JsonTokenLoginIncomingMessage(),
-				"token_login" => new JsonTokenLoginIncomingMessage(),
-				"mv" => new JsonManageVarsIncomingMessage(),
-				"set_account_settings" => new JsonSetAccountSettingsMessage(),
-				"get_level_list" => new JsonGetLevelListIncomingMessage(),
-				"jr" => new JsonJoinRoomIncomingMessage(),
-				"lr" => new JsonLeaveRoomIncomingMessage(),
-				"get_member_list" => new JsonGetMemberListIncomingMessage(),
-				"get_user_list" => new JsonGetUserListIncomingMessage(),
-				"get_user_page" => new JsonGetUserPageIncomingMessage(),
-				"sr" => new JsonSendToRoomIncomingMessage(),
-				"create_match" => new JsonCreateMatchIncomingMessage(),
-				"request_matches" => new JsonRequestMatchesIncomingMessage(),
-				"lose_hat" => new JsonLoseHatIncomingMessage(),
-				"get_hat" => new JsonGetHatIncomingMessage(),
-				"coins" => new JsonCoinsIncomingMessage(),
-				"get_pms" => new JsonGetPmsIncomingMessage(),
-				"get_pm" => new JsonGetPmIncomingMessage(),
-				"delete_pms" => new JsonDeletePmsIncomingMessage(),
-				"send_pm" => new JsonSendPmIncomingMessage(),
-				"edit_user_list" => new JsonEditUserListIncomingMessage(),
-				"kick" => new JsonKickFromMatchListingIncomingMessage(),
-				"ban" => new JsonBanFromMatchListingIncomingMessage(),
-				"rate_level" => new JsonRateLevelIncomingMessage(),
-				"send_thing" => new JsonSendThingIncomingMessage(),
-				"thingExits" => new JsonThingExistsIncomingMessage(),
-				"accept_thing_transfer" => new JsonAcceptThingTransferIncomingMessage(),
-				"report_pm" => new JsonReportPmIncomingMessage(),
-				"koth" => new JsonKothIncomingMessage(),
-				"dash" => new JsonDashIncomingMessage(),
-				"win_hat" => new JsonWinHatIncomingMessage(),
-				_ => new JsonPacket(),
-			};
+				throw new JsonException("Invalid document");
+			}
 
-			serializer.Populate(item.CreateReader(), target);
+			string type;
+			using(document)
+			{
+				if (!document.RootElement.TryGetProperty("t", out JsonElement typeProperty))
+				{
+					if (!document.RootElement.TryGetProperty("type", out typeProperty))
+					{
+						throw new JsonException("Failed to parse packet identifier");
+					}
+				}
 
-            return target;
-        }
+				type = typeProperty.GetString();
+			}
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) => throw new NotImplementedException();
-    }
+			if (!JsonPacketConverter.packets.TryGetValue(type, out Type packetType))
+			{
+				packetType = typeof(JsonPacketNoData);
+			}
+
+			return Unsafe.As<JsonPacket>(JsonSerializer.Deserialize(ref reader, packetType, options));
+		}
+
+		public override void Write(Utf8JsonWriter writer, JsonPacket value, JsonSerializerOptions options) => throw new NotImplementedException();
+	}
 }

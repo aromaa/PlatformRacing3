@@ -1,30 +1,20 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text.Json.Serialization;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonPacket
+    internal abstract class JsonPacket
     {
-        [JsonProperty("t")] //Use this as main as it uses less bandwith, thats pretty useaful on long run!
-        internal virtual string Type { get; private set; }
+        [JsonPropertyName("t")] //Only use the "t" property as the packet type indicator when serializing because we use less bandwidth
+        public virtual string Type { get; init; }
 
-        [JsonProperty("type")]
-        private string HackyTypeThanksJiggmin //This is needed as some packets use type instead of t, cool...
+        [JsonPropertyName("type")] //For whatever reason, the client uses the "type" property instead of the "t" in some cases to indicate which packet it is, only use this for deserializing
+        public string T
         {
-            set => this.Type = value;
+            init => this.Type = value;
         }
 
-        internal JsonPacket()
+        private protected JsonPacket()
         {
-
-        }
-
-        internal JsonPacket(string type)
-        {
-            this.Type = type;
         }
     }
 }

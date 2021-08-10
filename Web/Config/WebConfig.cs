@@ -1,47 +1,47 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Config;
+﻿using Platform_Racing_3_Common.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Web.Config
 {
     public class WebConfig : IDatabaseConfig, IRedisConfig, IEmailConfig
     {
-        [JsonProperty("database_host", Required = Required.Always)]
+        [JsonPropertyName("database_host")]
         public string DatabaseHost { get; set; }
-        [JsonProperty("database_port", Required = Required.Always)]
+        [JsonPropertyName("database_port")]
         public uint DatabasePort { get; set; }
 
-        [JsonProperty("database_user", Required = Required.Always)]
+        [JsonPropertyName("database_user")]
         public string DatabaseUser { get; set; }
-        [JsonProperty("database_pass", Required = Required.Always)]
+        [JsonPropertyName("database_pass")]
         public string DatabasePass { get; set; }
-        [JsonProperty("database_name", Required = Required.Always)]
+        [JsonPropertyName("database_name")]
         public string DatabaseName { get; set; }
 
-        [JsonProperty("redis_host", Required = Required.Always)]
+        [JsonPropertyName("redis_host")]
         public string RedisHost { get; set; }
-        [JsonProperty("redis_port", Required = Required.Always)]
+        [JsonPropertyName("redis_port")]
         public uint RedisPort { get; set; }
         
-        [JsonProperty("smtp_host", Required = Required.Always)]
+        [JsonPropertyName("smtp_host")]
         public string SmtpHost { get; set; }
-        [JsonProperty("smtp_port", Required = Required.Always)]
+        [JsonPropertyName("smtp_port")]
         public ushort SmtpPort { get; set; }
 
-        [JsonProperty("smtp_user", Required = Required.Always)]
+        [JsonPropertyName("smtp_user")]
         public string SmtpUser { get; set; }
-        [JsonProperty("smtp_pass", Required = Required.Always)]
+        [JsonPropertyName("smtp_pass")]
         public string SmtpPass { get; set; }
 
-        [JsonProperty("discord_client_id", Required = Required.Always)]
+        [JsonPropertyName("discord_client_id")]
         public string DiscordClientId { get; set; }
-        [JsonProperty("discord_client_secret", Required = Required.Always)]
+        [JsonPropertyName("discord_client_secret")]
         public string DiscordClientSecret { get; set; }
 
-        [JsonProperty("game_path", Required = Required.Always)]
+        [JsonPropertyName("game_path")]
         public string GamePath { get; set; }
     }
 }

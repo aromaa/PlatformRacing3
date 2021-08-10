@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -6,15 +6,15 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonFriendsAndIgnoredOutgoingMessage : JsonPacket
+    internal sealed class JsonFriendsAndIgnoredOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receiveFriendsAndIgnored";
+        public override string Type => "receiveFriendsAndIgnored";
 
-        [JsonProperty("friendArray")]
-        internal IReadOnlyCollection<uint> Friends { get; set; }
+        [JsonPropertyName("friendArray")]
+        public IReadOnlyCollection<uint> Friends { get; set; }
 
-        [JsonProperty("ignoredArray")]
-        internal IReadOnlyCollection<uint> Ignored { get; set; }
+        [JsonPropertyName("ignoredArray")]
+        public IReadOnlyCollection<uint> Ignored { get; set; }
 
         internal JsonFriendsAndIgnoredOutgoingMessage(IReadOnlyCollection<uint> friends, IReadOnlyCollection<uint> ignored)
         {

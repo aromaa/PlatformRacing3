@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class ThingExistsOutgoingMessage : JsonOutgoingMessage
+    internal class ThingExistsOutgoingMessage : JsonOutgoingMessage<JsonThingExistsOutgoingMessage>
     {
         internal ThingExistsOutgoingMessage(bool exists) : base(new JsonThingExistsOutgoingMessage(exists))
         {

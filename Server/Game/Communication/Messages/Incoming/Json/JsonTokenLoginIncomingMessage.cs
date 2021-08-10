@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonTokenLoginIncomingMessage : JsonPacket
+    internal sealed class JsonTokenLoginIncomingMessage : JsonPacket
     {
-        [JsonProperty("login_token", Required = Required.Always)]
-        internal string LoginToken { get; set; }
+        [JsonPropertyName("login_token")]
+        public string LoginToken { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class LoginErrorOutgoingMessage : JsonOutgoingMessage
+    internal class LoginErrorOutgoingMessage : JsonOutgoingMessage<JsonLoginErrorOutgoingMessage>
     {
         internal LoginErrorOutgoingMessage(string error) : base(new JsonLoginErrorOutgoingMessage(error))
         {

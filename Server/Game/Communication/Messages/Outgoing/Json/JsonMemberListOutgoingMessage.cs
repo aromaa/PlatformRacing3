@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Client;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
@@ -7,12 +7,12 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonMemberListOutgoingMessage : JsonPacket
+    internal sealed class JsonMemberListOutgoingMessage : JsonPacket
     {
-        internal override string Type => "memberList";
+        public override string Type => "memberList";
 
-        [JsonProperty("list")]
-        internal IReadOnlyCollection<IReadOnlyDictionary<string, object>> Members { get; set; }
+        [JsonPropertyName("list")]
+        public IReadOnlyCollection<IReadOnlyDictionary<string, object>> Members { get; set; }
 
         internal JsonMemberListOutgoingMessage(ICollection<ClientSession> members)
         {

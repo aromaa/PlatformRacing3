@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonLegacyPingIncomingMessage : JsonPacket
+    internal sealed class JsonLegacyPingIncomingMessage : JsonPacket
     {
-        [JsonProperty("time", Required = Required.Always)]
+        [JsonPropertyName("time")]
         public ulong Time { get; set; }
     }
 }

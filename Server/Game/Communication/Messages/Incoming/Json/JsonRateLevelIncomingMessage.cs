@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonRateLevelIncomingMessage : JsonPacket
+    internal sealed class JsonRateLevelIncomingMessage : JsonPacket
     {
-        [JsonProperty("level_id")]
-        internal uint LevelId { get; set; }
+        [JsonPropertyName("level_id")]
+        public uint LevelId { get; set; }
 
-        [JsonProperty("rating")]
-        internal int Rating { get; set; }
+        [JsonPropertyName("rating")]
+        public int Rating { get; set; }
     }
 }

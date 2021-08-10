@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonWinHatIncomingMessage : JsonPacket
+    internal sealed class JsonWinHatIncomingMessage : JsonPacket
     {
-        [JsonProperty("season")]
-        internal string Season { get; set; }
+        [JsonPropertyName("season")]
+        public string Season { get; set; }
 
-        [JsonProperty("medals", Required = Required.Always)]
-        internal uint Medals { get; set; }
+        [JsonPropertyName("medals")]
+        public uint Medals { get; set; }
     }
 }

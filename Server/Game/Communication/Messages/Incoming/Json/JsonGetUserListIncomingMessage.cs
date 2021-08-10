@@ -1,22 +1,22 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonGetUserListIncomingMessage : JsonPacket
+    internal sealed class JsonGetUserListIncomingMessage : JsonPacket
     {
-        [JsonProperty("list_type", Required = Required.Always)]
-        internal string ListType { get; set; }
+        [JsonPropertyName("list_type")]
+        public string ListType { get; set; }
 
-        [JsonProperty("request_id", Required = Required.Always)]
-        internal uint RequestId { get; set; }
+        [JsonPropertyName("request_id")]
+        public uint RequestId { get; set; }
 
-        [JsonProperty("start", Required = Required.Always)]
-        internal uint Start { get; set; }
+        [JsonPropertyName("start")]
+        public uint Start { get; set; }
 
-        [JsonProperty("Count", Required = Required.Always)]
-        internal uint Count { get; set; }
+        [JsonPropertyName("count")]
+        public uint Count { get; set; }
     }
 }

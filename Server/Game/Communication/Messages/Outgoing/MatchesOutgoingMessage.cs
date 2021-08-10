@@ -7,7 +7,7 @@ using Platform_Racing_3_Server.Game.Lobby;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class MatchesOutgoingMessage : JsonOutgoingMessage
+    internal class MatchesOutgoingMessage : JsonOutgoingMessage<JsonMatchesOutgoingMessage>
     {
         internal MatchesOutgoingMessage(uint lobbyId, IReadOnlyCollection<MatchListing> matchListings) : base(new JsonMatchesOutgoingMessage(lobbyId, matchListings))
         {

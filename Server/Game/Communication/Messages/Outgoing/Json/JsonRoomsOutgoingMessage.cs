@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Utils;
 using Platform_Racing_3_Server.Game.Chat;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
@@ -8,12 +8,12 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonRoomsOutgoingMessage : JsonPacket
+    internal sealed class JsonRoomsOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receiveRooms";
+        public override string Type => "receiveRooms";
 
-        [JsonProperty("roomList")]
-        internal IReadOnlyCollection<IReadOnlyDictionary<string, object>> Rooms { get; set; }
+        [JsonPropertyName("roomList")]
+        public IReadOnlyCollection<IReadOnlyDictionary<string, object>> Rooms { get; set; }
 
         internal JsonRoomsOutgoingMessage(ICollection<ChatRoom> chatRooms)
         {

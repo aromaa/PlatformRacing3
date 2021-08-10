@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonMatchFailedOutgoingMessage : JsonPacket
+    internal sealed class JsonMatchFailedOutgoingMessage : JsonPacket
     {
-        internal override string Type => "matchFailed";
+        public override string Type => "matchFailed";
     }
 }

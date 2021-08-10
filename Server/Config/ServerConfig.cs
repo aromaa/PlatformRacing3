@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Config;
 using Platform_Racing_3_Common.Redis;
 using System;
@@ -9,39 +9,39 @@ namespace Platform_Racing_3_Server.Config
 {
     internal class ServerConfig : IDatabaseConfig, IRedisConfig
     {
-        [JsonProperty("server_id", Required = Required.Always)]
-        internal uint ServerId { get; set; }
+        [JsonPropertyName("server_id")]
+        public uint ServerId { get; set; }
 
-        [JsonProperty("discord_chat_webhook_id")]
-        internal ulong DiscordChatWebhookId { get; set; }
-        [JsonProperty("discord_chat_webhook_token")]
-        internal string DiscordChatWebhookToken { get; set; }
+        [JsonPropertyName("discord_chat_webhook_id")]
+        public ulong DiscordChatWebhookId { get; set; }
+        [JsonPropertyName("discord_chat_webhook_token")]
+        public string DiscordChatWebhookToken { get; set; }
 
-        [JsonProperty("discord_notifications_webhook_id")]
-        internal ulong DiscordNotificationsWebhookId { get; set; }
-        [JsonProperty("discord_notifications_webhook_token")]
-        internal string DiscordNotificationsWebhookToken { get; set; }
+        [JsonPropertyName("discord_notifications_webhook_id")]
+        public ulong DiscordNotificationsWebhookId { get; set; }
+        [JsonPropertyName("discord_notifications_webhook_token")]
+        public string DiscordNotificationsWebhookToken { get; set; }
 
-        [JsonProperty("database_host", Required = Required.Always)]
+        [JsonPropertyName("database_host")]
         public string DatabaseHost { get; set; }
-        [JsonProperty("database_port", Required = Required.Always)]
+        [JsonPropertyName("database_port")]
         public uint DatabasePort { get; set; }
 
-        [JsonProperty("database_user", Required = Required.Always)]
+        [JsonPropertyName("database_user")]
         public string DatabaseUser { get; set; }
-        [JsonProperty("database_pass", Required = Required.Always)]
+        [JsonPropertyName("database_pass")]
         public string DatabasePass { get; set; }
-        [JsonProperty("database_name", Required = Required.Always)]
+        [JsonPropertyName("database_name")]
         public string DatabaseName { get; set; }
 
-        [JsonProperty("redis_host", Required = Required.Always)]
+        [JsonPropertyName("redis_host")]
         public string RedisHost { get; set; }
-        [JsonProperty("redis_port", Required = Required.Always)]
+        [JsonPropertyName("redis_port")]
         public uint RedisPort { get; set; }
 
-        [JsonProperty("bind_ip", Required = Required.Always)]
-        internal string BindIp { get; set; }
-        [JsonProperty("bind_port", Required = Required.Always)]
-        internal ushort BindPort { get; set; }
+        [JsonPropertyName("bind_ip")]
+        public string BindIp { get; set; }
+        [JsonPropertyName("bind_port")]
+        public ushort BindPort { get; set; }
     }
 }

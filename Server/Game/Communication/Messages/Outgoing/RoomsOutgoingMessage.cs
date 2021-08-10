@@ -7,7 +7,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class RoomsOutgoingMessage : JsonOutgoingMessage
+    internal class RoomsOutgoingMessage : JsonOutgoingMessage<JsonRoomsOutgoingMessage>
     {
         internal RoomsOutgoingMessage() : base(new JsonRoomsOutgoingMessage(PlatformRacing3Server.ChatRoomManager.Rooms))
         {

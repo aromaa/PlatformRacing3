@@ -1,23 +1,23 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms
 {
-    internal class JsonExplodeBlockMessage : JsonMessageOutgoingMessage
+    internal sealed class JsonExplodeBlockMessage : JsonMessageOutgoingMessage
     {
         internal JsonExplodeBlockMessage(string roomName, int tileY, int tileX) : base(roomName, new RoomMessageData("explodeBlock", new ExplodeBlockData(tileY, tileX)))
         {
         }
 
-        private class ExplodeBlockData
+        private sealed class ExplodeBlockData
         {
-            [JsonProperty("tileY")]
-            internal int TileY { get; set; }
+            [JsonPropertyName("tileY")]
+            public int TileY { get; set; }
 
-            [JsonProperty("tileX")]
-            internal int TileX { get; set; }
+            [JsonPropertyName("tileX")]
+            public int TileX { get; set; }
 
             internal ExplodeBlockData(int tileY, int tileX)
             {

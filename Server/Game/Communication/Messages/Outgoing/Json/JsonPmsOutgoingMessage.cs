@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.PrivateMessage;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
@@ -7,18 +7,18 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonPmsOutgoingMessage : JsonPacket
+    internal sealed class JsonPmsOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receivePMs";
+        public override string Type => "receivePMs";
 
-        [JsonProperty("requestID")]
-        internal uint RequestId { get; set; }
+        [JsonPropertyName("requestID")]
+        public uint RequestId { get; set; }
 
-        [JsonProperty("results")]
-        internal uint Results { get; set; }
+        [JsonPropertyName("results")]
+        public uint Results { get; set; }
 
-        [JsonProperty("pmArray")]
-        internal IReadOnlyCollection<IPrivateMessage> PMs { get; set; }
+        [JsonPropertyName("pmArray")]
+        public IReadOnlyCollection<IPrivateMessage> PMs { get; set; }
 
         internal JsonPmsOutgoingMessage(uint requestId, uint results, IReadOnlyCollection<IPrivateMessage> pms)
         {

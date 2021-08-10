@@ -7,7 +7,7 @@ using Platform_Racing_3_Server.Game.Lobby;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class QuickJoinSuccessOutgoingMessage : JsonOutgoingMessage
+    internal class QuickJoinSuccessOutgoingMessage : JsonOutgoingMessage<JsonQuickJoinSuccessOutgoingMessage>
     {
         internal QuickJoinSuccessOutgoingMessage(MatchListing matchListing) : base(new JsonQuickJoinSuccessOutgoingMessage(matchListing))
         {

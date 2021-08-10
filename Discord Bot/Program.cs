@@ -8,9 +8,11 @@ using Discord_Bot.Core;
 using Newtonsoft.Json;
 using System.IO;
 using Discord_Bot.Config;
+using Microsoft.Extensions.Logging.Abstractions;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.Campaign;
+using Platform_Racing_3_Common.Utils;
 
 namespace Discord_Bot
 {
@@ -18,6 +20,8 @@ namespace Discord_Bot
     {
         private static async Task Main(string[] args)
         {
+            LoggerUtil.LoggerFactory = NullLoggerFactory.Instance;
+
             DiscordBotConfig config = JsonConvert.DeserializeObject<DiscordBotConfig>(File.ReadAllText("settings.json"));
 
             DatabaseConnection.Init(config);

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class ForceMatchOutgoingMessage : JsonOutgoingMessage
+    internal class ForceMatchOutgoingMessage : JsonOutgoingMessage<JsonForceMatchOutgoingMessage>
     {
         internal ForceMatchOutgoingMessage(MatchListing listing) : base(new JsonForceMatchOutgoingMessage(listing))
         {

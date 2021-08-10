@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Customization;
 using Platform_Racing_3_Common.Utils;
@@ -22,11 +22,11 @@ namespace Platform_Racing_3_Server.Game.Match
         internal uint SocketId { get; }
         internal IPAddress IPAddress { get; }
 
-        [JsonProperty("speed")]
+        [JsonPropertyName("speed")]
         internal int _Speed;
-        [JsonProperty("accel")]
+        [JsonPropertyName("accel")]
         internal int _Accel;
-        [JsonProperty("jump")]
+        [JsonPropertyName("jump")]
         internal int _Jump;
 
         private Queue<MatchPlayerHat> _Hats { get; }

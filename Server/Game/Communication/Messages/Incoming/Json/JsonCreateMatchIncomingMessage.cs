@@ -1,28 +1,28 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonCreateMatchIncomingMessage : JsonPacket
+    internal sealed class JsonCreateMatchIncomingMessage : JsonPacket
     {
-        [JsonProperty("level_id", Required = Required.Always)]
+        [JsonPropertyName("level_id")]
         public uint LevelId { get; set; }
 
-        [JsonProperty("version", Required = Required.Always)]
+        [JsonPropertyName("version")]
         public uint Version { get; set; }
 
-        [JsonProperty("min_rank", Required = Required.Always)]
+        [JsonPropertyName("min_rank")]
         public uint MinRank { get; set; }
 
-        [JsonProperty("max_rank", Required = Required.Always)]
+        [JsonPropertyName("max_rank")]
         public uint MaxRank { get; set; }
 
-        [JsonProperty("max_members", Required = Required.Always)]
+        [JsonPropertyName("max_members")]
         public uint MaxMembers { get; set; }
 
-        [JsonProperty("only_friends", Required = Required.Always)]
+        [JsonPropertyName("only_friends")]
         public bool OnlyFriends { get; set; }
     }
 }

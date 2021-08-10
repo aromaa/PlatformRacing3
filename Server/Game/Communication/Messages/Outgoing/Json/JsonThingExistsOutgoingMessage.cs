@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonThingExistsOutgoingMessage : JsonPacket
+    internal sealed class JsonThingExistsOutgoingMessage : JsonPacket
     {
-        internal override string Type => "thingExits";
+        public override string Type => "thingExits";
 
-        [JsonProperty("exits")]
-        internal bool Exists { get; set; }
+        [JsonPropertyName("exits")]
+        public bool Exists { get; set; }
 
         internal JsonThingExistsOutgoingMessage(bool exists)
         {

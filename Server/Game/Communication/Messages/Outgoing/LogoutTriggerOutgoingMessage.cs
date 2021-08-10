@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class LogoutTriggerOutgoingMessage : JsonOutgoingMessage
+    internal class LogoutTriggerOutgoingMessage : JsonOutgoingMessage<JsonLogoutTriggerOutgoingMessage>
     {
         internal LogoutTriggerOutgoingMessage(string message) : base(new JsonLogoutTriggerOutgoingMessage(message))
         {

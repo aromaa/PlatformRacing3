@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonKickFromMatchListingIncomingMessage : JsonPacket
+    internal sealed class JsonKickFromMatchListingIncomingMessage : JsonPacket
     {
-        [JsonProperty("socket_id", Required = Required.Always)]
-        internal uint SocketId { get; set; }
+        [JsonPropertyName("socket_id")]
+        public uint SocketId { get; set; }
     }
 }

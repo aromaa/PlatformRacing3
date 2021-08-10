@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class ForfietOutgoingMessage : JsonOutgoingMessage
+    internal class ForfietOutgoingMessage : JsonOutgoingMessage<JsonForfietOutgoingMessage>
     {
         internal ForfietOutgoingMessage(uint socketId) : base(new JsonForfietOutgoingMessage(socketId))
         {

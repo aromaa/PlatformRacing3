@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class TournamnetStatusOutgoingMessage : JsonOutgoingMessage
+    internal class TournamnetStatusOutgoingMessage : JsonOutgoingMessage<JsonTournamentStatusOutgoingMessage>
     {
         internal TournamnetStatusOutgoingMessage(byte status) : base(new JsonTournamentStatusOutgoingMessage(status))
         {

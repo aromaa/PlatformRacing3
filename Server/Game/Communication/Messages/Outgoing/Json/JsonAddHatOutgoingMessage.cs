@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Customization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Match;
@@ -9,26 +9,26 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonAddHatOutgoingMessage : JsonPacket
+    internal sealed class JsonAddHatOutgoingMessage : JsonPacket
     {
-        internal override string Type => "addHat";
+        public override string Type => "addHat";
 
-        [JsonProperty("id")]
-        internal uint Id { get; set; }
-        [JsonProperty("num")]
-        internal Hat Hat { get; set; }
-        [JsonProperty("color")]
-        internal uint Color { get; set; }
+        [JsonPropertyName("id")]
+        public uint Id { get; set; }
+        [JsonPropertyName("num")]
+        public Hat Hat { get; set; }
+        [JsonPropertyName("color")]
+        public Color Color { get; set; }
 
-        [JsonProperty("x")]
-        internal double X { get; set; }
-        [JsonProperty("y")]
-        internal double Y { get; set; }
+        [JsonPropertyName("x")]
+        public double X { get; set; }
+        [JsonPropertyName("y")]
+        public double Y { get; set; }
 
-        [JsonProperty("velX")]
-        internal float VelX { get; set; }
-        [JsonProperty("velY")]
-        internal float VelY { get; set; }
+        [JsonPropertyName("velX")]
+        public float VelX { get; set; }
+        [JsonPropertyName("velY")]
+        public float VelY { get; set; }
 
         internal JsonAddHatOutgoingMessage(MatchPlayerHat hat, double x, double y, float velX, float velY)
         {

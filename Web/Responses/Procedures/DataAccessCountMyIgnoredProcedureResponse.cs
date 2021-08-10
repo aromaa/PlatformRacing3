@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static Platform_Racing_3_Web.Responses.Procedures.DataAccessCountMyIgnoredProcedureResponse;
@@ -27,8 +27,8 @@ namespace Platform_Racing_3_Web.Responses.Procedures
 
         public class CountMyIgnoredResponse
         {
-            [JsonProperty("ignored_count")]
-            internal uint IgnoredCount { get; set; }
+            [JsonPropertyName("ignored_count")]
+            public uint IgnoredCount { get; set; }
 
             private CountMyIgnoredResponse()
             {

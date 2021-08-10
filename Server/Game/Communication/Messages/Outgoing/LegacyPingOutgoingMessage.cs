@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class LegacyPingOutgoingMessage : JsonOutgoingMessage
+    internal class LegacyPingOutgoingMessage : JsonOutgoingMessage<JsonLegacyPingOutgoingMessage>
     {
         internal LegacyPingOutgoingMessage(ulong time, ulong serverTime) : base(new JsonLegacyPingOutgoingMessage(time, serverTime))
         {

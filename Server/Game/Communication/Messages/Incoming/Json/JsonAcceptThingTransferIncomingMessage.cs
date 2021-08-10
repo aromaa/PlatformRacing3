@@ -1,25 +1,25 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonAcceptThingTransferIncomingMessage : JsonPacket
+    internal sealed class JsonAcceptThingTransferIncomingMessage : JsonPacket
     {
-        [JsonProperty("transfer_id", Required = Required.Always)]
-        internal uint TransferId { get; set; }
+        [JsonPropertyName("transfer_id")]
+        public uint TransferId { get; set; }
 
-        [JsonProperty("title", Required = Required.Always)]
-        internal string Title { get; set; }
+        [JsonPropertyName("title")]
+        public string Title { get; set; }
 
-        [JsonProperty("comment", Required = Required.Always)]
-        internal string Description { get; set; }
+        [JsonPropertyName("comment")]
+        public string Description { get; set; }
 
-        [JsonProperty("category")]
-        internal string Category { get; set; }
+        [JsonPropertyName("category")]
+        public string Category { get; set; }
 
-        [JsonProperty("publish", Required = Required.Always)]
-        internal bool Publish { get; set; }
+        [JsonPropertyName("publish")]
+        public bool Publish { get; set; }
     }
 }

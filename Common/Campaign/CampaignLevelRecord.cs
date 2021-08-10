@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Platform_Racing_3_Common.Campaign
 {
     public struct CampaignLevelRecord
     {
-        [JsonProperty("timeMS")]
+        [JsonPropertyName("timeMS")]
         public int Time { get; }
 
-        [JsonProperty("season")]
+        [JsonPropertyName("season")]
         public string Season { get; }
 
-        [JsonProperty("medal")]
+        [JsonPropertyName("medal")]
         public CampaignMedal Medal { get; }
 
         public CampaignLevelRecord(int time, string season, CampaignMedal medal)

@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Campaign;
+﻿using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Common.Customization;
 using System;

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Utils;
 using Platform_Racing_3_Server.Collections;
@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Server.Game.Commands;
 using StackExchange.Redis;
@@ -29,20 +30,20 @@ namespace Platform_Racing_3_Server.Game.Chat
         internal ChatRoomType Type { get; }
 
         internal uint CreatorUserId { get; }
-        [JsonProperty("creator")]
+        [JsonPropertyName("creator")]
         internal string CreatorUsername => this.CreatorUserId == 0 ? null : UserManager.TryGetUserDataByIdAsync(this.CreatorUserId).Result?.Username ?? "Unknown";
 
-        [JsonProperty("roomName")]
+        [JsonPropertyName("roomName")]
         internal string Name { get; }
 
         internal string Pass { get; set; }
-        [JsonProperty("note")]
+        [JsonPropertyName("note")]
         internal string Note { get; set; }
 
         private ClientSessionCollection Clients;
         private ConcurrentBag<IUserIdentifier> BannedClients;
 
-        [JsonProperty("members")]
+        [JsonPropertyName("members")]
         internal int MembersCount => this.Clients.Count;
 
         private ConcurrentQueue<ChatOutgoingMessage> RecentMessages;
@@ -130,7 +131,7 @@ namespace Platform_Racing_3_Server.Game.Chat
                         {
                             if (!session.IsGuest)
                             {
-                                this.SendChatMessage(session, (string)data.Data["message"], sendToSelf);
+                                this.SendChatMessage(session, data.Data.GetProperty("message").GetString(), sendToSelf);
                             }
                         }
                         break;

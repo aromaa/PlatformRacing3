@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -6,12 +6,12 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonEventsOutgoingMessage : JsonPacket
+    internal sealed class JsonEventsOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receiveEvents";
+        public override string Type => "receiveEvents";
 
-        [JsonProperty("events")]
-        internal IReadOnlyCollection<string> Events { get; set; }
+        [JsonPropertyName("events")]
+        public IReadOnlyCollection<string> Events { get; set; }
 
         internal JsonEventsOutgoingMessage(IReadOnlyCollection<string> events)
         {

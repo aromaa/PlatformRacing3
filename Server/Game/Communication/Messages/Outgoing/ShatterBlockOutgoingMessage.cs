@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class ShatterBlockOutgoingMessage : JsonOutgoingMessage
+    internal class ShatterBlockOutgoingMessage : JsonOutgoingMessage<JsonShatterBlockMessage>
     {
         internal ShatterBlockOutgoingMessage(string roomName, int tileY, int tileX) : base(new JsonShatterBlockMessage(roomName, tileY, tileX))
         {

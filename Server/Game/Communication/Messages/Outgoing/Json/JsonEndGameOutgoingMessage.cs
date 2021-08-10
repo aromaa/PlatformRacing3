@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonEndGameOutgoingMessage : JsonPacket
+    internal sealed class JsonEndGameOutgoingMessage : JsonPacket
     {
-        internal override string Type => "endGame";
+        public override string Type => "endGame";
     }
 }

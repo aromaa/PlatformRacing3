@@ -7,7 +7,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class MemberListOutgoingMessage : JsonOutgoingMessage
+    internal class MemberListOutgoingMessage : JsonOutgoingMessage<JsonMemberListOutgoingMessage>
     {
         internal MemberListOutgoingMessage(ICollection<ClientSession> members) : base(new JsonMemberListOutgoingMessage(members))
         {

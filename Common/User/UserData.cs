@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Campaign;
+﻿using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Server;
 using Platform_Racing_3_Common.Customization;
 using Platform_Racing_3_Common.Utils;
@@ -12,94 +11,103 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace Platform_Racing_3_Common.User
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public abstract class UserData : IXmlSerializable
     {
         public const uint DEFAULT_STATS_COUNT = 150;
         public const uint STATS_MIN = 0;
         public const uint STATS_MAX = 100;
 
-        [JsonProperty("guest")]
+        [JsonPropertyName("guest")]
         public abstract bool IsGuest { get; }
 
-        [JsonProperty("userID")]
+        [JsonPropertyName("userID")]
         public abstract uint Id { get; }
-        [JsonProperty("userName")]
+        [JsonPropertyName("userName")]
         public abstract string Username { get; protected set; }
 
-        [JsonProperty("nameColor")]
+        [JsonPropertyName("nameColor")]
         public abstract Color NameColor { get; protected set; }
-        [JsonProperty("group")]
+        [JsonPropertyName("group")]
         public abstract string Group { get; protected set; }
 
-        [JsonProperty("status")]
+        [JsonPropertyName("status")]
         public abstract string Status { get; protected set; }
 
+        [JsonIgnore]
         public abstract DateTimeOffset? LastLogin { get; protected set; }
+        [JsonIgnore]
         public abstract DateTimeOffset? LastOnline { get; protected set; }
 
+        [JsonIgnore]
         public abstract ulong TotalExp { get; protected set; }
-        [JsonProperty("rank")]
+        [JsonPropertyName("rank")]
         public abstract uint Rank { get; protected set; }
-        [JsonProperty("exp")]
+        [JsonPropertyName("exp")]
+        [JsonIgnore]
         public abstract ulong Exp { get; protected set; }
+        [JsonIgnore]
         public abstract ulong BonusExp { get; protected set; }
 
-        [JsonProperty("hatArray")]
+        [JsonPropertyName("hatArray")]
         public abstract IReadOnlyCollection<Hat> Hats { get; }
-        [JsonProperty("headArray")]
+        [JsonPropertyName("headArray")]
         public abstract IReadOnlyCollection<Part> Heads { get; }
-        [JsonProperty("bodyArray")]
+        [JsonPropertyName("bodyArray")]
         public abstract IReadOnlyCollection<Part> Bodys { get; }
-        [JsonProperty("feetArray")]
+        [JsonPropertyName("feetArray")]
         public abstract IReadOnlyCollection<Part> Feets { get; }
 
-        [JsonProperty("hats")]
+        [JsonPropertyName("hats")]
         public uint HatsCount => (uint)this.Hats.Count((h) => h != Hat.None);
 
-        [JsonProperty("hat")]
+        [JsonPropertyName("hat")]
         public abstract Hat CurrentHat { get; protected set; }
-        [JsonProperty("hatColor")]
+        [JsonPropertyName("hatColor")]
         public abstract Color CurrentHatColor { get; protected set; }
 
-        [JsonProperty("head")]
+        [JsonPropertyName("head")]
         public abstract Part CurrentHead { get; protected set; }
-        [JsonProperty("headColor")]
+        [JsonPropertyName("headColor")]
         public abstract Color CurrentHeadColor { get; protected set; }
 
-        [JsonProperty("body")]
+        [JsonPropertyName("body")]
         public abstract Part CurrentBody { get; protected set; }
-        [JsonProperty("bodyColor")]
+        [JsonPropertyName("bodyColor")]
         public abstract Color CurrentBodyColor { get; protected set; }
 
-        [JsonProperty("feet")]
+        [JsonPropertyName("feet")]
         public abstract Part CurrentFeet { get; protected set; }
-        [JsonProperty("feetColor")]
+        [JsonPropertyName("feetColor")]
         public abstract Color CurrentFeetColor { get; protected set; }
 
-        [JsonProperty("speed")]
+        [JsonPropertyName("speed")]
         public abstract uint Speed { get; protected set; }
-        [JsonProperty("accel")]
+        [JsonPropertyName("accel")]
         public abstract uint Accel { get; protected set; }
-        [JsonProperty("jump")]
+        [JsonPropertyName("jump")]
         public abstract uint Jump { get; protected set; }
-        [JsonProperty("expBonus")]
+        [JsonPropertyName("expBonus")]
         private uint __ExpBonus__UNUSED__ { get; } = 0;
 
+        [JsonIgnore]
         public abstract uint RadiatingLuck { get; protected set; }
 
-        [JsonProperty("campaign")]
+        [JsonPropertyName("campaign")]
         public abstract IReadOnlyDictionary<uint, CampaignLevelRecord> CampaignLevelRecords { get; }
 
+        [JsonIgnore]
         public abstract IReadOnlyCollection<uint> Friends { get; }
+        [JsonIgnore]
         public abstract IReadOnlyCollection<uint> Ignored { get; }
 
+        [JsonIgnore]
         public abstract IReadOnlyCollection<string> Permissions { get; }
 
         private protected UserData()
@@ -109,7 +117,7 @@ namespace Platform_Racing_3_Common.User
         /// <summary>
         /// Jiggy
         /// </summary>
-        [JsonProperty("prizes")]
+        [JsonPropertyName("prizes")]
         public IReadOnlyDictionary<string, List<CampaignPrize>> Prizes => CampaignManager.DefaultPrizes;
 
         public virtual void SetServer(ServerDetails server)

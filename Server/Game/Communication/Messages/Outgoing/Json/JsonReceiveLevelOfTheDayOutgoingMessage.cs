@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Lobby;
 using System;
@@ -7,11 +7,11 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonReceiveLevelOfTheDayOutgoingMessage : JsonPacket
+    internal sealed class JsonReceiveLevelOfTheDayOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receiveLOTD";
+        public override string Type => "receiveLOTD";
 
-        [JsonProperty("lotd")]
+        [JsonPropertyName("lotd")]
         public IReadOnlyDictionary<string, object> Lotd { get; set; }
 
         internal JsonReceiveLevelOfTheDayOutgoingMessage(MatchListing matchListing)

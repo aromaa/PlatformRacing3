@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Platform_Racing_3_Common.Campaign
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class CampaignPrize
     {
-        [JsonProperty("id")]
+        [JsonPropertyName("id")]
         public uint Id { get; }
+        [JsonIgnore]
         public CampaignPrizeType Type { get; }
 
-        [JsonProperty("medals")]
+        [JsonPropertyName("medals")]
         public uint MedalsRequired { get; }
 
         internal CampaignPrize(DbDataReader reader)
@@ -23,7 +23,7 @@ namespace Platform_Racing_3_Common.Campaign
             this.MedalsRequired = (uint)(int)reader["medals_required"];
         }
 
-        [JsonProperty("category")]
-        private string Category => this.Type.ToString().ToLowerInvariant();
+        [JsonPropertyName("category")]
+        public string Category => this.Type.ToString().ToLowerInvariant();
     }
 }

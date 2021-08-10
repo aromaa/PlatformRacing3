@@ -1,5 +1,5 @@
 ﻿using Discord.Webhook;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
@@ -23,6 +23,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -70,7 +71,7 @@ namespace Platform_Racing_3_Server.Core
         {
             PlatformRacing3Server.StartTime = Stopwatch.StartNew();
 
-            PlatformRacing3Server.ServerConfig = JsonConvert.DeserializeObject<ServerConfig>(File.ReadAllText("settings.json"));
+            PlatformRacing3Server.ServerConfig = JsonSerializer.Deserialize<ServerConfig>(File.ReadAllText("settings.json"));
 
             RedisConnection.Init(PlatformRacing3Server.ServerConfig);
             DatabaseConnection.Init(PlatformRacing3Server.ServerConfig);
@@ -87,7 +88,7 @@ namespace Platform_Racing_3_Server.Core
             {
                 socket.Pipeline.AddHandlerFirst(new SplitPacketHandler(new ClientSession(socket)));
                 socket.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
-            });
+            }, this.serviceProvider);
 
             if (PlatformRacing3Server.ServerConfig.DiscordChatWebhookId != 0)
             {

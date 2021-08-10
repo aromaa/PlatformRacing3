@@ -5,9 +5,9 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonBeginMatchOutgoingMessage : JsonPacket
+    internal sealed class JsonBeginMatchOutgoingMessage : JsonPacket
     {
-        internal override string Type => "beginMatch";
+        public override string Type => "beginMatch";
 
         internal JsonBeginMatchOutgoingMessage()
         {

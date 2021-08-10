@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class MessageOutgoingMessage : JsonOutgoingMessage
+    internal class MessageOutgoingMessage : JsonOutgoingMessage<JsonMessageOutgoingMessage>
     {
         internal MessageOutgoingMessage(string roomName, JsonMessageOutgoingMessage.RoomMessageData data) : base(new JsonMessageOutgoingMessage(roomName, data))
         {

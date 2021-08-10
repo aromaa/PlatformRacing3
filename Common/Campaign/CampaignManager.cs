@@ -1,5 +1,4 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Newtonsoft.Json;
 using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,8 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -168,7 +169,7 @@ namespace Platform_Racing_3_Common.Campaign
                             {
                                 inflater.CopyTo(uncompressedMemoryStream);
 
-                                campaignRun = JsonConvert.DeserializeObject<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
+                                campaignRun = JsonSerializer.Deserialize<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
                             }
                         }
                     }

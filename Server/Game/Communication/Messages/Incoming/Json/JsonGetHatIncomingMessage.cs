@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonGetHatIncomingMessage : JsonPacket
+    internal sealed class JsonGetHatIncomingMessage : JsonPacket
     {
-        [JsonProperty("id")]
-        internal uint Id { get; set; }
+        [JsonPropertyName("id")]
+        public uint Id { get; set; }
     }
 }

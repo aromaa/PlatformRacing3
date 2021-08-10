@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    class MatchFailedOutgoingMessage : JsonOutgoingMessage
+    class MatchFailedOutgoingMessage : JsonOutgoingMessage<JsonMatchFailedOutgoingMessage>
     {
         internal MatchFailedOutgoingMessage() : base(new JsonMatchFailedOutgoingMessage())
         {

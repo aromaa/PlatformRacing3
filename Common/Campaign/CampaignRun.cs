@@ -1,45 +1,45 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Customization;
+﻿using Platform_Racing_3_Common.Customization;
 using Platform_Racing_3_Common.Json;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Platform_Racing_3_Common.Campaign
 {
     public class CampaignRun
     {
-        [JsonProperty("userName", Required = Required.Always)]
+        [JsonPropertyName("userName")]
         public string Username { get; private set; }
 
-        [JsonProperty("playbackFreq", Required = Required.Always)]
+        [JsonPropertyName("playbackFreq")]
         public uint PlaybackFreq { get; private set; }
-        [JsonProperty("updateArray", Required = Required.Always)]
+        [JsonPropertyName("updateArray")]
         public List<RecordUpdate> Updates;
         
-        [JsonProperty("hat", Required = Required.Always)]
+        [JsonPropertyName("hat")]
         public Hat Hat { get; private set; }
-        [JsonConverter(typeof(ColorJsonConverter))]
-        [JsonProperty("hatColor", Required = Required.Always)]
+        [JsonConverter(typeof(JsonColorConverter))]
+        [JsonPropertyName("hatColor")]
         public Color HatColor { get; private set; }
 
-        [JsonProperty("head", Required = Required.Always)]
+        [JsonPropertyName("head")]
         public Part Head { get; private set; }
-        [JsonConverter(typeof(ColorJsonConverter))]
-        [JsonProperty("headColor", Required = Required.Always)]
+        [JsonConverter(typeof(JsonColorConverter))]
+        [JsonPropertyName("headColor")]
         public Color HeadColor { get; private set; }
 
-        [JsonProperty("body", Required = Required.Always)]
+        [JsonPropertyName("body")]
         public Part Body { get; private set; }
-        [JsonConverter(typeof(ColorJsonConverter))]
-        [JsonProperty("bodyColor", Required = Required.Always)]
+        [JsonConverter(typeof(JsonColorConverter))]
+        [JsonPropertyName("bodyColor")]
         public Color BodyColor { get; private set; }
 
-        [JsonProperty("feet", Required = Required.Always)]
+        [JsonPropertyName("feet")]
         public Part Feet { get; private set; }
-        [JsonConverter(typeof(ColorJsonConverter))]
-        [JsonProperty("feetColor", Required = Required.Always)]
+        [JsonConverter(typeof(JsonColorConverter))]
+        [JsonPropertyName("feetColor")]
         public Color FeetColor { get; private set; }
         
         public class RecordUpdate
@@ -49,19 +49,19 @@ namespace Platform_Racing_3_Common.Campaign
             /// 
             /// This is offset from the last position, the first update contains the start position
             /// </summary>
-            [JsonProperty("p", Required = Required.Always)]
+            [JsonPropertyName("p")]
             public string Position { get; private set; }
 
-            [JsonProperty("s")]
+            [JsonPropertyName("s")]
             public string ScaleX { get; private set; }
 
-            [JsonProperty("t")]
+            [JsonPropertyName("t")]
             public string State { get; private set; }
 
-            [JsonProperty("i")]
+            [JsonPropertyName("i")]
             public string Item { get; private set; }
 
-            [JsonProperty("r")]
+            [JsonPropertyName("r")]
             public string Rotation { get; private set; }
         }
     }

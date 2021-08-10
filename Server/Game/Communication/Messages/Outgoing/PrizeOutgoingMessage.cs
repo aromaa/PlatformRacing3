@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class PrizeOutgoingMessage : JsonOutgoingMessage
+    internal class PrizeOutgoingMessage : JsonOutgoingMessage<JsonPrizeOutgoingMessage>
     {
         internal PrizeOutgoingMessage(MatchPrize prize, string status) : base (new JsonPrizeOutgoingMessage(prize, status))
         {

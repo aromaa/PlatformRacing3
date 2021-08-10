@@ -1,25 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-    internal class JsonJoinRoomIncomingMessage : JsonPacket
+    internal sealed class JsonJoinRoomIncomingMessage : JsonPacket
     {
-        [JsonProperty("chatId")]
-        internal uint ChatId { get; set; }
+        [JsonPropertyName("chatId")]
+        public uint ChatId { get; set; }
 
-        [JsonProperty("room_name", Required = Required.Always)]
-        internal string RoomName { get; set; }
+        [JsonPropertyName("room_name")]
+        public string RoomName { get; set; }
 
-        [JsonProperty("room_type", Required = Required.Always)]
-        internal string RoomType { get; set; }
+        [JsonPropertyName("room_type")]
+        public string RoomType { get; set; }
 
-        [JsonProperty("pass", Required = Required.Always)]
-        internal string Pass { get; set; }
+        [JsonPropertyName("pass")]
+        public string Pass { get; set; }
 
-        [JsonProperty("note")] //Only sent when room is created
-        internal string Note { get; set; }
+        [JsonPropertyName("note")] //Only sent when room is created
+        public string Note { get; set; }
     }
 }

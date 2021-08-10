@@ -1,20 +1,20 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms
 {
-    internal class JsonUseItemMessage : JsonMessageOutgoingMessage
+    internal sealed class JsonUseItemMessage : JsonMessageOutgoingMessage
     {
         internal JsonUseItemMessage(string roomName, uint socketId, double[] pos) : base(roomName, socketId, new RoomMessageData("useItem", new UseItemData(pos)))
         {
         }
 
-        private class UseItemData
+        private sealed class UseItemData
         {
-            [JsonProperty("p", Required = Required.Always)]
-            internal double[] Pos { get; set; }
+            [JsonPropertyName("p")]
+            public double[] Pos { get; set; }
 
             internal UseItemData(double[] pos)
             {

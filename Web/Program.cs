@@ -5,12 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
@@ -28,7 +28,7 @@ namespace Platform_Racing_3_Web
 
         private static void Main(string[] args)
         {
-            Program.Config = JsonConvert.DeserializeObject<WebConfig>(File.ReadAllText("settings.json"));
+            Program.Config = JsonSerializer.Deserialize<WebConfig>(File.ReadAllText("settings.json"));
 
             DataAccess2.Init(Program.Config);
 

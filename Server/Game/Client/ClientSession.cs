@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Redis;
 using Platform_Racing_3_Common.User;
@@ -30,7 +30,7 @@ namespace Platform_Racing_3_Server.Game.Client
         internal UserData UserData { get; set; }
 
         internal Stopwatch LastPing { get; }
-        [JsonProperty("ping")]
+        [JsonPropertyName("ping")]
         internal uint LastRoundtripTime { get; set; }
 
         internal bool HostTournament { get; set; }
@@ -72,7 +72,7 @@ namespace Platform_Racing_3_Server.Game.Client
         }
 
         internal bool Disconnected => this.Connection.Closed;
-        [JsonProperty("socketID")]
+        [JsonPropertyName("socketID")]
         internal uint SocketId => (uint)this.Connection.Id.GetHashCode(); //Relying on internal details, lmao, how bad
         internal IPAddress IPAddres => (this.Connection.RemoteEndPoint as IPEndPoint).Address;
 

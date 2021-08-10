@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class StartGameOutgoingMessage : JsonOutgoingMessage
+    internal class StartGameOutgoingMessage : JsonOutgoingMessage<JsonStartGameMessage>
     {
         internal StartGameOutgoingMessage(string roomName, string gameName) : base(new JsonStartGameMessage(roomName, gameName))
         {

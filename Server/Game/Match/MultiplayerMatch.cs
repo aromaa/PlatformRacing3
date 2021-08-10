@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Database;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.Customization;
@@ -27,6 +26,7 @@ using System.Threading.Tasks;
 using Platform_Racing_3_Server.Game.Communication.Messages;
 using Platform_Racing_3_Server.Game.Lobby;
 using System.Reflection;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
@@ -795,98 +795,98 @@ namespace Platform_Racing_3_Server.Game.Match
 
                 if (this.LevelData.Data.StartsWith("v2 | "))
                 {
-                    JObject levelData = JsonConvert.DeserializeObject<JObject>(this.LevelData.Data[5..]);
-                    if (levelData.TryGetValue("blockStr", out JToken jsonBlockStr))
-                    {
-                        string blockStr = (string)jsonBlockStr;
-                        if (!string.IsNullOrWhiteSpace(blockStr))
-                        {
-                            uint blockId = 0;
-                            int x = 0;
-                            int y = 0;
+                    //JObject levelData = JsonSerializer.Deserialize<JObject>(this.LevelData.Data[5..]);
+                    //if (levelData.TryGetValue("blockStr", out JToken jsonBlockStr))
+                    //{
+                    //    string blockStr = (string)jsonBlockStr;
+                    //    if (!string.IsNullOrWhiteSpace(blockStr))
+                    //    {
+                    //        uint blockId = 0;
+                    //        int x = 0;
+                    //        int y = 0;
 
-                            HashSet<uint> blockIds = new();
-                            Dictionary<Point, uint> blocks = new();
-                            foreach (string block in blockStr.Split(','))
-                            {
-                                if (block[0] == 'b')
-                                {
-                                    blockId = uint.Parse(block[1..]);
-                                    blockIds.Add(blockId);
-                                }
-                                else
-                                {
-                                    string[] coords = block.Split(':');
+                    //        HashSet<uint> blockIds = new();
+                    //        Dictionary<Point, uint> blocks = new();
+                    //        foreach (string block in blockStr.Split(','))
+                    //        {
+                    //            if (block[0] == 'b')
+                    //            {
+                    //                blockId = uint.Parse(block[1..]);
+                    //                blockIds.Add(blockId);
+                    //            }
+                    //            else
+                    //            {
+                    //                string[] coords = block.Split(':');
 
-                                    x += int.Parse(coords[0]);
-                                    y += int.Parse(coords[1]);
+                    //                x += int.Parse(coords[0]);
+                    //                y += int.Parse(coords[1]);
 
-                                    blocks[new Point(x, y)] = blockId;
-                                }
-                            }
+                    //                blocks[new Point(x, y)] = blockId;
+                    //            }
+                    //        }
 
-                            HashSet<uint> finishBlocks = new();
-                            foreach (uint blockId_ in blockIds.ToList())
-                            {
-                                if (blockId_ < 700)
-                                {
-                                    if (blockId_ % 100 == 7)
-                                    {
-                                        finishBlocks.Add(blockId_);
-                                    }
+                    //        HashSet<uint> finishBlocks = new();
+                    //        foreach (uint blockId_ in blockIds.ToList())
+                    //        {
+                    //            if (blockId_ < 700)
+                    //            {
+                    //                if (blockId_ % 100 == 7)
+                    //                {
+                    //                    finishBlocks.Add(blockId_);
+                    //                }
 
-                                    blockIds.Remove(blockId_); //Known block, no need to load from db
-                                }
-                            }
+                    //                blockIds.Remove(blockId_); //Known block, no need to load from db
+                    //            }
+                    //        }
 
-                            //Not found in cached blocks
-                            if (blockIds.Count > 0)
-                            {
-                                using (DatabaseConnection dbConnection = new())
-                                {
-                                    DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
-                                    while (reader?.Read() ?? false)
-                                    {
-                                        uint id = (uint)(int)reader["id"];
-                                        string settings = (string)reader["settings"];
-                                        if (settings.StartsWith("v2 | "))
-                                        {
-                                            JObject blockData = JsonConvert.DeserializeObject<JObject>(settings[5..]);
-                                            if (blockData.TryGetValue("left", out JToken sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                                            {
-                                                finishBlocks.Add(id);
-                                            }
-                                            else if (blockData.TryGetValue("right", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                                            {
-                                                finishBlocks.Add(id);
-                                            }
-                                            else if (blockData.TryGetValue("top", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                                            {
-                                                finishBlocks.Add(id);
-                                            }
-                                            else if (blockData.TryGetValue("bottom", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                                            {
-                                                finishBlocks.Add(id);
-                                            }
-                                            else if (blockData.TryGetValue("bump", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-                                            {
-                                                finishBlocks.Add(id);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    //        //Not found in cached blocks
+                    //        if (blockIds.Count > 0)
+                    //        {
+                    //            using (DatabaseConnection dbConnection = new())
+                    //            {
+                    //                DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
+                    //                while (reader?.Read() ?? false)
+                    //                {
+                    //                    uint id = (uint)(int)reader["id"];
+                    //                    string settings = (string)reader["settings"];
+                    //                    if (settings.StartsWith("v2 | "))
+                    //                    {
+                    //                        JObject blockData = JsonSerializer.Deserialize<object>(settings[5..]);
+                    //                        if (blockData.TryGetValue("left", out JToken sideSettings) && this.ReadBlockSideSettings(sideSettings))
+                    //                        {
+                    //                            finishBlocks.Add(id);
+                    //                        }
+                    //                        else if (blockData.TryGetValue("right", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+                    //                        {
+                    //                            finishBlocks.Add(id);
+                    //                        }
+                    //                        else if (blockData.TryGetValue("top", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+                    //                        {
+                    //                            finishBlocks.Add(id);
+                    //                        }
+                    //                        else if (blockData.TryGetValue("bottom", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+                    //                        {
+                    //                            finishBlocks.Add(id);
+                    //                        }
+                    //                        else if (blockData.TryGetValue("bump", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
+                    //                        {
+                    //                            finishBlocks.Add(id);
+                    //                        }
+                    //                    }
+                    //                }
+                    //            }
+                    //        }
 
-                            //We loaded everything
-                            foreach (KeyValuePair<Point, uint> block in blocks)
-                            {
-                                if (finishBlocks.Contains(block.Value))
-                                {
-                                    this.FinishBlocks.Add(block.Key);
-                                }
-                            }
-                        }
-                    }
+                    //        //We loaded everything
+                    //        foreach (KeyValuePair<Point, uint> block in blocks)
+                    //        {
+                    //            if (finishBlocks.Contains(block.Value))
+                    //            {
+                    //                this.FinishBlocks.Add(block.Key);
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
             }
             catch (Exception ex)
@@ -904,9 +904,9 @@ namespace Platform_Racing_3_Server.Game.Match
             }
         }
 
-        private bool ReadBlockSideSettings(JToken sideSettings)
+        private bool ReadBlockSideSettings(JsonElement sideSettings)
         {
-            string type = (string)sideSettings["type"];
+            string type = sideSettings.GetProperty("type").GetString();
             if (type == "finish")
             {
                 return true;
@@ -1252,23 +1252,23 @@ namespace Platform_Racing_3_Server.Game.Match
                     {
                         if (!session.IsGuest)
                         {
-                            this.SendChatMessage(session, (string)data.Data["message"], sendToSelf);
+                            this.SendChatMessage(session, data.Data.GetProperty("message").GetString(), sendToSelf);
                         }
                     }
                     break;
                 case "useItem":
                     {
-                        this.SendUseItem(session, data.Data["p"].ToObject<double[]>(), sendToSelf);
+                        this.SendUseItem(session, data.Data.GetProperty("p").EnumerateArray().Select(v => v.GetDouble()).ToArray(), sendToSelf);
                     }
                     break;
                 case "shatterBlock":
                     {
-                        this.SendShatterBlock(session, (int)data.Data["tileY"], (int)data.Data["tileX"], sendToSelf);
+                        this.SendShatterBlock(session, data.Data.GetProperty("tileY").GetInt32(), data.Data.GetProperty("tileX").GetInt32(), sendToSelf);
                     }
                     break;
                 case "explodeBlock":
                     {
-                        this.SendExplodeBlock(session, (int)data.Data["tileY"], (int)data.Data["tileX"], sendToSelf);
+                        this.SendExplodeBlock(session, data.Data.GetProperty("tileY").GetInt32(), data.Data.GetProperty("tileX").GetInt32(), sendToSelf);
                     }
                     break;
             }

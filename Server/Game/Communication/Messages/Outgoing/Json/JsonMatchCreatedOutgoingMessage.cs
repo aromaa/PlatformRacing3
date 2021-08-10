@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using Platform_Racing_3_Server.Game.Lobby;
@@ -8,42 +8,42 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonMatchCreatedOutgoingMessage : JsonPacket
+    internal sealed class JsonMatchCreatedOutgoingMessage : JsonPacket
     {
-        internal override string Type => "matchCreated";
+        public override string Type => "matchCreated";
 
-        [JsonProperty("roomName")]
-        internal string Name { get; set; }
+        [JsonPropertyName("roomName")]
+        public string Name { get; set; }
 
-        [JsonProperty("levelID")]
-        internal uint LevelId { get; set; }
-        [JsonProperty("levelTitle")]
-        internal string LevelTitle { get; set; }
-        [JsonProperty("version")]
-        internal uint LevelVersion { get; set; }
+        [JsonPropertyName("levelID")]
+        public uint LevelId { get; set; }
+        [JsonPropertyName("levelTitle")]
+        public string LevelTitle { get; set; }
+        [JsonPropertyName("version")]
+        public uint LevelVersion { get; set; }
 
-        [JsonProperty("creatorID")]
-        internal uint CreatorId { get; set; }
-        [JsonProperty("creatorName")]
-        internal string CreatorName { get; set; }
-        [JsonProperty("creatorNameColor")]
-        internal uint CreatorNameColor { get; set; }
+        [JsonPropertyName("creatorID")]
+        public uint CreatorId { get; set; }
+        [JsonPropertyName("creatorName")]
+        public string CreatorName { get; set; }
+        [JsonPropertyName("creatorNameColor")]
+        public uint CreatorNameColor { get; set; }
 
-        [JsonProperty("levelType")]
-        internal string LevelMod { get; set; }
+        [JsonPropertyName("levelType")]
+        public string LevelMod { get; set; }
 
-        [JsonProperty("likes")]
+        [JsonPropertyName("likes")]
         public uint Likes { get; }
-        [JsonProperty("dislikes")]
+        [JsonPropertyName("dislikes")]
         public uint Dislikes { get; }
 
-        [JsonProperty("minRank")]
-        internal uint MinRank { get; }
-        [JsonProperty("maxRank")]
-        internal uint MaxRank { get; }
+        [JsonPropertyName("minRank")]
+        public uint MinRank { get; }
+        [JsonPropertyName("maxRank")]
+        public uint MaxRank { get; }
 
-        [JsonProperty("maxMembers")]
-        internal uint MaxMembers { get; }
+        [JsonPropertyName("maxMembers")]
+        public uint MaxMembers { get; }
 
         internal JsonMatchCreatedOutgoingMessage(MatchListing matchListing)
         {
@@ -58,7 +58,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
             this.CreatorNameColor = (uint)matchListing.CreatorNameColor.ToArgb();
 
             string mode = matchListing.LevelMod.ToString();
-            this.LevelMod = Char.ToLowerInvariant(mode[0]) + mode[1..];
+            this.LevelMod = char.ToLowerInvariant(mode[0]) + mode[1..];
 
             this.Likes = matchListing.Likes;
             this.Dislikes = matchListing.Dislikes;

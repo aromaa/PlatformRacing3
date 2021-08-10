@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -8,16 +8,16 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal class JsonMessageOutgoingMessage : JsonPacket
     {
-        internal override string Type => "receiveMessage";
+        public override string Type => "receiveMessage";
 
-        [JsonProperty("roomName", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        internal string RoomName { get; set; }
+        [JsonPropertyName("roomName")]
+        public string RoomName { get; set; }
 
-        [JsonProperty("socketID", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        internal uint SocketId { get; set; }
+        [JsonPropertyName("socketID")]
+        public uint SocketId { get; set; }
 
-        [JsonProperty("data")]
-        internal RoomMessageData Data { get; set; }
+        [JsonPropertyName("data")]
+        public object Data { get; set; }
 
         internal JsonMessageOutgoingMessage(string roomName, RoomMessageData data)
         {
@@ -40,11 +40,11 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 
         internal class RoomMessageData
         {
-            [JsonProperty("type", DefaultValueHandling = DefaultValueHandling.Ignore)]
-            internal string Type { get; set; }
+            [JsonPropertyName("type")]
+            public string Type { get; set; }
 
-            [JsonProperty("data")]
-            internal object Data { get; set; }
+            [JsonPropertyName("data")]
+            public object Data { get; set; }
 
             internal RoomMessageData(string type, object data)
             {

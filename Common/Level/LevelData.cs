@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Campaign;
+﻿using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.Exceptions;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Utils;
@@ -10,79 +9,98 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace Platform_Racing_3_Common.Level
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class LevelData : IXmlSerializable
     {
-        [JsonProperty("levelID")]
+        [JsonPropertyName("levelID")]
         public uint Id { get; }
-        [JsonProperty("version")]
+        [JsonPropertyName("version")]
         public uint Version { get; }
 
         [XmlElement("user_id")]
         public uint AuthorUserId { get; }
-        [JsonProperty("author")]
+        [JsonPropertyName("author")]
         public string AuthorUsername { get; }
         public Color AuthorNameColor { get; }
         
-        [JsonProperty("title")]
+        [JsonPropertyName("title")]
         public string Title { get; }
-        [JsonProperty("comment")]
+        [JsonPropertyName("comment")]
         public string Description { get; }
+        [JsonIgnore]
         public bool Publish { get; }
 
+        [JsonIgnore]
         public string SongId { get; }
+        [JsonIgnore]
         public LevelMode Mode { get; }
 
+        [JsonIgnore]
         public uint Seconds { get; }
+        [JsonIgnore]
         public double Gravity { get; }
 
+        [JsonIgnore]
         public float Alien { get; }
+        [JsonIgnore]
         public float Sfchm { get; }
+        [JsonIgnore]
         public float Snow { get; }
+        [JsonIgnore]
         public float Wind { get; }
 
+        [JsonIgnore]
         public string[] Items { get; }
 
+        [JsonIgnore]
         public uint Health { get; }
+        [JsonIgnore]
         public uint[] KingOfTheHat { get; }
 
+        [JsonIgnore]
         public string BgImage { get; }
+        [JsonIgnore]
         public string Data { get; }
+        [JsonIgnore]
         public string Lua { get; }
 
+        [JsonIgnore]
         public DateTime LastUpdated { get; }
         
         //Below this all fields should be dynamically updated as they are "outside of level data" and should be updated as long as something holds reference to them
-        [JsonProperty("plays")]
+        [JsonPropertyName("plays")]
         public uint Plays { get; internal set; }
-        [JsonProperty("likes")]
+        [JsonPropertyName("likes")]
         public uint Likes { get; internal set; }
-        [JsonProperty("dislikes")]
+        [JsonPropertyName("dislikes")]
         public uint Dislikes { get; internal set; }
 
+        [JsonIgnore]
         public bool IsCampaign { get; }
 
-        [JsonProperty("bronze")]
+        [JsonPropertyName("bronze")]
         public uint BronzeTime { get; internal set; }
-        [JsonProperty("silver")]
+        [JsonPropertyName("silver")]
         public uint SilverTime { get; internal set; }
-        [JsonProperty("gold")]
+        [JsonPropertyName("gold")]
         public uint GoldTime { get; internal set; }
 
-        [JsonProperty("medalsRequired")]
+        [JsonPropertyName("medalsRequired")]
         public uint MedalsRequired { get; internal set; }
 
-        [JsonProperty("campaignSeason")]
+        [JsonPropertyName("campaignSeason")]
         public string CampaignSeason { get; internal set; }
 
+        [JsonIgnore]
         public bool HasPrize { get; }
 
+        [JsonIgnore]
         public List<(string prizeType, uint prizeId)> Prizes { get; }
 
         private LevelData()
@@ -156,10 +174,10 @@ namespace Platform_Racing_3_Common.Level
             }
         }
 
-        [JsonProperty("author_name_color")]
+        [JsonPropertyName("author_name_color")]
         public uint AuthorNameColorArgb => (uint)this.AuthorNameColor.ToArgb();
 
-        [JsonProperty("mode")]
+        [JsonPropertyName("mode")]
         public string StringMode
         {
             get

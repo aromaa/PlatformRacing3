@@ -7,7 +7,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class EventsOutgoingMessage : JsonOutgoingMessage
+    internal class EventsOutgoingMessage : JsonOutgoingMessage<JsonEventsOutgoingMessage>
     {
         internal EventsOutgoingMessage(IReadOnlyCollection<string> events) : base(new JsonEventsOutgoingMessage(events))
         {

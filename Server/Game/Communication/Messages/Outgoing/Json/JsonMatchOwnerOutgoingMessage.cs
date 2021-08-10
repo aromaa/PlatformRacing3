@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -6,18 +6,18 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonMatchOwnerOutgoingMessage : JsonPacket
+    internal sealed class JsonMatchOwnerOutgoingMessage : JsonPacket
     {
-        internal override string Type => "matchOwner";
+        public override string Type => "matchOwner";
 
-        [JsonProperty("matchName")]
+        [JsonPropertyName("matchName")]
         public string Name { get; set; }
 
-        [JsonProperty("play")]
+        [JsonPropertyName("play")]
         public bool Play { get; set; }
-        [JsonProperty("kick")]
+        [JsonPropertyName("kick")]
         public bool Kick { get; set; }
-        [JsonProperty("ban")]
+        [JsonPropertyName("ban")]
         public bool Ban { get; set; }
 
         internal JsonMatchOwnerOutgoingMessage(string name, bool play, bool kick, bool ban)

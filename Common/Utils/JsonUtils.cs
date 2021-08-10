@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Level;
+﻿using Platform_Racing_3_Common.Level;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,23 +8,24 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.User;
 
 namespace Platform_Racing_3_Common.Utils
 {
     public static class JsonUtils
     {
-        private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyAttribute, Func<object, object>>> CachedProperties = new();
+        private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyNameAttribute, Func<object, object>>> CachedProperties = new();
 
-        private static Dictionary<JsonPropertyAttribute, Func<object, object>> GetProperties<T>()
+        private static Dictionary<JsonPropertyNameAttribute, Func<object, object>> GetProperties<T>()
         {
             Type type = typeof(T);
-            if (!JsonUtils.CachedProperties.TryGetValue(type, out Dictionary<JsonPropertyAttribute, Func<object, object>> info))
+            if (!JsonUtils.CachedProperties.TryGetValue(type, out Dictionary<JsonPropertyNameAttribute, Func<object, object>> info))
             {
-                info = new Dictionary<JsonPropertyAttribute, Func<object, object>>();
+                info = new Dictionary<JsonPropertyNameAttribute, Func<object, object>>();
                 foreach (PropertyInfo property in type.GetRuntimeProperties())
                 {
-                    JsonPropertyAttribute jsonProperty = property.GetCustomAttribute<JsonPropertyAttribute>();
+	                JsonPropertyNameAttribute jsonProperty = property.GetCustomAttribute<JsonPropertyNameAttribute>();
                     if (jsonProperty != null)
                     {
                         ParameterExpression parameter = Expression.Parameter(type);
@@ -55,26 +55,14 @@ namespace Platform_Racing_3_Common.Utils
         {
             bool all = vars.Contains("*");
 
-            foreach (KeyValuePair<JsonPropertyAttribute, Func<object, object>> property in JsonUtils.GetProperties<T>())
+            foreach (KeyValuePair<JsonPropertyNameAttribute, Func<object, object>> property in JsonUtils.GetProperties<T>())
             {
-                JsonPropertyAttribute jsonAttribute = property.Key;
+	            JsonPropertyNameAttribute jsonAttribute = property.Key;
                 Func<object, object> getter = property.Value;
 
-                if (all || vars.Contains(jsonAttribute.PropertyName))
+                if (all || vars.Contains(jsonAttribute.Name))
                 {
-                    object value = getter.Invoke(target);
-                    if (value is Color color) //SPECIAL CASE OMG
-                    {
-                        value = color.ToArgb();
-                    }
-                    else if (value is LevelMode levelMode) //SPECIAL CASE OMG
-                    {
-                        string mode = levelMode.ToString();
-
-                        value = Char.ToLowerInvariant(mode[0]) + mode[1..];
-                    }
-
-                    to[jsonAttribute.PropertyName] = value;
+                    to[jsonAttribute.Name] = getter.Invoke(target);
                 }
             }
         }

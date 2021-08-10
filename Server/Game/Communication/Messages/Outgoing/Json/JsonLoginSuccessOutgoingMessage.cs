@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
 using System;
 using System.Collections.Generic;
@@ -6,24 +6,24 @@ using System.Text;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal class JsonLoginSuccessOutgoingMessage : JsonPacket
+    internal sealed class JsonLoginSuccessOutgoingMessage : JsonPacket
     {
-        internal override string Type => "loginSuccess";
+        public override string Type => "loginSuccess";
 
-        [JsonProperty("socketID")]
-        internal uint SocketID { get; set; }
+        [JsonPropertyName("socketID")]
+        public uint SocketID { get; set; }
 
-        [JsonProperty("userID")]
-        internal uint UserID { get; set; }
+        [JsonPropertyName("userID")]
+        public uint UserID { get; set; }
 
-        [JsonProperty("userName")]
-        internal string Username { get; set; }
+        [JsonPropertyName("userName")]
+        public string Username { get; set; }
 
-        [JsonProperty("permissions")]
-        internal IReadOnlyCollection<string> Permissions { get; set; }
+        [JsonPropertyName("permissions")]
+        public IReadOnlyCollection<string> Permissions { get; set; }
 
-        [JsonProperty("vars")]
-        internal IReadOnlyDictionary<string, object> Vars { get; set; }
+        [JsonPropertyName("vars")]
+        public IReadOnlyDictionary<string, object> Vars { get; set; }
 
         internal JsonLoginSuccessOutgoingMessage(uint socketID, uint userID, string username, IReadOnlyCollection<string> permissions, IReadOnlyDictionary<string, object> vars)
         {

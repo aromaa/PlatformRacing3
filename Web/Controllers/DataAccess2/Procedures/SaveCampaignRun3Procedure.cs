@@ -4,12 +4,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Platform_Racing_3_Common.Campaign;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Web.Extensions;
@@ -42,7 +41,7 @@ namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
                             {
                                 inflater.CopyTo(uncompressedMemoryStream);
 
-                                campaignRun = JsonConvert.DeserializeObject<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
+                                campaignRun = JsonSerializer.Deserialize<CampaignRun>(Encoding.UTF8.GetString(uncompressedMemoryStream.ToArray()));
                             }
                         }
                     }

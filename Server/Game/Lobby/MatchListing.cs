@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 using Platform_Racing_3_Common.Level;
 using Platform_Racing_3_Common.User;
 using Platform_Racing_3_Common.Utils;
@@ -33,37 +33,37 @@ namespace Platform_Racing_3_Server.Game.Lobby
 
         internal MatchListingType Type { get; }
 
-        [JsonProperty("roomName")]
+        [JsonPropertyName("roomName")]
         internal string Name { get; }
 
-        [JsonProperty("levelID")]
+        [JsonPropertyName("levelID")]
         internal uint LevelId => this.LevelData.Id;
-        [JsonProperty("levelTitle")]
+        [JsonPropertyName("levelTitle")]
         internal string LevelTitle => this.LevelData.Title;
-        [JsonProperty("version")]
+        [JsonPropertyName("version")]
         internal uint LevelVersion => this.LevelData.Version;
 
-        [JsonProperty("creatorID")]
+        [JsonPropertyName("creatorID")]
         internal uint CreatorId => this.LevelData.AuthorUserId;
-        [JsonProperty("creatorName")]
+        [JsonPropertyName("creatorName")]
         internal string CreatorName => this.LevelData.AuthorUsername;
-        [JsonProperty("creatorNameColor")]
+        [JsonPropertyName("creatorNameColor")]
         internal Color CreatorNameColor => this.LevelData.AuthorNameColor;
 
-        [JsonProperty("levelType")]
+        [JsonPropertyName("levelType")]
         internal LevelMode LevelMod => this.LevelData.Mode;
 
-        [JsonProperty("likes")]
+        [JsonPropertyName("likes")]
         public uint Likes => this.LevelData.Likes;
-        [JsonProperty("dislikes")]
+        [JsonPropertyName("dislikes")]
         public uint Dislikes => this.LevelData.Dislikes;
 
-        [JsonProperty("minRank")]
+        [JsonPropertyName("minRank")]
         internal uint MinRank { get; }
-        [JsonProperty("maxRank")]
+        [JsonPropertyName("maxRank")]
         internal uint MaxRank { get; }
 
-        [JsonProperty("maxMembers")]
+        [JsonPropertyName("maxMembers")]
         internal uint MaxMembers { get; }
         internal bool OnlyFriends { get; }
 

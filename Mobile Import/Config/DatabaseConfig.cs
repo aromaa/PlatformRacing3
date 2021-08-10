@@ -1,23 +1,23 @@
-﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Config;
+﻿using Platform_Racing_3_Common.Config;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Mobile_Import.Config
 {
     internal class DatabaseConfig : IDatabaseConfig
     {
-        [JsonProperty("database_host", Required = Required.Always)]
+        [JsonPropertyName("database_host")]
         public string DatabaseHost { get; set; }
-        [JsonProperty("database_port", Required = Required.Always)]
+        [JsonPropertyName("database_port")]
         public uint DatabasePort { get; set; }
 
-        [JsonProperty("database_user", Required = Required.Always)]
+        [JsonPropertyName("database_user")]
         public string DatabaseUser { get; set; }
-        [JsonProperty("database_pass", Required = Required.Always)]
+        [JsonPropertyName("database_pass")]
         public string DatabasePass { get; set; }
-        [JsonProperty("database_name", Required = Required.Always)]
+        [JsonPropertyName("database_name")]
         public string DatabaseName { get; set; }
     }
 }

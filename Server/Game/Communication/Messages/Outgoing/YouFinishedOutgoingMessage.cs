@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class YouFinishedOutgoingMessage : JsonOutgoingMessage
+    internal class YouFinishedOutgoingMessage : JsonOutgoingMessage<JsonYouFinishedOutgoingMessage>
     {
         internal YouFinishedOutgoingMessage(uint rank, ulong curExp, ulong maxExp, ulong totExpGain, IReadOnlyCollection<object[]> expArray, int place) 
 	        : base(new JsonYouFinishedOutgoingMessage(rank, curExp, maxExp, totExpGain, expArray, place))

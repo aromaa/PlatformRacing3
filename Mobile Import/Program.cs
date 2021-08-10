@@ -1,13 +1,14 @@
 ﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Mobile_Import.Config;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Platform_Racing_3_Common.Database;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Mobile_Import
 {
@@ -18,7 +19,7 @@ namespace Mobile_Import
             Console.Write("Author: ");
             uint authorId = uint.Parse(Console.ReadLine());
 
-            DatabaseConfig config = JsonConvert.DeserializeObject<DatabaseConfig>(File.ReadAllText("settings.json"));
+            DatabaseConfig config = JsonSerializer.Deserialize<DatabaseConfig>(File.ReadAllText("settings.json"));
 
             Console.WriteLine("Connecting to database... ");
             DatabaseConnection.Init(config);

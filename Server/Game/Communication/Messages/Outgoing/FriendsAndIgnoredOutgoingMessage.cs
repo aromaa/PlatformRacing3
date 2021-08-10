@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class FriendsAndIgnoredOutgoingMessage : JsonOutgoingMessage
+    internal class FriendsAndIgnoredOutgoingMessage : JsonOutgoingMessage<JsonFriendsAndIgnoredOutgoingMessage>
     {
         internal FriendsAndIgnoredOutgoingMessage(IReadOnlyCollection<uint> friends, IReadOnlyCollection<uint> ignored) : base(new JsonFriendsAndIgnoredOutgoingMessage(friends, ignored))
         {

@@ -6,7 +6,7 @@ using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
 {
-    internal class AlertOutgoingMessage : JsonOutgoingMessage
+    internal class AlertOutgoingMessage : JsonOutgoingMessage<JsonAlertOutgoingMessage>
     {
         internal AlertOutgoingMessage(string message) : base(new JsonAlertOutgoingMessage(message))
         {
