@@ -11,7 +11,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonCoinsOutgoingMessage : JsonPacket
     {
-        public override string Type => "coins";
+        private protected override string InternalType => "coins";
 
         [JsonPropertyName("array")]
         public IReadOnlyCollection<PlayerCoinsData> Array { get; set; }

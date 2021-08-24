@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonEventsOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveEvents";
+        private protected override string InternalType => "receiveEvents";
 
         [JsonPropertyName("events")]
         public IReadOnlyCollection<string> Events { get; set; }

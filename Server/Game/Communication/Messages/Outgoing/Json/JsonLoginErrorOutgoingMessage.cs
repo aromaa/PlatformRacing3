@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonLoginErrorOutgoingMessage : JsonPacket
     {
-        public override string Type => "loginError";
+        private protected override string InternalType => "loginError";
 
         [JsonPropertyName("error")]
         public string Error { get; set; }

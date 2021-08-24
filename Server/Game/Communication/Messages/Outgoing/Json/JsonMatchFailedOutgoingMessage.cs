@@ -7,6 +7,6 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMatchFailedOutgoingMessage : JsonPacket
     {
-        public override string Type => "matchFailed";
+        private protected override string InternalType => "matchFailed";
     }
 }

@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMatchesOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveMatches";
+        private protected override string InternalType => "receiveMatches";
 
         [JsonPropertyName("lobbyId")]
         public uint LobbyId { get; set; }

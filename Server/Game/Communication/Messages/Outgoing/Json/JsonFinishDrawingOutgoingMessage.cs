@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonFinishDrawingOutgoingMessage : JsonPacket
     {
-        public override string Type => "finishDrawing";
+        private protected override string InternalType => "finishDrawing";
 
         [JsonPropertyName("socketID")]
         public uint SocketId { get; set; }

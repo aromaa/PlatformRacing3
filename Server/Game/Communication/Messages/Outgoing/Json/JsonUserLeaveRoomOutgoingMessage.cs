@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonUserLeaveRoomOutgoingMessage : JsonPacket
     {
-        public override string Type => "userLeaveRoom";
+        private protected override string InternalType => "userLeaveRoom";
 
         [JsonPropertyName("roomName")]
         public string RoomName { get; set; }

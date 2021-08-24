@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMemberListOutgoingMessage : JsonPacket
     {
-        public override string Type => "memberList";
+        private protected override string InternalType => "memberList";
 
         [JsonPropertyName("list")]
         public IReadOnlyCollection<IReadOnlyDictionary<string, object>> Members { get; set; }

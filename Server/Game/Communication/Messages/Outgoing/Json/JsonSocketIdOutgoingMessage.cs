@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonSocketIdOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveSocketID";
+        private protected override string InternalType => "receiveSocketID";
 
         [JsonPropertyName("socketID")]
         public uint SocketID { get; set; }

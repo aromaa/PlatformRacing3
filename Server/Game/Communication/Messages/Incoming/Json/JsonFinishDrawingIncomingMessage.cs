@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
 {
-	internal sealed class JsonPacketNoData : JsonPacket
+	internal sealed class JsonFinishDrawingIncomingMessage : JsonPacket
 	{
 	}
 }

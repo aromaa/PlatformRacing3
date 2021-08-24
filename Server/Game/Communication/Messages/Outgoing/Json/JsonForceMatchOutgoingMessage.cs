@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonForceMatchOutgoingMessage : JsonPacket
     {
-        public override string Type => "force_match";
+        private protected override string InternalType => "force_match";
 
         [JsonPropertyName("roomName")]
         public string Name { get; set; }

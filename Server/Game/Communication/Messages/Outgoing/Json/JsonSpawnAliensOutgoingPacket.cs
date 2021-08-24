@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonSpawnAliensOutgoingPacket : JsonPacket
     {
-        public override string Type => "spawnAliens";
+        private protected override string InternalType => "spawnAliens";
 
         [JsonPropertyName("count")]
         public uint Id { get; set; }

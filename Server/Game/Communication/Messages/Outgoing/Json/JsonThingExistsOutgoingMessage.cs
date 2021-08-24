@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonThingExistsOutgoingMessage : JsonPacket
     {
-        public override string Type => "thingExits";
+        private protected override string InternalType => "thingExits";
 
         [JsonPropertyName("exits")]
         public bool Exists { get; set; }

@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Platform_Racing_3_Web</RootNamespace>
     <StartupObject>Platform_Racing_3_Web.Program</StartupObject>
+    <UserSecretsId>9c9fed24-eeb2-4bdd-9284-c2f0cb0afb63</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

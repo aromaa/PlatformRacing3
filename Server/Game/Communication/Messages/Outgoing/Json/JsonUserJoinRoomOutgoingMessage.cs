@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonUserJoinRoomOutgoingMessage : JsonPacket
     {
-        public override string Type => "userJoinRoom";
+        private protected override string InternalType => "userJoinRoom";
 
         [JsonPropertyName("roomName")]
         public string RoomName { get; set; }

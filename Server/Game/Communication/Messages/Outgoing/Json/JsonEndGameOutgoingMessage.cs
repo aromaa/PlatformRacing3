@@ -7,6 +7,6 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonEndGameOutgoingMessage : JsonPacket
     {
-        public override string Type => "endGame";
+        private protected override string InternalType => "endGame";
     }
 }

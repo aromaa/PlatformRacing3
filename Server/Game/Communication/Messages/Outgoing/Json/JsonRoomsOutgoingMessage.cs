@@ -10,7 +10,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonRoomsOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveRooms";
+        private protected override string InternalType => "receiveRooms";
 
         [JsonPropertyName("roomList")]
         public IReadOnlyCollection<IReadOnlyDictionary<string, object>> Rooms { get; set; }

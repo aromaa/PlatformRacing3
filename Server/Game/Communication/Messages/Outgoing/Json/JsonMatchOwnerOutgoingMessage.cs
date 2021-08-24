@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMatchOwnerOutgoingMessage : JsonPacket
     {
-        public override string Type => "matchOwner";
+        private protected override string InternalType => "matchOwner";
 
         [JsonPropertyName("matchName")]
         public string Name { get; set; }

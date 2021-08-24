@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonFriendsAndIgnoredOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveFriendsAndIgnored";
+        private protected override string InternalType => "receiveFriendsAndIgnored";
 
         [JsonPropertyName("friendArray")]
         public IReadOnlyCollection<uint> Friends { get; set; }

@@ -10,7 +10,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMatchCreatedOutgoingMessage : JsonPacket
     {
-        public override string Type => "matchCreated";
+        private protected override string InternalType => "matchCreated";
 
         [JsonPropertyName("roomName")]
         public string Name { get; set; }

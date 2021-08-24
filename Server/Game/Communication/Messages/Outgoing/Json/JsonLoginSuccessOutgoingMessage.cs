@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonLoginSuccessOutgoingMessage : JsonPacket
     {
-        public override string Type => "loginSuccess";
+        private protected override string InternalType => "loginSuccess";
 
         [JsonPropertyName("socketID")]
         public uint SocketID { get; set; }

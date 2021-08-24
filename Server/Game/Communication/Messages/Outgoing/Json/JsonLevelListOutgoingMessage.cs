@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonLevelListOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveLevelList";
+        private protected override string InternalType => "receiveLevelList";
 
         [JsonPropertyName("requestID")]
         public uint RequestId { get; set; }

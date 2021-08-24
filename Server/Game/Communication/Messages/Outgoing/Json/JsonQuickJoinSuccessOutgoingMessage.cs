@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonQuickJoinSuccessOutgoingMessage : JsonPacket
     {
-        public override string Type => "quickJoinSuccess";
+        private protected override string InternalType => "quickJoinSuccess";
 
         [JsonPropertyName("roomName")]
         public string Name { get; set; }

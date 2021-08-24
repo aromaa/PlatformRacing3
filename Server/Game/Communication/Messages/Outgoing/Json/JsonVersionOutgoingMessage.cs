@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonVersionOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveVersion";
+        private protected override string InternalType => "receiveVersion";
 
         [JsonPropertyName("version")]
         public uint Version { get; set; }

@@ -21,7 +21,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers
 
         internal override void Handle(ClientSession session, in JsonPacket packet)
         {
-            if (this.packetManager.GetIncomingJSONPacket(packet.Type, out IMessageIncomingJson handler))
+            if (this.packetManager.GetIncomingJSONPacket(packet.GetType(), out IMessageIncomingJson handler))
             {
                 handler.Handle(session, packet);
             }

@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonTournamentStatusOutgoingMessage : JsonPacket
     {
-        public override string Type => "tournament_status";
+        private protected override string InternalType => "tournament_status";
 
         [JsonPropertyName("status")]
         public byte Status { get; set; }

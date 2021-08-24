@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonRemoveHatOutgoingMessage : JsonPacket
     {
-        public override string Type => "removeHat";
+        private protected override string InternalType => "removeHat";
 
         [JsonPropertyName("id")]
         public uint Id { get; set; }

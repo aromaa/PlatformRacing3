@@ -10,7 +10,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonUserPageOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveUserPage";
+        private protected override string InternalType => "receiveUserPage";
 
         [JsonPropertyName("userID")]
         public uint UserId { get; set; }

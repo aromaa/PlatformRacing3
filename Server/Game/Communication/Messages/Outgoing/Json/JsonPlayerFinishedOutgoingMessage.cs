@@ -11,7 +11,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonPlayerFinishedOutgoingMessage : JsonPacket
     {
-        public override string Type => "playerFinished";
+        private protected override string InternalType => "playerFinished";
 
         [JsonPropertyName("socketID")]
         public uint SocketId { get; set; }

@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonLegacyPingOutgoingMessage : JsonPacket
     {
-        public override string Type => "ping";
+        private protected override string InternalType => "ping";
 
         [JsonPropertyName("time")]
         public ulong Time { get; set; }

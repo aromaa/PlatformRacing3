@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonSetPlayerHatsOutgoingMessage : JsonPacket
     {
-        public override string Type => "setPlayerHats";
+        private protected override string InternalType => "setPlayerHats";
 
         [JsonPropertyName("socketID")]
         public uint SocketId { get; set; }

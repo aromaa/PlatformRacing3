@@ -8,7 +8,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonAlertOutgoingMessage : JsonPacket
     {
-        public override string Type => "alert";
+        private protected override string InternalType => "alert";
 
         [JsonPropertyName("message")]
         public string Message { get; set; }

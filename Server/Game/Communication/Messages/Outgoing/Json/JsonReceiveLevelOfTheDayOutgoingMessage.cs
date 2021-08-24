@@ -9,7 +9,7 @@ namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonReceiveLevelOfTheDayOutgoingMessage : JsonPacket
     {
-        public override string Type => "receiveLOTD";
+        private protected override string InternalType => "receiveLOTD";
 
         [JsonPropertyName("lotd")]
         public IReadOnlyDictionary<string, object> Lotd { get; set; }
