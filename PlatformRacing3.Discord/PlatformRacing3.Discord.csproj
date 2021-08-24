@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\PlatformRacing3.Common\PlatformRacing3.Common.csproj" />
   </ItemGroup>
 
 </Project>
