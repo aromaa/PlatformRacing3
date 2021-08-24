@@ -1,12 +1,9 @@
-﻿using Platform_Racing_3_Common.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Platform_Racing_3_Common.PrivateMessage
+namespace PlatformRacing3.Common.PrivateMessage
 {
     public class ThingTransferPrivateMessage : IPrivateMessage
     {

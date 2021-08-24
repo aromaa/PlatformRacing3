@@ -1,13 +1,10 @@
-﻿using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server_API.Game.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Server.API.Game.Commands;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Game.Commands.User
+namespace PlatformRacing3.Server.Game.Commands.User
 {
     internal sealed class GiveHatCommand : ICommand
     {

@@ -1,11 +1,9 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using Net.Communication.Incoming.Handler;
 using Net.Sockets.Pipeline.Handler;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers
 {
     internal abstract class AbstractIncomingClientSessionPacketHandler<T> : IClientSessionPacketHandler, IIncomingPacketHandler<T>
     {

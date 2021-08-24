@@ -1,10 +1,6 @@
-﻿using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
-using Platform_Racing_3_Server.Game.Match;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.Match
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Match
 {
     internal readonly struct UpdatePacketIncomingPacket
     {

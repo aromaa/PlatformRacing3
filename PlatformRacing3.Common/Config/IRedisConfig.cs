@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Platform_Racing_3_Common.Config
+﻿namespace PlatformRacing3.Common.Config
 {
     public interface IRedisConfig
     {

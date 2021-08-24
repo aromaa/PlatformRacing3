@@ -1,11 +1,8 @@
-﻿using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
-using Platform_Racing_3_Server.Game.Match;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Net.Buffers;
+﻿using Net.Buffers;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
 {
     internal class UpdateOutgoingMessage : IMessageOutgoing
     {

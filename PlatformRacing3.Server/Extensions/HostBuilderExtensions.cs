@@ -1,25 +1,21 @@
-﻿using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Server.Config;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Chat;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Commands;
-using Platform_Racing_3_Server.Game.Communication.Messages;
-using Platform_Racing_3_Server.Game.Lobby;
-using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server.Host;
-using Platform_Racing_3_Server.Host.Implementation;
+using Microsoft.Extensions.Hosting;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Server.Config;
+using PlatformRacing3.Server.Core;
+using PlatformRacing3.Server.Game.Chat;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Commands;
+using PlatformRacing3.Server.Game.Communication.Messages;
+using PlatformRacing3.Server.Game.Lobby;
+using PlatformRacing3.Server.Game.Match;
+using PlatformRacing3.Server.Host;
+using PlatformRacing3.Server.Host.Implementation;
 
-namespace Platform_Racing_3_Server.Extensions
+namespace PlatformRacing3.Server.Extensions
 {
 	public static class HostBuilderExtensions
 	{

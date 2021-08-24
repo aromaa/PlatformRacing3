@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
+﻿using System.Text.Json.Serialization;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages
+namespace PlatformRacing3.Server.Game.Communication.Messages
 {
 	[JsonSerializable(typeof(JsonAcceptThingTransferIncomingMessage))]
 	[JsonSerializable(typeof(JsonBanFromMatchListingIncomingMessage))]

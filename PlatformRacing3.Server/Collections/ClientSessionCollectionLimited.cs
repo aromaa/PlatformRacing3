@@ -1,13 +1,9 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Text;
+﻿using System;
 using System.Threading;
-using System.Transactions;
 using Net.Sockets;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Collections
+namespace PlatformRacing3.Server.Collections
 {
     internal class ClientSessionCollectionLimited : ClientSessionCollection
     {

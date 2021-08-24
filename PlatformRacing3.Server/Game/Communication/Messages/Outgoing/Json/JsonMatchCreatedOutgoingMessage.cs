@@ -1,12 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Lobby;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Lobby;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json
 {
     internal sealed class JsonMatchCreatedOutgoingMessage : JsonPacket
     {

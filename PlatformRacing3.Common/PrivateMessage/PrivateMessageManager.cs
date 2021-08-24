@@ -1,17 +1,15 @@
-﻿using Platform_Racing_3_Common.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Platform_Racing_3_Common.Utils;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Utils;
 
-namespace Platform_Racing_3_Common.PrivateMessage
+namespace PlatformRacing3.Common.PrivateMessage
 {
     public sealed class PrivateMessageManager
     {

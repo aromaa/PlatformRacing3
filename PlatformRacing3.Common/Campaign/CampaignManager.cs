@@ -1,23 +1,16 @@
-﻿using Platform_Racing_3_Common.Database;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
-using System.IO.Compression;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Utils;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Common.Utils;
 
-namespace Platform_Racing_3_Common.Campaign
+namespace PlatformRacing3.Common.Campaign
 {
     public sealed class CampaignManager
     {

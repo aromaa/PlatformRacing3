@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Text.Json.Serialization;
 
-namespace Platform_Racing_3_Common.PrivateMessage
+namespace PlatformRacing3.Common.PrivateMessage
 {
     public interface IPrivateMessage
     {

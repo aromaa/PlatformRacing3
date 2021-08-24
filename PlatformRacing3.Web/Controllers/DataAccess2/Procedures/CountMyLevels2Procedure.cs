@@ -1,18 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Web.Extensions;
-using Platform_Racing_3_Web.Responses;
-using Platform_Racing_3_Web.Responses.Procedures;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Http;
+using PlatformRacing3.Common.Level;
+using PlatformRacing3.Web.Extensions;
+using PlatformRacing3.Web.Responses;
+using PlatformRacing3.Web.Responses.Procedures;
 
-namespace Platform_Racing_3_Web.Controllers.DataAccess2.Procedures
+namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
     public class CountMyLevels2Procedure : IProcedure
     {

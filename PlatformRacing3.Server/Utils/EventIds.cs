@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace Platform_Racing_3_Server.Utils
+namespace PlatformRacing3.Server.Utils
 {
 	internal sealed class EventIds
 	{

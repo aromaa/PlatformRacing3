@@ -1,14 +1,9 @@
-﻿using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Utils;
-using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
+using PlatformRacing3.Common.Redis;
 
-namespace Platform_Racing_3_Common.Authenication
+namespace PlatformRacing3.Common.Authenication
 {
     public class AuthenicationManager
     {

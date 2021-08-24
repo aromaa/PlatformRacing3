@@ -1,14 +1,10 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Net.Buffers;
-using Platform_Racing_3_Common.Json;
+using PlatformRacing3.Common.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
 {
     internal abstract class JsonOutgoingMessage<T> : IMessageOutgoing where T: JsonPacket
     {

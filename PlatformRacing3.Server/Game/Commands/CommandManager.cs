@@ -1,17 +1,15 @@
-﻿using Platform_Racing_3_Server.Game.Commands.Match;
-using Platform_Racing_3_Server.Game.Commands.Misc;
-using Platform_Racing_3_Server.Game.Commands.User;
-using Platform_Racing_3_Server_API.Game.Commands;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Utils;
+using PlatformRacing3.Server.API.Game.Commands;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Commands.Match;
+using PlatformRacing3.Server.Game.Commands.Misc;
+using PlatformRacing3.Server.Game.Commands.User;
+using PlatformRacing3.Server.Utils;
 
-namespace Platform_Racing_3_Server.Game.Commands
+namespace PlatformRacing3.Server.Game.Commands
 {
     internal sealed class CommandManager
     {

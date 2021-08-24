@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("crossdomain.xml")]

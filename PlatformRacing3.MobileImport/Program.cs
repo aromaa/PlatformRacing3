@@ -1,16 +1,16 @@
-﻿using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using Mobile_Import.Config;
-using Platform_Racing_3_Common.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.MobileImport.Config;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Mobile_Import
+namespace PlatformRacing3.MobileImport
 {
     internal class Program
     {

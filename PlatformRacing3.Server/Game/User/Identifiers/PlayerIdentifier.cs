@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 
-namespace Platform_Racing_3_Server.Game.User.Identifiers
+namespace PlatformRacing3.Server.Game.User.Identifiers
 {
     internal class PlayerIdentifier : IUserIdentifier
     {

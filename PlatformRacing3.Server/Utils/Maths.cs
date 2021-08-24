@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 
-namespace Platform_Racing_3_Server.Utils
+namespace PlatformRacing3.Server.Utils
 {
     internal class Maths
     {

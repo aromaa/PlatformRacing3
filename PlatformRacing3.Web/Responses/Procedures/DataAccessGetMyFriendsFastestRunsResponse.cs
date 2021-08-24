@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using Platform_Racing_3_Common.Campaign;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessGetMyFriendsFastestRunsResponse;
+using PlatformRacing3.Common.Campaign;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyFriendsFastestRunsResponse : DataAccessDataResponse<UserCampaignRun>
+    public class DataAccessGetMyFriendsFastestRunsResponse : DataAccessDataResponse<DataAccessGetMyFriendsFastestRunsResponse.UserCampaignRun>
     {
         public DataAccessGetMyFriendsFastestRunsResponse()
         {

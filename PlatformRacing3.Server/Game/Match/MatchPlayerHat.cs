@@ -1,11 +1,8 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Customization;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
+using System.Text.Json.Serialization;
+using PlatformRacing3.Common.Customization;
 
-namespace Platform_Racing_3_Server.Game.Match
+namespace PlatformRacing3.Server.Game.Match
 {
     internal sealed class MatchPlayerHat
     {

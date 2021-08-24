@@ -1,13 +1,8 @@
-﻿using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Xml.Serialization;
+using PlatformRacing3.Web.Utils;
 
-namespace Platform_Racing_3_Web.Responses
+namespace PlatformRacing3.Web.Responses
 {
     public class IsLoggedInResponse
     {

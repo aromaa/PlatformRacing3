@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Text;
+﻿using System.Data.Common;
 using System.Text.Json.Serialization;
 
-namespace Platform_Racing_3_Common.Campaign
+namespace PlatformRacing3.Common.Campaign
 {
     public class CampaignPrize
     {

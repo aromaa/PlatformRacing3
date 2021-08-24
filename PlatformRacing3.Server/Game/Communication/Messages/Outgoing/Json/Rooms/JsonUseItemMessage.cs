@@ -1,9 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json.Rooms
 {
     internal sealed class JsonUseItemMessage : JsonMessageOutgoingMessage
     {

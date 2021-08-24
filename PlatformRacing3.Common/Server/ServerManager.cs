@@ -1,20 +1,15 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using StackExchange.Redis;
-using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
-using Platform_Racing_3_Common.Utils;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Common.Utils;
+using StackExchange.Redis;
 
-namespace Platform_Racing_3_Common.Server
+namespace PlatformRacing3.Common.Server
 {
     public sealed class ServerManager
     {

@@ -1,13 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Platform_Racing_3_Server.Host.Implementation
+namespace PlatformRacing3.Server.Host.Implementation
 {
 	internal sealed class ServerHostBuilder : IServerHostBuilder
 	{

@@ -1,15 +1,13 @@
-﻿using Npgsql;
-using Platform_Racing_3_Common.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Common.Utils;
+using Npgsql;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Utils;
 
-namespace Platform_Racing_3_Common.Block
+namespace PlatformRacing3.Common.Block
 {
     public sealed class BlockManager
     {

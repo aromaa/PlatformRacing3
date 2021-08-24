@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Platform_Racing_3_Server.Game.Chat
+﻿namespace PlatformRacing3.Server.Game.Chat
 {
     public enum ChatRoomType
     {

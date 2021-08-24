@@ -1,25 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.Utils;
-using Platform_Racing_3_Web.Controllers.DataAccess2;
-using Platform_Racing_3_Web.Middleware;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Web.Middleware;
 
-namespace Platform_Racing_3_Web
+namespace PlatformRacing3.Web
 {
     internal class Startup
     {

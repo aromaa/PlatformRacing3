@@ -1,18 +1,15 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Utils;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Net;
-using System.Text;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Packets.Match;
+using System.Text.Json.Serialization;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
-namespace Platform_Racing_3_Server.Game.Match
+namespace PlatformRacing3.Server.Game.Match
 {
     internal class MatchPlayer
     {

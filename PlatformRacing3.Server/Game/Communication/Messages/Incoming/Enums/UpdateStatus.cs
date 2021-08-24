@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums
 {
     [Flags]
     public enum UpdateStatus

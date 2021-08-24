@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
+﻿using System.Drawing;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
 {
     internal class UserPageOutgoingMessage : JsonOutgoingMessage<JsonUserPageOutgoingMessage>
     {

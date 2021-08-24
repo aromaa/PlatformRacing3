@@ -1,15 +1,9 @@
-﻿using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessCountMyLevels2Response;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCountMyLevels2Response : DataAccessDataResponse<CountMyLevelsResponse>
+    public class DataAccessCountMyLevels2Response : DataAccessDataResponse<DataAccessCountMyLevels2Response.CountMyLevelsResponse>
     {
         private DataAccessCountMyLevels2Response()
         {

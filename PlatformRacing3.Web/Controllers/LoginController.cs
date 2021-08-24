@@ -1,15 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Web.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Web.Extensions;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("login")]

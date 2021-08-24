@@ -1,11 +1,7 @@
-﻿using Platform_Racing_3_Common.Config;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
+﻿using System.Text.Json.Serialization;
+using PlatformRacing3.Common.Config;
 
-namespace Platform_Racing_3_Web.Config
+namespace PlatformRacing3.Web.Config
 {
     public class WebConfig : IDatabaseConfig, IRedisConfig, IEmailConfig
     {

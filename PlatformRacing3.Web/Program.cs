@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
 using System.Net.Mail;
-using System.Reflection;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Web.Config;
-using Platform_Racing_3_Web.Controllers.DataAccess2;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Web.Config;
+using PlatformRacing3.Web.Controllers.DataAccess2;
 
-namespace Platform_Racing_3_Web
+namespace PlatformRacing3.Web
 {
     internal class Program
     {

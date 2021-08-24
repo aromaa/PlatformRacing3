@@ -1,19 +1,15 @@
-﻿using Discord;
+﻿using System;
+using System.Reflection;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using Discord_Bot.Config;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Server;
-using StackExchange.Redis;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Discord.Config;
 
-namespace Discord_Bot.Core
+namespace PlatformRacing3.Discord.Core
 {
     internal class DiscordBot
     {

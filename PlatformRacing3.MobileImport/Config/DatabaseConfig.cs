@@ -1,10 +1,7 @@
-﻿using Platform_Racing_3_Common.Config;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using PlatformRacing3.Common.Config;
 
-namespace Mobile_Import.Config
+namespace PlatformRacing3.MobileImport.Config
 {
     internal class DatabaseConfig : IDatabaseConfig
     {

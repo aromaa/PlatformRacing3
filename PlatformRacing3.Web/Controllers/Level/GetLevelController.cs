@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Web.Responses;
-using Platform_Racing_3_Web.Responses.Procedures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using PlatformRacing3.Common.Level;
+using PlatformRacing3.Web.Responses;
 
-namespace Platform_Racing_3_Web.Controllers.Level
+namespace PlatformRacing3.Web.Controllers.Level
 {
     [ApiController]
     [Route("GetLevel")]

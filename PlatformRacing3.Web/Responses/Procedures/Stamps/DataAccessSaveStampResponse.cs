@@ -1,14 +1,10 @@
-﻿using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.Stamps.DataAccessSaveStampResponse;
+using PlatformRacing3.Web.Utils;
 
-namespace Platform_Racing_3_Web.Responses.Procedures.Stamps
+namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessSaveStampResponse : DataAccessDataResponse<StampSavedResponse>
+    public class DataAccessSaveStampResponse : DataAccessDataResponse<DataAccessSaveStampResponse.StampSavedResponse>
     {
         public DataAccessSaveStampResponse()
         {

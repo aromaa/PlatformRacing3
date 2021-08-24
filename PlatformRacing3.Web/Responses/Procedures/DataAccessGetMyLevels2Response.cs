@@ -1,12 +1,7 @@
-﻿using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
+﻿using System.Collections.Generic;
+using PlatformRacing3.Common.Level;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
     public class DataAccessGetMyLevels2Response : DataAccessDataResponse<LevelData>
     {

@@ -1,13 +1,9 @@
-﻿using Discord;
+﻿using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.User;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using PlatformRacing3.Common.User;
 
-namespace Discord_Bot.Commands
+namespace PlatformRacing3.Discord.Commands
 {
     public class VerifyCommand : ModuleBase<SocketCommandContext>
     {

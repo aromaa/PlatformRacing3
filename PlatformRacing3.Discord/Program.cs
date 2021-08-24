@@ -1,20 +1,16 @@
-﻿using Discord.WebSocket;
-using System;
-using Discord;
-using System.Threading.Tasks;
-using Discord.Commands;
-using System.Reflection;
-using Discord_Bot.Core;
-using Newtonsoft.Json;
+﻿using System;
 using System.IO;
-using Discord_Bot.Config;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging.Abstractions;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Utils;
+using Newtonsoft.Json;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Discord.Config;
+using PlatformRacing3.Discord.Core;
 
-namespace Discord_Bot
+namespace PlatformRacing3.Discord
 {
     internal class Program
     {

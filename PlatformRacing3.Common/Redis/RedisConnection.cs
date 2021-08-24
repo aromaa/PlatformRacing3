@@ -1,12 +1,7 @@
-﻿using Platform_Racing_3_Common.Config;
-using Platform_Racing_3_Common.User;
+﻿using PlatformRacing3.Common.Config;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Platform_Racing_3_Common.Redis
+namespace PlatformRacing3.Common.Redis
 {
     public class RedisConnection
     {

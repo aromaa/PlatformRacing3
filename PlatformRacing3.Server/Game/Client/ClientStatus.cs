@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Platform_Racing_3_Server.Game.Client
+﻿namespace PlatformRacing3.Server.Game.Client
 {
     public enum ClientStatus
     {

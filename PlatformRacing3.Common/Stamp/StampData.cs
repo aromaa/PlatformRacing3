@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
-namespace Platform_Racing_3_Common.Stamp
+namespace PlatformRacing3.Common.Stamp
 {
     public class StampData : IXmlSerializable
     {

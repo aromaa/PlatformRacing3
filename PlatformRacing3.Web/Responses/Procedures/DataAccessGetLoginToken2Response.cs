@@ -1,15 +1,10 @@
-﻿using Platform_Racing_3_Common.Exceptions;
-using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessGetLoginToken2Response;
+using PlatformRacing3.Common.Exceptions;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetLoginToken2Response : DataAccessDataResponse<LoginTokenResponse>
+    public class DataAccessGetLoginToken2Response : DataAccessDataResponse<DataAccessGetLoginToken2Response.LoginTokenResponse>
     {
         //Kinda useless warning but whatever, might remove it later
         [XmlElement("WARNING")]

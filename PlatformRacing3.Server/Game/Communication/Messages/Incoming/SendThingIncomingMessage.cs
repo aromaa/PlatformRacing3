@@ -1,12 +1,9 @@
-﻿using Platform_Racing_3_Common.Block;
-using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using PlatformRacing3.Common.Block;
+using PlatformRacing3.Common.Level;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
     internal class SendThingIncomingMessage : MessageIncomingJson<JsonSendThingIncomingMessage>
     {

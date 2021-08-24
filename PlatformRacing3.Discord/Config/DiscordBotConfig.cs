@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Platform_Racing_3_Common.Config;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PlatformRacing3.Common.Config;
 
-namespace Discord_Bot.Config
+namespace PlatformRacing3.Discord.Config
 {
     internal class DiscordBotConfig : IDatabaseConfig, IRedisConfig
     {

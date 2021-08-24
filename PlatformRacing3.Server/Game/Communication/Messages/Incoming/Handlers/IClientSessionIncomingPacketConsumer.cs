@@ -1,12 +1,10 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using Net.Buffers;
 using Net.Communication.Incoming.Consumer;
 using Net.Sockets.Pipeline.Handler;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers
 {
     internal interface IClientSessionIncomingPacketConsumer : IIncomingPacketConsumer
     {

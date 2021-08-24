@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Text;
 
-namespace Platform_Racing_3_Common.Utils
+namespace PlatformRacing3.Common.Utils
 {
     public static class ExpUtils
     {

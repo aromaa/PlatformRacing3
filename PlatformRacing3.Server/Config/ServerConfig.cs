@@ -1,11 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Config;
-using Platform_Racing_3_Common.Redis;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PlatformRacing3.Common.Config;
 
-namespace Platform_Racing_3_Server.Config
+namespace PlatformRacing3.Server.Config
 {
     internal class ServerConfig : IDatabaseConfig, IRedisConfig
     {

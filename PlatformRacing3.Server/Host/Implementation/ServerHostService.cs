@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
-using Platform_Racing_3_Server.Core;
+using PlatformRacing3.Server.Core;
 
-namespace Platform_Racing_3_Server.Host.Implementation
+namespace PlatformRacing3.Server.Host.Implementation
 {
 	internal sealed class ServerHostService : IHostedService
 	{

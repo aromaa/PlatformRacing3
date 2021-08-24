@@ -1,21 +1,16 @@
-﻿using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
+﻿using Microsoft.Extensions.Logging;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Server.Core;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+using PlatformRacing3.Server.Utils;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Server.Utils;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
     internal sealed class TokenLoginIncomingMessage : MessageIncomingJson<JsonTokenLoginIncomingMessage>
     {

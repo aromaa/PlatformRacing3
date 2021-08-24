@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace Platform_Racing_3_Web.Utils
+namespace PlatformRacing3.Web.Utils
 {
 	internal static class EventIds
 	{

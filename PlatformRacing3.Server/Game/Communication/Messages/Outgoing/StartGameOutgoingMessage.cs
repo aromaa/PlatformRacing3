@@ -1,12 +1,6 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+﻿using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json.Rooms;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
 {
     internal class StartGameOutgoingMessage : JsonOutgoingMessage<JsonStartGameMessage>
     {

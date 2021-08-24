@@ -1,22 +1,17 @@
-﻿using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Utils;
-using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.Utils;
 
-namespace Platform_Racing_3_Common.User
+namespace PlatformRacing3.Common.User
 {
     public abstract class UserData : IXmlSerializable
     {

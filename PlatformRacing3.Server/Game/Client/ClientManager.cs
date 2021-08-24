@@ -1,12 +1,10 @@
-﻿using Platform_Racing_3_Server.Collections;
-using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
+using PlatformRacing3.Server.Collections;
 
-namespace Platform_Racing_3_Server.Game.Client
+namespace PlatformRacing3.Server.Game.Client
 {
     internal sealed class ClientManager
     {

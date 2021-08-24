@@ -1,18 +1,12 @@
-﻿using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages;
-using System;
-using System.Buffers;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Text;
-using Net.Buffers;
+﻿using Net.Buffers;
 using Net.Sockets.Pipeline.Handler;
 using Net.Sockets.Pipeline.Handler.Incoming;
 using Net.Sockets.Pipeline.Handler.Outgoing;
-using Platform_Racing_3_Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Communication.Messages;
 
-namespace Platform_Racing_3_Server.Game.Communication.Handlers
+namespace PlatformRacing3.Server.Game.Communication.Handlers
 {
     internal sealed class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
     {

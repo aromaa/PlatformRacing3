@@ -1,39 +1,27 @@
-﻿using Discord.Webhook;
-using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Config;
-using Platform_Racing_3_Server.Game.Chat;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Commands;
-using Platform_Racing_3_Server.Game.Communication.Handlers;
-using Platform_Racing_3_Server.Game.Communication.Managers;
-using Platform_Racing_3_Server.Game.Communication.Messages;
-using Platform_Racing_3_Server.Game.Lobby;
-using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server_API.Core;
-using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Reflection;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.Webhook;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Net.Sockets.Listener;
-using Platform_Racing_3_Common.Utils;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Server.Config;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Handlers;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using StackExchange.Redis;
 
-namespace Platform_Racing_3_Server.Core
+namespace PlatformRacing3.Server.Core
 {
-    internal sealed class PlatformRacing3Server : PlatformRacing3
+    internal sealed class PlatformRacing3Server : PlatformRacing3.Server.API.Core.PlatformRacing3
     {
         public const uint PROTOCOL_VERSION = 24;
 

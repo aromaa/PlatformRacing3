@@ -1,8 +1,4 @@
-﻿using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Json;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -10,8 +6,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Json;
 
-namespace Platform_Racing_3_Common.Campaign
+namespace PlatformRacing3.Common.Campaign
 {
     public class CampaignRun
     {

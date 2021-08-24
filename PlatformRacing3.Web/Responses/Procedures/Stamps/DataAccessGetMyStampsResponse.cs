@@ -1,14 +1,9 @@
-﻿using Platform_Racing_3_Common.Stamp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.Stamps.DataAccessGetMyStampsResponse;
 
-namespace Platform_Racing_3_Web.Responses.Procedures.Stamps
+namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessGetMyStampsResponse : DataAccessDataResponse<MyStampData>
+    public class DataAccessGetMyStampsResponse : DataAccessDataResponse<DataAccessGetMyStampsResponse.MyStampData>
     {
         [XmlElement("category")]
         public string Category { get; set; }

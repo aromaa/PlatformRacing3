@@ -1,17 +1,15 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Managers.Consumer;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using Net.Buffers;
 using Net.Communication.Incoming.Consumer;
 using Net.Communication.Incoming.Handler;
 using Net.Communication.Incoming.Parser;
 using Net.Communication.Manager;
 using Net.Sockets.Pipeline.Handler;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Managers.Consumer;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers;
 
-namespace Platform_Racing_3_Server.Game.Communication.Managers
+namespace PlatformRacing3.Server.Game.Communication.Managers
 {
     internal sealed class BytePacketManager : PacketManager<uint>
     {

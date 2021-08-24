@@ -1,22 +1,16 @@
-﻿using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Utils;
-using StackExchange.Redis;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Drawing;
 using System.Linq;
-using System.Numerics;
-using System.Text;
-using Platform_Racing_3_Common.Extensions;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Extensions;
+using PlatformRacing3.Common.Redis;
+using PlatformRacing3.Common.Utils;
+using StackExchange.Redis;
 
-namespace Platform_Racing_3_Common.User
+namespace PlatformRacing3.Common.User
 {
     public class PlayerUserData : BaseUserData
     {

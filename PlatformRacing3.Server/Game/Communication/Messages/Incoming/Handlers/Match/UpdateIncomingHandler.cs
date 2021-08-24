@@ -1,15 +1,11 @@
 ﻿using Net.Communication.Attributes;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Managers;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Enums;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.Match;
-using Platform_Racing_3_Server.Game.Match;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Match;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers.Match
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers.Match
 {
     [PacketManagerRegister(typeof(BytePacketManager))]
     internal class UpdateIncomingHandler : AbstractIncomingClientSessionPacketHandler<UpdatePacketIncomingPacket>

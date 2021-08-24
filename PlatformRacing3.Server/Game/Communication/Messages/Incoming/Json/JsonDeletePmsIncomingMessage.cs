@@ -1,9 +1,7 @@
-﻿using System.Text.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json
 {
     internal sealed class JsonDeletePmsIncomingMessage : JsonPacket
     {

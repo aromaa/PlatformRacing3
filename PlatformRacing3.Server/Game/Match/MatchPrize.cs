@@ -1,10 +1,6 @@
-﻿using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using PlatformRacing3.Common.Customization;
 
-namespace Platform_Racing_3_Server.Game.Match
+namespace PlatformRacing3.Server.Game.Match
 {
     internal class MatchPrize
     {

@@ -1,9 +1,7 @@
-﻿using Platform_Racing_3_Server.Game.Lobby;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using PlatformRacing3.Server.Game.Lobby;
 
-namespace Platform_Racing_3_Server.Extensions
+namespace PlatformRacing3.Server.Extensions
 {
     public static class MatchListingTypeExtenssion
     {

@@ -1,31 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures;
-using Platform_Racing_3_Web.Controllers.DataAccess2.Procedures.Stamps;
-using Platform_Racing_3_Web.Responses;
-using Platform_Racing_3_Web.Responses.Procedures;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Web.Extensions;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Web.Config;
-using Platform_Racing_3_Web.Utils;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Web.Config;
+using PlatformRacing3.Web.Controllers.DataAccess2.Procedures;
+using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Exceptions;
+using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Stamps;
+using PlatformRacing3.Web.Extensions;
+using PlatformRacing3.Web.Responses;
+using PlatformRacing3.Web.Utils;
 
-namespace Platform_Racing_3_Web.Controllers.DataAccess2
+namespace PlatformRacing3.Web.Controllers.DataAccess2
 {
     [ApiController]
     [Route("dataaccess2")]

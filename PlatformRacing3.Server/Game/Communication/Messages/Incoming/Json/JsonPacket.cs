@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json
 {
     internal abstract class JsonPacket
     {

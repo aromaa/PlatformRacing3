@@ -1,15 +1,11 @@
-﻿using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessSaveLevel4Response;
+using PlatformRacing3.Web.Utils;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessSaveLevel4Response : DataAccessDataResponse<LevelSaveResponse>
+    public class DataAccessSaveLevel4Response : DataAccessDataResponse<DataAccessSaveLevel4Response.LevelSaveResponse>
     {
         public DataAccessSaveLevel4Response()
         {

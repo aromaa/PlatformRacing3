@@ -1,17 +1,13 @@
-﻿using Net.Collections;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages;
-using Platform_Racing_3_Server_API.Net;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Net.Collections;
 using Net.Sockets;
-using Platform_Racing_3_Server.Collections.Matcher;
+using PlatformRacing3.Server.Collections.Matcher;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Collections
+namespace PlatformRacing3.Server.Collections
 {
     internal class ClientSessionCollection
     {

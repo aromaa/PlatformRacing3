@@ -1,13 +1,9 @@
-﻿using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
     internal sealed class GetUserListIncomingMessage : MessageIncomingJson<JsonGetUserListIncomingMessage>
     {

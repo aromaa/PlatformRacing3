@@ -1,17 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Common.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using System;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using PlatformRacing3.Common.User;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("forgotpassword")]

@@ -1,13 +1,10 @@
-﻿using Net.Communication.Attributes;
-using Platform_Racing_3_Server.Game.Communication.Managers;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Packets.Handshake;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Net.Buffers;
+﻿using Net.Buffers;
+using Net.Communication.Attributes;
 using Net.Communication.Incoming.Parser;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Handshake;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Parsers.Handshake
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Parsers.Handshake
 {
     [PacketManagerRegister(typeof(BytePacketManager))]
     [PacketParserId(45u)]

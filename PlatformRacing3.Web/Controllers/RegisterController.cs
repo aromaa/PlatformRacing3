@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Web.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Web.Extensions;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("register")]

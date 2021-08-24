@@ -1,13 +1,9 @@
-﻿using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using Platform_Racing_3_Server.Game.Commands;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Commands;
 
-namespace Platform_Racing_3_Server.Game.Chat
+namespace PlatformRacing3.Server.Game.Chat
 {
     internal sealed class ChatRoomManager
     {

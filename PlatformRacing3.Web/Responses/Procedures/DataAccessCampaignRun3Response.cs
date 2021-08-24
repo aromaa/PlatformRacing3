@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessCampaignRun3Response;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCampaignRun3Response : DataAccessDataResponse<CampaignRunResponse>
+    public class DataAccessCampaignRun3Response : DataAccessDataResponse<DataAccessCampaignRun3Response.CampaignRunResponse>
     {
         public DataAccessCampaignRun3Response()
         {

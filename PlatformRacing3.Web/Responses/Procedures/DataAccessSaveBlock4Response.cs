@@ -1,14 +1,10 @@
-﻿using Platform_Racing_3_Web.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessSaveBlock4Response;
+using PlatformRacing3.Web.Utils;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessSaveBlock4Response : DataAccessDataResponse<BlockSaveResponse>
+    public class DataAccessSaveBlock4Response : DataAccessDataResponse<DataAccessSaveBlock4Response.BlockSaveResponse>
     {
         public DataAccessSaveBlock4Response()
         {

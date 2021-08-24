@@ -1,13 +1,10 @@
-﻿using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.Customization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Numerics;
-using System.Text;
+using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Customization;
 
-namespace Platform_Racing_3_Common.User
+namespace PlatformRacing3.Common.User
 {
     public abstract class BaseUserData : UserData
     {

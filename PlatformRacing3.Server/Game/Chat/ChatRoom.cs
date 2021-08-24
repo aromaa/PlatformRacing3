@@ -1,24 +1,19 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Utils;
-using Platform_Racing_3_Server.Collections;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms;
-using Platform_Racing_3_Server.Game.User.Identifiers;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Server.Game.Commands;
-using StackExchange.Redis;
+using System.Text.Json.Serialization;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Server.Collections;
+using PlatformRacing3.Server.Core;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Commands;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+using PlatformRacing3.Server.Game.User.Identifiers;
 
-namespace Platform_Racing_3_Server.Game.Chat
+namespace PlatformRacing3.Server.Game.Chat
 {
     internal class ChatRoom
     {

@@ -1,11 +1,8 @@
-﻿using Platform_Racing_3_Common.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
 using System.Xml.Serialization;
+using PlatformRacing3.Common.Exceptions;
 
-namespace Platform_Racing_3_Web.Responses
+namespace PlatformRacing3.Web.Responses
 {
     public class DataAccessEmptyResponse : IDataAccessDataResponse
     {

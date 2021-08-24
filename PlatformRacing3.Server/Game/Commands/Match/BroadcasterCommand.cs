@@ -1,11 +1,9 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server_API.Game.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
+using PlatformRacing3.Server.API.Game.Commands;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Commands.Match
+namespace PlatformRacing3.Server.Game.Commands.Match
 {
     internal class BroadcasterCommand : ICommand
     {

@@ -1,10 +1,6 @@
-﻿using Npgsql;
-using Platform_Racing_3_Common.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
-namespace Platform_Racing_3_Common.Database
+namespace PlatformRacing3.Common.Database
 {
     internal class DatabaseCustomFormatter : ICustomFormatter
     {

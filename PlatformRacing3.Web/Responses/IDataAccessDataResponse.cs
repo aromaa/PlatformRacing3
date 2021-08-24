@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-
-namespace Platform_Racing_3_Web.Responses
+﻿namespace PlatformRacing3.Web.Responses
 {
     public interface IDataAccessDataResponse
     {

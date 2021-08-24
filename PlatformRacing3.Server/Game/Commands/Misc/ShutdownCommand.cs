@@ -1,12 +1,8 @@
-﻿using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server_API.Game.Commands;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using Microsoft.Extensions.Hosting;
+using PlatformRacing3.Server.API.Game.Commands;
 
-namespace Platform_Racing_3_Server.Game.Commands.Misc
+namespace PlatformRacing3.Server.Game.Commands.Misc
 {
     internal sealed class ShutdownCommand : ICommand
     {

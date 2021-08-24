@@ -1,16 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Web.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Web.Extensions;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("linkdiscord")]

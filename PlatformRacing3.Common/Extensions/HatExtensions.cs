@@ -1,9 +1,6 @@
-﻿using Platform_Racing_3_Common.Customization;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using PlatformRacing3.Common.Customization;
 
-namespace Platform_Racing_3_Common.Extensions
+namespace PlatformRacing3.Common.Extensions
 {
     public static class HatExtensions
     {

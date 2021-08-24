@@ -1,10 +1,7 @@
-﻿using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json.Rooms;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
+﻿using System.Drawing;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json.Rooms;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
 {
     internal class ChatOutgoingMessage : JsonOutgoingMessage<JsonChatMessage>
     {

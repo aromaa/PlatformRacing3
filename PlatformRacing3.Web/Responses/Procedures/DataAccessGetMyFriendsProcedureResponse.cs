@@ -1,10 +1,7 @@
-﻿using Platform_Racing_3_Common.User;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using PlatformRacing3.Common.User;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
     public class DataAccessGetMyFriendsProcedureResponse : DataAccessDataResponse<PlayerUserData>
     {

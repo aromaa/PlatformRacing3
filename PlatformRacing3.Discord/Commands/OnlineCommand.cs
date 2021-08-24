@@ -1,12 +1,9 @@
-﻿using Discord.Commands;
-using Discord.Commands.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using System.Threading.Tasks;
-using Platform_Racing_3_Common.Server;
+using Discord.Commands;
+using PlatformRacing3.Common.Server;
 
-namespace Discord_Bot.Commands
+namespace PlatformRacing3.Discord.Commands
 {
     public class OnlineCommand : ModuleBase<SocketCommandContext>
     {

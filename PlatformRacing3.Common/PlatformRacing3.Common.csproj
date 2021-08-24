@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Platform_Racing_3_Common</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

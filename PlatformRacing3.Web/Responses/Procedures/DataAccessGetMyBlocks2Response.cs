@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using static Platform_Racing_3_Web.Responses.Procedures.DataAccessGetMyBlocks2Response;
 
-namespace Platform_Racing_3_Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyBlocks2Response : DataAccessDataResponse<MyBlocksData>
+    public class DataAccessGetMyBlocks2Response : DataAccessDataResponse<DataAccessGetMyBlocks2Response.MyBlocksData>
     {
         [XmlElement("category")]
         public string Category { get; set; }

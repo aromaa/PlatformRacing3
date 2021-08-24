@@ -1,13 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Commands.Executors;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Threading.Tasks;
-using Platform_Racing_3_Server.Extensions;
+﻿using System;
+using Microsoft.Extensions.Hosting;
+using PlatformRacing3.Server.Extensions;
 
-namespace Platform_Racing_3_Server
+namespace PlatformRacing3.Server
 {
     internal static class Program
     {

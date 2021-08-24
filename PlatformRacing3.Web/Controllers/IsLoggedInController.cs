@@ -1,18 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Web.Extensions;
-using Platform_Racing_3_Web.Responses;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Web.Extensions;
+using PlatformRacing3.Web.Responses;
 
-namespace Platform_Racing_3_Web.Controllers
+namespace PlatformRacing3.Web.Controllers
 {
     [ApiController]
     [Route("isloggedin")]

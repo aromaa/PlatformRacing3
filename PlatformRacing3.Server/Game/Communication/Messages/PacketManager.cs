@@ -1,16 +1,15 @@
-﻿using Platform_Racing_3_Server.Game.Communication.Messages.Incoming;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Server.Game.Chat;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Lobby;
-using Platform_Racing_3_Server.Game.Match;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Server.Game.Chat;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Lobby;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages
+namespace PlatformRacing3.Server.Game.Communication.Messages
 {
     internal sealed class PacketManager
     {

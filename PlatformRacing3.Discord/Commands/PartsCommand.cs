@@ -1,14 +1,13 @@
-﻿using Discord;
-using Discord.Commands;
-using Platform_Racing_3_Common.Customization;
-using Platform_Racing_3_Common.Extensions;
-using Platform_Racing_3_Common.User;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Text;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Extensions;
+using PlatformRacing3.Common.User;
 
-namespace Discord_Bot.Commands
+namespace PlatformRacing3.Discord.Commands
 {
     public class MyPartsCommand : ModuleBase<SocketCommandContext>
     {

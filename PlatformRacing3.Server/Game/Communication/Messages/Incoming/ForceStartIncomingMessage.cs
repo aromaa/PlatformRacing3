@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
+﻿using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
     internal class ForceStartIncomingMessage : IMessageIncomingJson
     {

@@ -1,10 +1,8 @@
-﻿using Platform_Racing_3_Server.Game.Client;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using PlatformRacing3.Server.Game.Client;
 
-namespace Platform_Racing_3_Server.Game.Lobby
+namespace PlatformRacing3.Server.Game.Lobby
 {
     internal class LobbySession
     {

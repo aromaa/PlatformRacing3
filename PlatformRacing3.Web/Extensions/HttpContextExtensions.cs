@@ -1,19 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using Platform_Racing_3_Common.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Common.Utils;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
+using PlatformRacing3.Common.Database;
 
-namespace Platform_Racing_3_Web.Extensions
+namespace PlatformRacing3.Web.Extensions
 {
     internal static class HttpContextExtensions
     {

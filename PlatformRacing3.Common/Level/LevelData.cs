@@ -1,20 +1,16 @@
-﻿using Platform_Racing_3_Common.Campaign;
-using Platform_Racing_3_Common.Exceptions;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using PlatformRacing3.Common.Utils;
 
-namespace Platform_Racing_3_Common.Level
+namespace PlatformRacing3.Common.Level
 {
     public class LevelData : IXmlSerializable
     {

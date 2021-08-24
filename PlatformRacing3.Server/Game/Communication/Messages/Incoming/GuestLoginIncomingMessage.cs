@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Reflection;
+﻿using System.Data.Common;
 using Microsoft.Extensions.Logging;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Server;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing.Json;
-using Platform_Racing_3_Server.Utils;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Server.Core;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+using PlatformRacing3.Server.Utils;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
     internal sealed class GuestLoginIncomingMessage : IMessageIncomingJson
     {

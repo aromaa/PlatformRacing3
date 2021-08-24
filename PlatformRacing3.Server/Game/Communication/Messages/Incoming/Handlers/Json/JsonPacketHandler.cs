@@ -1,13 +1,9 @@
 ﻿using Net.Communication.Attributes;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Managers;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Handlers.Json
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers.Json
 {
     [PacketManagerRegister(typeof(BytePacketManager))]
     internal sealed class JsonPacketHandler : AbstractIncomingClientSessionPacketHandler<JsonPacket>

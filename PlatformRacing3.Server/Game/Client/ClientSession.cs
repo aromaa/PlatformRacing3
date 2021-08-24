@@ -1,25 +1,22 @@
-﻿using System.Text.Json.Serialization;
-using Platform_Racing_3_Common.Database;
-using Platform_Racing_3_Common.Redis;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Common.Utils;
-using Platform_Racing_3_Server.Game.Communication.Messages;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using Platform_Racing_3_Server.Game.Lobby;
-using Platform_Racing_3_Server.Game.Match;
-using Platform_Racing_3_Server_API.Game.Commands;
-using Platform_Racing_3_Server_API.Net;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Net.Sockets;
+using PlatformRacing3.Common.Database;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Server.API.Game.Commands;
+using PlatformRacing3.Server.Game.Communication.Messages;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+using PlatformRacing3.Server.Game.Lobby;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Client
+namespace PlatformRacing3.Server.Game.Client
 {
     internal class ClientSession : ICommandExecutor
     {

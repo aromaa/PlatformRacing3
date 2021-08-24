@@ -1,20 +1,18 @@
-﻿using Platform_Racing_3_Common.Level;
-using Platform_Racing_3_Common.User;
-using Platform_Racing_3_Server.Collections;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Extensions;
-using Platform_Racing_3_Server.Game.Client;
-using Platform_Racing_3_Server.Game.Communication.Messages.Outgoing;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Platform_Racing_3_Server.Game.Match;
+using PlatformRacing3.Common.Level;
+using PlatformRacing3.Common.User;
+using PlatformRacing3.Server.Collections;
+using PlatformRacing3.Server.Extensions;
+using PlatformRacing3.Server.Game.Client;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+using PlatformRacing3.Server.Game.Match;
 
-namespace Platform_Racing_3_Server.Game.Lobby
+namespace PlatformRacing3.Server.Game.Lobby
 {
     internal sealed class MatchListingManager
     {

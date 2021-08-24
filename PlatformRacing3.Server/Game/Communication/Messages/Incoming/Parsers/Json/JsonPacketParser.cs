@@ -1,18 +1,13 @@
-﻿using Net.Communication.Attributes;
-using System.Text.Json.Serialization;
-using Platform_Racing_3_Server.Core;
-using Platform_Racing_3_Server.Game.Communication.Managers;
-using Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Json;
-using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Text.Json;
 using Net.Buffers;
+using Net.Communication.Attributes;
 using Net.Communication.Incoming.Parser;
-using Platform_Racing_3_Common.Json;
+using PlatformRacing3.Common.Json;
+using PlatformRacing3.Server.Game.Communication.Managers;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
-namespace Platform_Racing_3_Server.Game.Communication.Messages.Incoming.Parsers.Json
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Parsers.Json
 {
     [PacketManagerRegister(typeof(BytePacketManager))]
     [PacketParserId(0u)]
