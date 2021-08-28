@@ -32,6 +32,9 @@
         PetRock = 27,
         BunnyEars = 28,
         BullHorns = 29,
-        Beret = 30
+        Beret = 30,
+        TinFoil = 31,
+        Glue = 32,
+        TrafficCone = 33
     }
 }
