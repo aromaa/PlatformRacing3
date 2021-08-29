@@ -76,6 +76,9 @@ namespace PlatformRacing3.Server.Game.Match
             Hat.Halo,
 		Hat.TinFoil,
 		Hat.TrafficCone,
+		Hat.MagnetHelmet,
+		Hat.PetSquid,
+		Hat.CamoCap,
         };
 
         private readonly MatchManager matchManager;
