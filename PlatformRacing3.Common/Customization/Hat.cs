@@ -35,6 +35,9 @@
         Beret = 30,
         TinFoil = 31,
         Glue = 32,
-        TrafficCone = 33
+        TrafficCone = 33,
+        MagnetHelmet = 34,
+        PetSquid = 35,
+        CamoCap = 36
     }
 }
