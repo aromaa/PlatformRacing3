@@ -26,26 +26,23 @@ namespace PlatformRacing3.Common.Stamp
             }
 
             //TODO: CACHE
-
-            FormattableString query;
+            
             if (category == "default-all-stamps")
             {
-                query = $"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId}").ContinueWith(StampManager.ParseSqlReadCountMyStamps));
             }
             else if (category == "default-all-stamps-without-category")
             {
-                query = $"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category = ''";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category = ''").ContinueWith(StampManager.ParseSqlReadCountMyStamps));
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.stamps_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}").ContinueWith(StampManager.ParseSqlReadCountMyStamps));
             }
             else
             {
                 throw new ArgumentException(null, nameof(category));
             }
-
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(StampManager.ParseSqlReadCountMyStamps));
         }
 
         public static Task<ISet<string>> GetMyStampCategoriesAsync(uint userId)
@@ -64,26 +61,23 @@ namespace PlatformRacing3.Common.Stamp
             {
                 throw new ArgumentException(null, nameof(userId));
             }
-
-            FormattableString query;
+            
             if (category == "default-all-stamps")
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(StampManager.ParseSqlGetMyStamps));
             }
             else if (category == "default-all-stamps-without-category")
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(StampManager.ParseSqlGetMyStamps));
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT b.id FROM(SELECT DISTINCT ON(t.id) t.id, b.last_updated FROM base.stamps_titles t JOIN base.stamps b ON b.id = t.id WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY t.id, b.last_updated DESC) AS b ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(StampManager.ParseSqlGetMyStamps));
             }
             else
             {
                 throw new ArgumentException(null, nameof(category));
             }
-
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(StampManager.ParseSqlGetMyStamps));
         }
 
         public static Task<bool> SaveStampAsync(uint userId, string title, string category, string description, string art)

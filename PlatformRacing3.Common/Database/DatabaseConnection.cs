@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Npgsql;
+using NpgsqlTypes;
 using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Config;
 using PlatformRacing3.Common.Level;
@@ -26,8 +27,8 @@ namespace PlatformRacing3.Common.Database
 
         public static void Init(IDatabaseConfig dbConfig)
         {
-            DatabaseConnection.ConnectionString = $"Host={dbConfig.DatabaseHost};Port={dbConfig.DatabasePort};Username={dbConfig.DatabaseUser};Password={dbConfig.DatabasePass};Database={dbConfig.DatabaseName}";
-            DatabaseConnection.TestConnection();
+	        DatabaseConnection.ConnectionString = $"Host={dbConfig.DatabaseHost};Port={dbConfig.DatabasePort};Username={dbConfig.DatabaseUser};Password={dbConfig.DatabasePass};Database={dbConfig.DatabaseName}";
+	        DatabaseConnection.TestConnection();
         }
 
         private static void TestConnection()
@@ -51,18 +52,23 @@ namespace PlatformRacing3.Common.Database
             this.Connection.Open();
         }
 
-        public DbDataReader ReadData(FormattableString query)
+        internal void ResetState()
         {
-            this.PrepareQuery(query);
+            this.Command.Parameters.Clear();
+        }
+
+        public DbDataReader ReadData([InterpolatedStringHandlerArgument("")] ref DatabaseInterpolatedStringHandler handler)
+        {
+            this.PrepareQuery(ref handler);
 
             this.Command.Prepare();
 
             return this.Command.ExecuteReader();
         }
         
-        public Task<NpgsqlDataReader> ReadDataAsync(FormattableString query)
+        public Task<NpgsqlDataReader> ReadDataAsync([InterpolatedStringHandlerArgument("")] ref DatabaseInterpolatedStringHandler handler)
         {
-            this.PrepareQuery(query);
+            this.PrepareQuery(ref handler);
 
             this.Command.Prepare();
 
@@ -76,27 +82,27 @@ namespace PlatformRacing3.Common.Database
             return this.Command.ExecuteReaderAsync();
         }
 
-        public Task<int> ExecuteNonQueryAsync(FormattableString query)
+        public Task<int> ExecuteNonQueryAsync([InterpolatedStringHandlerArgument("")] ref DatabaseInterpolatedStringHandler handler)
         {
-            this.PrepareQuery(query);
+            this.PrepareQuery(ref handler);
 
             this.Command.Prepare();
 
             return this.Command.ExecuteNonQueryAsync();
         }
 
-        public int ExecuteNonQuery(FormattableString query)
+        public int ExecuteNonQuery([InterpolatedStringHandlerArgument("")] ref DatabaseInterpolatedStringHandler handler)
         {
-            this.PrepareQuery(query);
+            this.PrepareQuery(ref handler);
 
             this.Command.Prepare();
 
             return this.Command.ExecuteNonQuery();
         }
 
-        public object ExecuteScalar(FormattableString query)
+        public object ExecuteScalar([InterpolatedStringHandlerArgument("")] ref DatabaseInterpolatedStringHandler handler)
         {
-            this.PrepareQuery(query);
+            this.PrepareQuery(ref handler);
 
             this.Command.Prepare();
 
@@ -108,46 +114,19 @@ namespace PlatformRacing3.Common.Database
             this.Command.Parameters.AddWithValue(name, value);
         }
 
-        //This methods does something horrible...
-        public void PrepareQuery(FormattableString query)
+        public void AddParamWithValue(object value)
         {
-            this.Command.Parameters.Clear();
+	        this.Command.Parameters.AddWithValue(value);
+        }
 
-            object[] @params = ArrayPool<object>.Shared.Rent(query.ArgumentCount);
+        public void AddParamWithValue(object value, NpgsqlDbType type)
+        {
+	        this.Command.Parameters.AddWithValue(type, value);
+        }
 
-            try
-            {
-                for (int i = 0; i < query.ArgumentCount; i++)
-                {
-                    object argument = query.GetArgument(i);
-                    if (argument is ushort @short)
-                    {
-                        argument = Convert.ToInt32(@short);
-                    }
-                    else if (argument is uint @uint)
-                    {
-                        argument = Convert.ToInt64(@uint);
-                    }
-                    else if (argument is ulong @ulong)
-                    {
-                        argument = Unsafe.As<ulong, long>(ref @ulong);
-                    }
-                    else if (argument is uint[] uintArray)
-                    {
-                        argument = MemoryMarshal.Cast<uint, int>(uintArray).ToArray();
-                    }
-
-                    this.Command.Parameters.AddWithValue(i.ToString(), argument);
-
-                    @params[i] = "@" + i;
-                }
-
-                this.SetQuery(string.Format(DatabaseIFormatProvider.Instance, query.Format, @params));
-            }
-            finally
-            {
-                ArrayPool<object>.Shared.Return(@params);
-            }
+        public void PrepareQuery(ref DatabaseInterpolatedStringHandler handler)
+        {
+	        this.SetQuery(handler.Text);
         }
 
         private void SetQuery(string query)
@@ -161,43 +140,31 @@ namespace PlatformRacing3.Common.Database
             this.Command.Dispose();
         }
 
-        public static Task NewAsyncConnection(Func<DatabaseConnection, Task> func)
+        public static async Task NewAsyncConnection(Func<DatabaseConnection, Task> func)
         {
-            DatabaseConnection dbConnection = new();
+	        DatabaseConnection dbConnection = new();
 
             try
             {
-                Task task = func.Invoke(dbConnection);
-
-                Task.WhenAll(task).ContinueWith((task_) => dbConnection.Dispose()); //All is done, dispose
-
-                return task;
+                await func.Invoke(dbConnection);
             }
-            catch (Exception ex)
+            finally
             {
-                dbConnection.Dispose();
-
-                return Task.FromException(ex);
+	            dbConnection.Dispose();
             }
         }
 
-        public static Task<TNewResult> NewAsyncConnection<TNewResult>(Func<DatabaseConnection, Task<TNewResult>> func)
+        public static async Task<TNewResult> NewAsyncConnection<TNewResult>(Func<DatabaseConnection, Task<TNewResult>> func)
         {
-            DatabaseConnection dbConnection = new();
+	        DatabaseConnection dbConnection = new();
 
             try
             {
-                Task<TNewResult> task = func.Invoke(dbConnection);
-                
-                Task.WhenAll(task).ContinueWith((task_) => dbConnection.Dispose()); //All is done, dispose
-
-                return task;
+                return await func.Invoke(dbConnection);
             }
-            catch(Exception ex)
+            finally
             {
                 dbConnection.Dispose();
-
-                return Task.FromException<TNewResult>(ex);
             }
         }
     }

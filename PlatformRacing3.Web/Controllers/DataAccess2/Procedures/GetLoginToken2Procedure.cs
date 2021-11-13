@@ -10,16 +10,16 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
     public class GetLoginToken2Procedure : IProcedure
     {
-        public Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
+        public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {
             uint userId = httpContext.IsAuthenicatedPr3User();
             if (userId > 0)
             {
-                return Task.FromResult<IDataAccessDataResponse>(new DataAccessGetLoginToken2Response(AuthenicationManager.CreateUniqueLoginToken(userId)));
+                return new DataAccessGetLoginToken2Response(await AuthenicationManager.CreateUniqueLoginTokenAsync(userId));
             }
             else
             {
-                return Task.FromResult<IDataAccessDataResponse>(new DataAccessErrorResponse("You are not logged in! If you think this is error, please try again. If this error keeps happening, please contact staff."));
+                return new DataAccessErrorResponse("You are not logged in! If you think this is error, please try again. If this error keeps happening, please contact staff.");
             }
         }
     }

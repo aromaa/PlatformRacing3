@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Mail;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using PlatformRacing3.Common.Database;
@@ -17,9 +18,9 @@ namespace PlatformRacing3.Web
         
         internal static SmtpClient SmtpClient { get; private set; }
 
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
-            Program.Config = JsonSerializer.Deserialize<WebConfig>(File.ReadAllText("settings.json"));
+            Program.Config = await JsonSerializer.DeserializeAsync<WebConfig>(File.OpenRead("settings.json"));
 
             DataAccess2.Init(Program.Config);
 
@@ -34,7 +35,7 @@ namespace PlatformRacing3.Web
                 Credentials = new NetworkCredential(Program.Config.SmtpUser, Program.Config.SmtpPass)
             };
             
-            WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().Run();
+            await WebHost.CreateDefaultBuilder(args).UseStartup<Startup>().Build().RunAsync();
         }
     }
 }

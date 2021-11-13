@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -115,10 +116,7 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
         {
             using (MemoryStream memoryStream = new(span[5..].ToArray()))
             {
-	            //TODO: Read zlib header, .NET 6 has ZlibStream, switch to that and remove this workaround
-                memoryStream.Position = 2;
-
-                using (DeflateStream val = new(memoryStream, CompressionMode.Decompress))
+                using (ZLibStream val = new(memoryStream, CompressionMode.Decompress))
                 {
                     using (MemoryStream memoryStream2 = new())
                     {
@@ -175,11 +173,11 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
                     stringBuilder.Append(array[i].ToString("x2"));
                 }
 
-                return $"{DataAccess2.IntOrZero(stringBuilder[9])}12345{DataAccess2.IntOrZero(stringBuilder[18]) + 56 - 32}8{DataAccess2.IntOrZero(stringBuilder[31]) + 11 - 11}10A{stringBuilder[16]}CD";
+                return $"{IntOrZero(stringBuilder[9])}12345{IntOrZero(stringBuilder[18]) + 56 - 32}8{IntOrZero(stringBuilder[31]) + 11 - 11}10A{stringBuilder[16]}CD";
             }
-        }
 
-        private static int IntOrZero(char c) => char.IsNumber(c) ? int.Parse(c.ToString()) : 0;
+            static int IntOrZero(char c) => char.IsNumber(c) ? int.Parse(c.ToString()) : 0;
+        }
 
         private readonly ILogger<DataAccess2> logger;
 
@@ -225,51 +223,47 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
         }
 
         [HttpPost]
-        public async Task<object> DataAccessAsync([FromQuery] uint id, [FromForm] uint dataRequestID, [FromForm(Name = "gameId")] string gameIdEncoded, [FromForm(Name = "storedProcID")] string storedProcIdEncoded, [FromForm(Name = "storedProcedureName")] string storedProcedureNameEncoded, [FromForm(Name = "parametersXML")] string parametersXmlEncoded, [FromForm(Name = "platform")] string platform, [FromForm(Name = "playerType")] string playerType)
+        public async Task<object> DataAccessAsync([FromQuery] uint id, [FromForm] uint dataRequestId, [FromForm(Name = "gameId")] string gameIdEncoded, [FromForm(Name = "storedProcID")] byte[] storedProcId, [FromForm(Name = "storedProcedureName")] string storedProcedureNameEncoded, [FromForm(Name = "parametersXML")] string parametersXmlEncoded, [FromForm(Name = "platform")] string platform, [FromForm(Name = "playerType")] string playerType)
         {
-            if (id == dataRequestID)
+            if (id != dataRequestId || gameIdEncoded is null || storedProcId is null || storedProcedureNameEncoded is null || parametersXmlEncoded is null)
             {
-                if (gameIdEncoded != null && storedProcIdEncoded != null && storedProcedureNameEncoded != null && parametersXmlEncoded != null)
+	            return this.BadRequest();
+            }
+            
+            byte[] key = await this.FindEncryptionKeyAsync(storedProcId, gameIdEncoded, platform, playerType);
+            if (key != null)
+            {
+                string storedProcedureName = this.DecryptDataAsString(storedProcedureNameEncoded, storedProcId, key);
+                if (this.Procedures.TryGetValue(storedProcedureName, out IProcedure procedure))
                 {
-                    byte[] storedProcId = Convert.FromBase64String(storedProcIdEncoded);
-                    byte[] key = await this.FindEncryptionKeyAsync(storedProcId, gameIdEncoded, platform, playerType);
-                    if (key != null)
+                    XDocument xml = this.DecryptDataAsXml(parametersXmlEncoded, storedProcId, key);
+
+                    try
                     {
-                        string storedProcedureName = this.DecryptData(storedProcedureNameEncoded, storedProcId, key);
-                        if (this.Procedures.TryGetValue(storedProcedureName, out IProcedure procedure))
-                        {
-                            XDocument xml = XDocument.Parse(this.DecryptData(parametersXmlEncoded, storedProcId, key));
-
-                            try
-                            {
-                                IDataAccessDataResponse response = await procedure.GetResponseAsync(this.HttpContext, xml);
-                                response.DataRequestId = dataRequestID;
-                                return response;
-                            }
-                            catch (DataAccessProcedureMissingData)
-                            {
-                                return new DataAccessErrorResponse(dataRequestID, "Invalid request, procedure was missing required data");
-                            }
-                            catch (Exception ex)
-                            {
-                                this.logger.LogError(EventIds.DataAccess2Failed, ex, "Failed to execute procedure");
-
-                                return new DataAccessErrorResponse(dataRequestID, "Critical error while executing procedure");
-                            }
-                        }
-                        else
-                        {
-                            return new DataAccessErrorResponse(dataRequestID, "No procedure found by the name");
-                        }
+                        IDataAccessDataResponse response = await procedure.GetResponseAsync(this.HttpContext, xml);
+                        response.DataRequestId = dataRequestId;
+                        return response;
                     }
-                    else
+                    catch (DataAccessProcedureMissingData)
                     {
-                        return new DataAccessEmptyResponse(dataRequestID);
+                        return new DataAccessErrorResponse(dataRequestId, "Invalid request, procedure was missing required data");
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(EventIds.DataAccess2Failed, ex, "Failed to execute procedure");
+
+                        return new DataAccessErrorResponse(dataRequestId, "Critical error while executing procedure");
                     }
                 }
+                else
+                {
+                    return new DataAccessErrorResponse(dataRequestId, "No procedure found by the name");
+                }
             }
-
-            return this.BadRequest();
+            else
+            {
+                return new DataAccessEmptyResponse(dataRequestId);
+            }
         }
 
         private async Task<byte[]> FindEncryptionKeyAsync(byte[] storedProcId, string gameIdEncoded, string platform, string playerType)
@@ -282,12 +276,14 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
 				_ => playerType switch
 				{
 					"ActiveX" or "PlugIn" => DataAccess2.KEYS["Browser"].Keys,
+
 					_ => DataAccess2.KEYS["Standalone"].Keys,
 				},
 			};
+
 			foreach (byte[] key in keys)
             {
-                string gameId = this.DecryptData(gameIdEncoded, storedProcId, key);
+                string gameId = this.DecryptDataAsString(gameIdEncoded, storedProcId, key);
                 if (gameId == "f1c25e3bd3523110394b5659c68d8092")
                 {
                     return key;
@@ -300,7 +296,7 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
                 PlayerUserData player = await UserManager.TryGetUserDataByIdAsync(userId, true);
                 if (player != null && player.HasPermissions("debug"))
                 {
-                    string gameId = this.DecryptData(gameIdEncoded, storedProcId, DataAccess2.DEFAULT_KEY);
+                    string gameId = this.DecryptDataAsString(gameIdEncoded, storedProcId, DataAccess2.DEFAULT_KEY);
                     if (gameId == "f1c25e3bd3523110394b5659c68d8092")
                     {
                         return DataAccess2.DEFAULT_KEY;
@@ -311,30 +307,73 @@ namespace PlatformRacing3.Web.Controllers.DataAccess2
             return null;
         }
 
-        private string DecryptData(string data, byte[] iv, byte[] key)
+        private MemoryStream DecryptDataAsStream(string data, byte[] iv, byte[] key)
         {
-            byte[] bytes = Convert.FromBase64String(data);
-
-            using (Rijndael crypt = Rijndael.Create())
+            Span<byte> bytes = stackalloc byte[0];
+            if (data.Length <= 1024)
             {
-                crypt.Mode = CipherMode.CBC;
+                bytes = stackalloc byte[768];
+
+                Convert.TryFromBase64String(data, bytes, out int bytesWritten);
+
+                bytes = bytes[..bytesWritten];
+            }
+            else
+            {
+	            bytes = Convert.FromBase64String(data);
+            }
+            
+            using (Aes crypt = Aes.Create())
+            {
+	            crypt.Mode = CipherMode.CBC;
                 crypt.KeySize = 128;
                 crypt.Padding = PaddingMode.Zeros;
 
                 crypt.IV = iv;
                 crypt.Key = key;
 
-                using (MemoryStream memoryStream = new())
+                MemoryStream memoryStream = new();
+
+                using (Stream transcoding = Encoding.CreateTranscodingStream(memoryStream, Encoding.Unicode, Encoding.UTF8, leaveOpen: true))
                 {
                     using (ICryptoTransform decryptor = crypt.CreateDecryptor())
                     {
-                        using (CryptoStream stream = new(memoryStream, decryptor, CryptoStreamMode.Write))
+                        using (CryptoStream stream = new(transcoding, decryptor, CryptoStreamMode.Write))
                         {
-                            stream.Write(bytes, 0, bytes.Length);
+                            stream.Write(bytes);
                         }
                     }
+                }
+                
+                return memoryStream;
+            }
+        }
 
-                    return Encoding.UTF8.GetString(memoryStream.ToArray()).Trim('\0'); //Trim to remove extra null bytes
+        private string DecryptDataAsString(string data, byte[] iv, byte[] key)
+        {
+	        using (MemoryStream stream = this.DecryptDataAsStream(data, iv, key))
+	        {
+		        byte[] buffer = stream.GetBuffer();
+
+                Span<byte> bytes = buffer.AsSpan(..(int)stream.Length);
+		        Span<char> chars = MemoryMarshal.Cast<byte, char>(bytes).TrimEnd('\0'); //Trim to remove extra null bytes
+                
+		        return new string(chars);
+            }
+        }
+
+        private XDocument DecryptDataAsXml(string data, byte[] iv, byte[] key)
+        {
+            using (MemoryStream stream = this.DecryptDataAsStream(data, iv, key))
+            {
+                byte[] buffer = stream.GetBuffer();
+                
+	            Span<byte> bytes = buffer.AsSpan(..(int)stream.Length);
+	            Span<char> chars = MemoryMarshal.Cast<byte, char>(bytes).TrimEnd('\0'); //Trim to remove extra null bytes
+                
+                using (MemoryStream trimmedStream = new(buffer, 0, chars.Length * sizeof(char)))
+                {
+                    return XDocument.Load(trimmedStream);
                 }
             }
         }

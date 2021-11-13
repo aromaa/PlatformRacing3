@@ -41,26 +41,23 @@ namespace PlatformRacing3.Common.Block
             }
 
             //TODO: CACHE
-
-            FormattableString query;
+            
             if (category == "default-all-blocks")
             {
-                query = $"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId}").ContinueWith(BlockManager.ParseSqlReadCountMyBlocks));
             }
             else if (category == "default-all-blocks-without-category")
             {
-                query = $"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category = ''";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category = ''").ContinueWith(BlockManager.ParseSqlReadCountMyBlocks));
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(id) AS count FROM base.blocks_titles WHERE author_user_id = {userId} AND category ILIKE {category["category-".Length..]}").ContinueWith(BlockManager.ParseSqlReadCountMyBlocks));
             }
             else
             {
                 throw new ArgumentException(null, nameof(category));
             }
-
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(BlockManager.ParseSqlReadCountMyBlocks));
         }
 
         public static Task<HashSet<string>> GetMyCategorysAsync(uint userId)
@@ -79,26 +76,23 @@ namespace PlatformRacing3.Common.Block
             {
                 throw new ArgumentException(null, nameof(userId));
             }
-
-            FormattableString query;
+            
             if (category == "default-all-blocks")
             {
-                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(BlockManager.ParseSqlGetMyBlocks));
             }
             else if (category == "default-all-blocks-without-category")
             {
-                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category = '' ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(BlockManager.ParseSqlGetMyBlocks));
             }
             else if (category.StartsWith("category-"))
             {
-                query = $"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}";
+                return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT t.id FROM base.blocks_titles t LEFT JOIN LATERAL(SELECT b.* FROM base.blocks b WHERE b.id = t.id ORDER BY b.version DESC LIMIT 1) b ON TRUE WHERE t.author_user_id = {userId} AND t.category ILIKE {category["category-".Length..]} ORDER BY b.last_updated DESC OFFSET {start} LIMIT {count}").ContinueWith(BlockManager.ParseSqlGetMyBlocks));
             }
             else
             {
                 throw new ArgumentException(null, nameof(category));
             }
-
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync(query).ContinueWith(BlockManager.ParseSqlGetMyBlocks));
         }
 
         public static Task<bool> SaveBlockAsync(uint userId, string title, string category, string description, string imageData, string settings)

@@ -59,7 +59,7 @@ namespace PlatformRacing3.Server.Game.Chat
                 else
                 {
                     //Password functionality is not properly implemented in the client but keep this anyway
-                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) ? chat.Join(session, chatId) : false;
+                    status = (string.IsNullOrWhiteSpace(chat.Pass) || chat.Pass == pass) && chat.Join(session, chatId);
                 }
 
                 //If we failed to join to the room return and dont try again

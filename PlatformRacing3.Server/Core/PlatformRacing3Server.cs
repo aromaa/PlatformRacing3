@@ -41,8 +41,6 @@ namespace PlatformRacing3.Server.Core
 
         private IListener listener;
 
-        private Timer statusTimer;
-
         public PlatformRacing3Server(ILoggerFactory loggerFactory, IServiceProvider serviceProvider, ServerManager serverManager, ClientManager clientManager, CampaignManager campaignManager)
         {
             LoggerUtil.LoggerFactory = loggerFactory;
@@ -59,11 +57,11 @@ namespace PlatformRacing3.Server.Core
         {
             PlatformRacing3Server.StartTime = Stopwatch.StartNew();
 
-            PlatformRacing3Server.ServerConfig = JsonSerializer.Deserialize<ServerConfig>(File.ReadAllText("settings.json"));
+            PlatformRacing3Server.ServerConfig = await JsonSerializer.DeserializeAsync<ServerConfig>(File.OpenRead("settings.json"));
 
             RedisConnection.Init(PlatformRacing3Server.ServerConfig);
             DatabaseConnection.Init(PlatformRacing3Server.ServerConfig);
-
+            
             await this.serverManager.LoadServersAsync();
             
             await this.campaignManager.LoadCampaignTimesAsync();
@@ -87,21 +85,24 @@ namespace PlatformRacing3.Server.Core
                 socket.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
             }, this.serviceProvider);
 
-            this.statusTimer = new Timer(this.UpdateStatus, null, 1000, 1000);
+            _ = UpdateStatus();
         }
 
-        private void UpdateStatus(object state)
+        private async Task UpdateStatus()
         {
-            //Kinda look bulky but two of them is requrired
-            RedisConnection.GetDatabase().StringSetAsync($"server-status:{PlatformRacing3Server.ServerConfig.ServerId}", $"{this.clientManager.Count} online", TimeSpan.FromSeconds(3), When.Always, CommandFlags.FireAndForget);
-            RedisConnection.GetDatabase().PublishAsync("ServerStatusUpdated", $"{PlatformRacing3Server.ServerConfig.ServerId}\0{this.clientManager.Count} online");
+            PeriodicTimer timer = new(TimeSpan.FromSeconds(1));
+
+            while (await timer.WaitForNextTickAsync())
+            {
+                //Kinda look bulky but two of them is requrired
+                await RedisConnection.GetDatabase().StringSetAsync($"server-status:{PlatformRacing3Server.ServerConfig.ServerId}", $"{this.clientManager.Count} online", TimeSpan.FromSeconds(3), When.Always, CommandFlags.FireAndForget);
+                await RedisConnection.GetDatabase().PublishAsync("ServerStatusUpdated", $"{PlatformRacing3Server.ServerConfig.ServerId}\0{this.clientManager.Count} online", CommandFlags.FireAndForget);
+            }
         }
 
         public void Shutdown()
         {
             this.listener.Dispose();
-
-            this.statusTimer.Dispose();
         }
         
         public static TimeSpan Uptime => PlatformRacing3Server.StartTime.Elapsed;

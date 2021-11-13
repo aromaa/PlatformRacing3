@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using PlatformRacing3.Server.Collections;
 
 namespace PlatformRacing3.Server.Game.Client
@@ -13,14 +15,12 @@ namespace PlatformRacing3.Server.Game.Client
         private readonly ClientSessionCollection ClientsBySocketId;
         private readonly ConcurrentDictionary<uint, ClientSession> ClientsByUserId;
 
-        private Timer LastPingCheckTimer;
-
         public ClientManager()
         {
             this.ClientsBySocketId = new ClientSessionCollection(this.OnAdded, this.OnRemoved);
             this.ClientsByUserId = new ConcurrentDictionary<uint, ClientSession>();
 
-            this.LastPingCheckTimer = new Timer(this.CheckForTimedoutConnections, null, 2500, 2500);
+            _ = this.CheckForTimedOutConnections();
         }
 
         internal int Count => this.ClientsBySocketId.Count;
@@ -57,14 +57,19 @@ namespace PlatformRacing3.Server.Game.Client
             }
         }
 
-        private void CheckForTimedoutConnections(object state)
+        private async Task CheckForTimedOutConnections()
         {
-            foreach (ClientSession session in this.ClientsBySocketId.Sessions)
+            PeriodicTimer timer = new(TimeSpan.FromSeconds(5));
+
+            while (await timer.WaitForNextTickAsync())
             {
-                if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
-                {
-                    session.Disconnect("Timeout (No ping)");
-                }
+	            foreach (ClientSession session in this.ClientsBySocketId.Sessions)
+	            {
+		            if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
+		            {
+			            session.Disconnect("Timeout (No ping)");
+		            }
+	            }
             }
         }
     }

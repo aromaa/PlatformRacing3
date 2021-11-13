@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using PlatformRacing3.Server.Extensions;
 
@@ -6,13 +7,13 @@ namespace PlatformRacing3.Server
 {
     internal static class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
 			Console.Title = "Platform Racing 3 Server";
 
-			Program.CreateHostBuilder(args)
+			await Program.CreateHostBuilder(args)
 	               .Build()
-	               .Run();
+	               .RunAsync();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>

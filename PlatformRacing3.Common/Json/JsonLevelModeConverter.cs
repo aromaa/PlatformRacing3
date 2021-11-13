@@ -12,8 +12,8 @@ namespace PlatformRacing3.Common.Json
 		public override void Write(Utf8JsonWriter writer, LevelMode value, JsonSerializerOptions options)
 		{
 			string mode = value.ToString();
-
-			writer.WriteStringValue(char.ToLowerInvariant(mode[0]) + mode[1..]);
+			
+			writer.WriteStringValue($"{char.ToLowerInvariant(mode[0])}{mode[1..]}");
 		}
 	}
 }

@@ -1,35 +1,45 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using PlatformRacing3.Common.Redis;
+using StackExchange.Redis;
 
 namespace PlatformRacing3.Common.Authenication
 {
     public class AuthenicationManager
     {
-        private const string TOKEN_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        private const uint TOKEN_LENGTH = 64;
+        private const int TOKEN_LENGTH = 64;
 
-        public static string CreateUniqueLoginToken(uint userId)
+        public static async Task<string> CreateUniqueLoginTokenAsync(uint userId)
         {
             if (userId == 0)
             {
                 throw new ArgumentException(null, nameof(userId));
             }
-
-            byte[] bytes = new byte[4]; //Four bytes should so it can be converted to int
-            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            
+            static string GenerateToken()
             {
-                rng.GetBytes(bytes);
+                return string.Create(AuthenicationManager.TOKEN_LENGTH, (object)null, (span, unused) =>
+                {
+	                Span<byte> bytes = stackalloc byte[AuthenicationManager.TOKEN_LENGTH / 4 * 3];
+
+	                RandomNumberGenerator.Fill(bytes);
+
+	                Convert.TryToBase64Chars(bytes, span, out _);
+                });
             }
 
-            Random random = new(BitConverter.ToInt32(bytes, 0)); //Secure random
+            while (true)
+            {
+                string token = GenerateToken();
 
-            string token = new(Enumerable.Repeat(AuthenicationManager.TOKEN_CHARS, (int)AuthenicationManager.TOKEN_LENGTH).Select(s => s[random.Next(s.Length)]).ToArray());
-
-            RedisConnection.GetDatabase().StringSet($"logintoken:{token}", userId, TimeSpan.FromSeconds(30));
-
-            return token;
+                bool success = await RedisConnection.GetDatabase().StringSetAsync(new RedisKey("logintoken:").Append(token), userId, TimeSpan.FromSeconds(30), When.NotExists);
+                if (success)
+                {
+                    return token;
+                }
+            }
         }
     }
 }

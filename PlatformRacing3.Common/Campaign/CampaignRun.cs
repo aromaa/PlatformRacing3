@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
@@ -74,15 +75,10 @@ namespace PlatformRacing3.Common.Campaign
             {
                 using (CryptoStream cryptoStream = new(stream, base64Transformer, CryptoStreamMode.Read, leaveOpen: true))
                 {
-                    //TODO: Read zlib header, .NET 6 has ZlibStream, switch to that and remove this workaround
-                    cryptoStream.ReadByte();
-                    cryptoStream.ReadByte();
-
-                    using (DeflateStream deflate = new(cryptoStream, CompressionMode.Decompress))
+                    using (ZLibStream zlip = new(cryptoStream, CompressionMode.Decompress))
 	                {
-                        //TODO: .NET 6 has sync method for stream, no need for async->sync
-                        return JsonSerializer.DeserializeAsync<CampaignRun>(deflate).GetAwaiter().GetResult();
-	                }
+                        return JsonSerializer.Deserialize<CampaignRun>(zlip);
+                    }
                 }
             }
         }
