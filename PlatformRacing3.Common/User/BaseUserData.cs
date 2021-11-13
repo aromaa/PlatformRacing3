@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Customization;
 
 namespace PlatformRacing3.Common.User
 {
-    public abstract class BaseUserData : UserData
+	public abstract class BaseUserData : UserData
     {
         private static readonly Hat[] DefaultHats = new Hat[] { Hat.None };
         private static readonly Part[] DefaultHeads = new Part[] { Part.Alien, Part.Bigfoot, Part.Bird };

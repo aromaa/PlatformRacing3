@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCountMyLevels2Response : DataAccessDataResponse<DataAccessCountMyLevels2Response.CountMyLevelsResponse>
+	public class DataAccessCountMyLevels2Response : DataAccessDataResponse<DataAccessCountMyLevels2Response.CountMyLevelsResponse>
     {
         private DataAccessCountMyLevels2Response()
         {

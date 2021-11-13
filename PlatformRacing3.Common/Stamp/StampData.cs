@@ -1,12 +1,11 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace PlatformRacing3.Common.Stamp
 {
-    public class StampData : IXmlSerializable
+	public class StampData : IXmlSerializable
     {
         private const string DELETED_ART_DATA = "v2 | {\"artArray\":[]}";
 

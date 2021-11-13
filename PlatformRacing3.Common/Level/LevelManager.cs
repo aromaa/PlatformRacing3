@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -11,7 +8,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.Level
 {
-    public sealed class LevelManager
+	public sealed class LevelManager
     {
 	    private static readonly ILogger<LevelManager> logger = LoggerUtil.LoggerFactory.CreateLogger<LevelManager>();
 

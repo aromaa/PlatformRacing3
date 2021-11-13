@@ -1,12 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace PlatformRacing3.Common.Utils
 {
-    internal static class PasswordUtils
+	internal static class PasswordUtils
     {
         internal static string HashPassword(string password)
         {

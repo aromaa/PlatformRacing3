@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCampaignRun3Response : DataAccessDataResponse<DataAccessCampaignRun3Response.CampaignRunResponse>
+	public class DataAccessCampaignRun3Response : DataAccessDataResponse<DataAccessCampaignRun3Response.CampaignRunResponse>
     {
         public DataAccessCampaignRun3Response()
         {

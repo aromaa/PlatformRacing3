@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading;
-using Net.Sockets;
+﻿using Net.Sockets;
 using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Collections
 {
-    internal class ClientSessionCollectionLimited : ClientSessionCollection
+	internal class ClientSessionCollectionLimited : ClientSessionCollection
     {
         private const int FULL_CAPACITY = int.MinValue;
 

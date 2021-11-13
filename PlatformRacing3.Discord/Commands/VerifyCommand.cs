@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
 using Discord.Commands;
 using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Discord.Commands
 {
-    public class VerifyCommand : ModuleBase<SocketCommandContext>
+	public class VerifyCommand : ModuleBase<SocketCommandContext>
     {
         [Command("pr3verify")]
         [Summary("I swear I'm Jiggmin")]

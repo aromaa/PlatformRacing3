@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using PlatformRacing3.Common.Exceptions;
 
 namespace PlatformRacing3.Web.Responses
 {
-    public abstract class DataAccessDataResponse<T> : IDataAccessDataResponse
+	public abstract class DataAccessDataResponse<T> : IDataAccessDataResponse
     {
         [XmlElement("DataRequestID")]
         public uint DataRequestId { get; set; }

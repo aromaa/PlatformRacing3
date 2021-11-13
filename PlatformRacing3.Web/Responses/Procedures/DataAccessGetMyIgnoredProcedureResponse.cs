@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.User;
+﻿using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyIgnoredProcedureResponse : DataAccessDataResponse<PlayerUserData>
+	public class DataAccessGetMyIgnoredProcedureResponse : DataAccessDataResponse<PlayerUserData>
     {
         private DataAccessGetMyIgnoredProcedureResponse()
         {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
@@ -13,7 +10,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.User
 {
-    public abstract class UserData : IXmlSerializable
+	public abstract class UserData : IXmlSerializable
     {
         public const uint DEFAULT_STATS_COUNT = 150;
         public const uint STATS_MIN = 0;

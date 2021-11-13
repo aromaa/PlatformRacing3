@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
+﻿using System.Drawing;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,7 +9,7 @@ using PlatformRacing3.Common.Json;
 
 namespace PlatformRacing3.Common.Campaign
 {
-    public class CampaignRun
+	public class CampaignRun
     {
         [JsonPropertyName("userName")]
         public string Username { get; set; }

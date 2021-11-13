@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace PlatformRacing3.Server.API.Net
+﻿namespace PlatformRacing3.Server.API.Net
 {
-    public interface INetworkManager : IDisposable
+	public interface INetworkManager : IDisposable
     {
         void AddListener(INetworkListener listener, bool start);
         void Shutdown();

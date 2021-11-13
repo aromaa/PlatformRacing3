@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Net.Buffers;
 using Net.Communication.Attributes;
 using Net.Communication.Incoming.Parser;
@@ -9,7 +8,7 @@ using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Parsers.Json
 {
-    [PacketManagerRegister(typeof(BytePacketManager))]
+	[PacketManagerRegister(typeof(BytePacketManager))]
     [PacketParserId(0u)]
     internal sealed class JsonPacketParser : IIncomingPacketParser<JsonPacket>
     {

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.Server;
+﻿using PlatformRacing3.Common.Server;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetServers2Response : DataAccessDataResponse<ServerDetails>
+	public class DataAccessGetServers2Response : DataAccessDataResponse<ServerDetails>
     {
         private DataAccessGetServers2Response()
         {

@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using PlatformRacing3.Web.Utils;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessSaveBlock4Response : DataAccessDataResponse<DataAccessSaveBlock4Response.BlockSaveResponse>
+	public class DataAccessSaveBlock4Response : DataAccessDataResponse<DataAccessSaveBlock4Response.BlockSaveResponse>
     {
         public DataAccessSaveBlock4Response()
         {

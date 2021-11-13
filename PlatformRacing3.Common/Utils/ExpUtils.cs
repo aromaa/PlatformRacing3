@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace PlatformRacing3.Common.Utils
+﻿namespace PlatformRacing3.Common.Utils
 {
-    public static class ExpUtils
+	public static class ExpUtils
     {
         public const ulong EXP_FOR_FINISHING = 5;
 

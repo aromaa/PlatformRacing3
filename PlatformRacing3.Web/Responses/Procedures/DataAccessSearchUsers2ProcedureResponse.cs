@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.User;
+﻿using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessSearchUsers2ProcedureResponse : DataAccessDataResponse<PlayerUserData>
+	public class DataAccessSearchUsers2ProcedureResponse : DataAccessDataResponse<PlayerUserData>
     {
         private DataAccessSearchUsers2ProcedureResponse()
         {

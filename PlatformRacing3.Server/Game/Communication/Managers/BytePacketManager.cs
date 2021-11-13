@@ -1,5 +1,4 @@
-﻿using System;
-using Net.Buffers;
+﻿using Net.Buffers;
 using Net.Communication.Incoming.Consumer;
 using Net.Communication.Incoming.Handler;
 using Net.Communication.Incoming.Parser;
@@ -11,7 +10,7 @@ using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers;
 
 namespace PlatformRacing3.Server.Game.Communication.Managers
 {
-    internal sealed class BytePacketManager : PacketManager<uint>
+	internal sealed class BytePacketManager : PacketManager<uint>
     {
         public BytePacketManager(IServiceProvider serviceProvider) : base(serviceProvider)
         {

@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyBlockCategorysResponse : DataAccessDataResponse<DataAccessGetMyBlockCategorysResponse.BlockCategory>
+	public class DataAccessGetMyBlockCategorysResponse : DataAccessDataResponse<DataAccessGetMyBlockCategorysResponse.BlockCategory>
     {
         public DataAccessGetMyBlockCategorysResponse()
         {

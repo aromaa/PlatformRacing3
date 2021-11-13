@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
 using PlatformRacing3.Common.Redis;
 using StackExchange.Redis;
 
 namespace PlatformRacing3.Common.Authenication
 {
-    public class AuthenicationManager
+	public class AuthenicationManager
     {
         private const int TOKEN_LENGTH = 64;
 

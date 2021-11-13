@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using PlatformRacing3.Common.Campaign;
 
 namespace PlatformRacing3.Common.User
 {
-    public class GuestUserData : BaseUserData
+	public class GuestUserData : BaseUserData
     {
         private static readonly string GuestGroup = "Guest";
         private static readonly Color GuestColor = Color.FromArgb(29, 84, 151);

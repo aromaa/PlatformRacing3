@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessCountMyStampsResponse : DataAccessDataResponse<DataAccessCountMyStampsResponse.StampCountResponse>
+	public class DataAccessCountMyStampsResponse : DataAccessDataResponse<DataAccessCountMyStampsResponse.StampCountResponse>
     {
         private DataAccessCountMyStampsResponse()
         {

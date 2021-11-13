@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Drawing;
-using System.Linq;
 using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.Extensions;
@@ -12,7 +9,7 @@ using StackExchange.Redis;
 
 namespace PlatformRacing3.Common.User
 {
-    public class PlayerUserData : BaseUserData
+	public class PlayerUserData : BaseUserData
     {
         private const uint DAILY_LUCK = 5;
 

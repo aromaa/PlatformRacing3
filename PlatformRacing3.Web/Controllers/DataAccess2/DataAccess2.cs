@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Concurrent;
 using System.IO.Compression;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.FileProviders.Physical;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using PlatformRacing3.Common.Server;
 using PlatformRacing3.Common.User;
@@ -26,7 +20,7 @@ using PlatformRacing3.Web.Utils;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2
 {
-    [ApiController]
+	[ApiController]
     [Route("dataaccess2")]
     [Produces("text/xml")]
     public class DataAccess2 : ControllerBase

@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <StartupObject>PlatformRacing3.Web.Program</StartupObject>
     <UserSecretsId>9c9fed24-eeb2-4bdd-9284-c2f0cb0afb63</UserSecretsId>
+	  <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

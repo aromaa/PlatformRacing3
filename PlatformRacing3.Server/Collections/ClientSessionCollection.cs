@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using Net.Collections;
 using Net.Sockets;
 using PlatformRacing3.Server.Collections.Matcher;
@@ -9,7 +6,7 @@ using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Collections
 {
-    internal class ClientSessionCollection
+	internal class ClientSessionCollection
     {
         private readonly CriticalSocketCollection<ClientSession> SessionCollection;
         private readonly ConcurrentDictionary<uint, ClientSession> SessionsBySocketId;

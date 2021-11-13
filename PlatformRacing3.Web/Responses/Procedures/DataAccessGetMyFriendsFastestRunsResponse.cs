@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using PlatformRacing3.Common.Campaign;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyFriendsFastestRunsResponse : DataAccessDataResponse<DataAccessGetMyFriendsFastestRunsResponse.UserCampaignRun>
+	public class DataAccessGetMyFriendsFastestRunsResponse : DataAccessDataResponse<DataAccessGetMyFriendsFastestRunsResponse.UserCampaignRun>
     {
         public DataAccessGetMyFriendsFastestRunsResponse()
         {

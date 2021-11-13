@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessGetMyStampCategories : DataAccessDataResponse<DataAccessGetMyStampCategories.StampCategory>
+	public class DataAccessGetMyStampCategories : DataAccessDataResponse<DataAccessGetMyStampCategories.StampCategory>
     {
         private DataAccessGetMyStampCategories()
         {

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCountMyBlocks2Response : DataAccessDataResponse<DataAccessCountMyBlocks2Response.CategoryData>
+	public class DataAccessCountMyBlocks2Response : DataAccessDataResponse<DataAccessCountMyBlocks2Response.CategoryData>
     {
         private DataAccessCountMyBlocks2Response()
         {

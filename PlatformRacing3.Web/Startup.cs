@@ -1,12 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Server;
 using PlatformRacing3.Common.Utils;
@@ -14,7 +6,7 @@ using PlatformRacing3.Web.Middleware;
 
 namespace PlatformRacing3.Web
 {
-    internal class Startup
+	internal class Startup
     {
         public IConfiguration Configuration { get; }
 

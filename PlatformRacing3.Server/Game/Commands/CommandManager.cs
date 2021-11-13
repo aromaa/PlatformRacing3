@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
@@ -11,7 +9,7 @@ using PlatformRacing3.Server.Utils;
 
 namespace PlatformRacing3.Server.Game.Commands
 {
-    internal sealed class CommandManager
+	internal sealed class CommandManager
     {
         private readonly ILogger<CommandManager> logger;
 

@@ -1,12 +1,11 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace PlatformRacing3.Common.Block
 {
-    public class BlockData : IXmlSerializable
+	public class BlockData : IXmlSerializable
     {
         private const string DELETED_BLOCK_IMAGE_DATA = "v2 | {\"artArray\":[]}";
         private const string DELETED_BLOCK_SETTINGS = "v2 | {\"type\":\"inactive\"}";

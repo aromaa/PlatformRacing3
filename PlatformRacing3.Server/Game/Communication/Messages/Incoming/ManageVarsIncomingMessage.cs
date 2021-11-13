@@ -1,11 +1,10 @@
-﻿using System;
-using PlatformRacing3.Server.Game.Client;
+﻿using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
-    internal class ManageVarsIncomingMessage : MessageIncomingJson<JsonManageVarsIncomingMessage>
+	internal class ManageVarsIncomingMessage : MessageIncomingJson<JsonManageVarsIncomingMessage>
     {
         internal override void Handle(ClientSession session, JsonManageVarsIncomingMessage message)
         {

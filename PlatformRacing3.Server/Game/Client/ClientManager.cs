@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 using PlatformRacing3.Server.Collections;
 
 namespace PlatformRacing3.Server.Game.Client
 {
-    internal sealed class ClientManager
+	internal sealed class ClientManager
     {
         private const uint TimeoutTime = 10;
 

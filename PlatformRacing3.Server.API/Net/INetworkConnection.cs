@@ -1,9 +1,8 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 
 namespace PlatformRacing3.Server.API.Net
 {
-    public interface INetworkConnection : IDisposable
+	public interface INetworkConnection : IDisposable
     {
         bool Disconnected { get; }
 

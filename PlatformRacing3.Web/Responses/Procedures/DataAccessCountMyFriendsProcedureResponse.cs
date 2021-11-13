@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCountMyFriendsProcedureResponse : DataAccessDataResponse<DataAccessCountMyFriendsProcedureResponse.FriendsCountResponse>
+	public class DataAccessCountMyFriendsProcedureResponse : DataAccessDataResponse<DataAccessCountMyFriendsProcedureResponse.FriendsCountResponse>
     {
         private DataAccessCountMyFriendsProcedureResponse()
         {

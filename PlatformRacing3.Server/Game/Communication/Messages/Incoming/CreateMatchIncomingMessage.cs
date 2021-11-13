@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using PlatformRacing3.Common.Level;
+﻿using PlatformRacing3.Common.Level;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
@@ -7,7 +6,7 @@ using PlatformRacing3.Server.Game.Lobby;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
-    internal sealed class CreateMatchIncomingMessage : MessageIncomingJson<JsonCreateMatchIncomingMessage>
+	internal sealed class CreateMatchIncomingMessage : MessageIncomingJson<JsonCreateMatchIncomingMessage>
     {
         private readonly MatchListingManager matchListingManager;
 

@@ -1,9 +1,8 @@
-﻿using System;
-using PlatformRacing3.Server.Game.Lobby;
+﻿using PlatformRacing3.Server.Game.Lobby;
 
 namespace PlatformRacing3.Server.Extensions
 {
-    public static class MatchListingTypeExtenssion
+	public static class MatchListingTypeExtenssion
     {
         public static string GetLobbyId(this MatchListingType type, uint id)
         {

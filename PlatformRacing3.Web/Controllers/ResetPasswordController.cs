@@ -1,14 +1,12 @@
-﻿using System;
-using System.Net.Mail;
+﻿using System.Net.Mail;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Web.Controllers
 {
-    [ApiController]
+	[ApiController]
     [Route("resetpassword")]
     public class ResetPasswordController : ControllerBase
     {

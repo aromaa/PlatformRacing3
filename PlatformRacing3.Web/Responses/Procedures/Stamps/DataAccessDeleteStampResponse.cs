@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace PlatformRacing3.Web.Responses.Procedures.Stamps
+﻿namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessDeleteStampResponse : DataAccessDataResponse<bool>
+	public class DataAccessDeleteStampResponse : DataAccessDataResponse<bool>
     {
         public DataAccessDeleteStampResponse()
         {

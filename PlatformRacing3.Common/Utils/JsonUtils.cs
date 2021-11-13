@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace PlatformRacing3.Common.Utils
 {
-    public static class JsonUtils
+	public static class JsonUtils
     {
         private static readonly ConcurrentDictionary<Type, Dictionary<JsonPropertyNameAttribute, Func<object, object>>> CachedProperties = new();
 

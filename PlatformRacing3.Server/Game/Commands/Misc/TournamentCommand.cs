@@ -1,10 +1,9 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Game.Commands.Misc
 {
-    internal class TournamentCommand : ICommand
+	internal class TournamentCommand : ICommand
     {
         public string Permission => "command.tournament.use";
 

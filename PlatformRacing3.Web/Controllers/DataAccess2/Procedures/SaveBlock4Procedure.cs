@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using System.Xml.Linq;
 using PlatformRacing3.Common.Block;
 using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Exceptions;
 using PlatformRacing3.Web.Extensions;
@@ -9,7 +7,7 @@ using PlatformRacing3.Web.Responses.Procedures;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
-    public class SaveBlock4Procedure : IProcedure
+	public class SaveBlock4Procedure : IProcedure
     {
         private const uint TITLE_MIN_LENGTH = 1;
         private const uint TITLE_MAX_LENGTH = 50;

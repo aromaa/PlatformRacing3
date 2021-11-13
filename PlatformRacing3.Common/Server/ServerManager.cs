@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.Common;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -11,7 +9,7 @@ using StackExchange.Redis;
 
 namespace PlatformRacing3.Common.Server
 {
-    public sealed class ServerManager
+	public sealed class ServerManager
     {
 	    public const uint SERVER_STATUS_TIMEOUT = 3;
         public const string SERVER_STATUS_TIMEOUT_MESSAGE = "Offline";

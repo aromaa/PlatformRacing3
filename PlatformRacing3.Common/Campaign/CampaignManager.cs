@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Customization;
@@ -12,7 +9,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.Campaign
 {
-    public sealed class CampaignManager
+	public sealed class CampaignManager
     {
         private static readonly ILogger<CampaignManager> logger = LoggerUtil.LoggerFactory.CreateLogger<CampaignManager>();
 

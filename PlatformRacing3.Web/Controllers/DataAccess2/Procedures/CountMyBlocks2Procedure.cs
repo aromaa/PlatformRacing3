@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using System.Xml.Linq;
 using PlatformRacing3.Common.Block;
 using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Exceptions;
 using PlatformRacing3.Web.Extensions;
@@ -9,7 +7,7 @@ using PlatformRacing3.Web.Responses.Procedures;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
-    public class CountMyBlocks2Procedure : IProcedure
+	public class CountMyBlocks2Procedure : IProcedure
     {
         public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {

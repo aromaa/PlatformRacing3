@@ -1,13 +1,12 @@
 ﻿using System.Net.Mail;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Web.Extensions;
 
 namespace PlatformRacing3.Web.Controllers
 {
-    [ApiController]
+	[ApiController]
     [Route("register")]
     public class RegisterController : ControllerBase
     {

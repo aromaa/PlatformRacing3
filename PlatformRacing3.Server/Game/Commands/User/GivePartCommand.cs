@@ -1,12 +1,11 @@
-﻿using System;
-using PlatformRacing3.Common.Customization;
+﻿using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Game.Commands.User
 {
-    internal sealed class GivePartCommand : ICommand
+	internal sealed class GivePartCommand : ICommand
     {
         private readonly ClientManager clientManager;
 

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
@@ -12,7 +9,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.Level
 {
-    public class LevelData : IXmlSerializable
+	public class LevelData : IXmlSerializable
     {
         [JsonPropertyName("levelID")]
         public uint Id { get; }

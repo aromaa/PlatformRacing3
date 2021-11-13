@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.PrivateMessage;
+﻿using PlatformRacing3.Common.PrivateMessage;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing

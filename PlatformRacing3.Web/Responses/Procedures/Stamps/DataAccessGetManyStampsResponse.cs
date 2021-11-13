@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.Stamp;
+﻿using PlatformRacing3.Common.Stamp;
 
 namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessGetManyStampsResponse : DataAccessDataResponse<StampData>
+	public class DataAccessGetManyStampsResponse : DataAccessDataResponse<StampData>
     {
         public DataAccessGetManyStampsResponse()
         {

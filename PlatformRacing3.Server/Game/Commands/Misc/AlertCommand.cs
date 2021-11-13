@@ -1,11 +1,10 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Commands.Misc
 {
-    internal sealed class AlertCommand : ICommand
+	internal sealed class AlertCommand : ICommand
     {
         private readonly ClientManager clientManager;
 

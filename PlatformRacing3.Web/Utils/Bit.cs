@@ -1,12 +1,11 @@
-﻿using System;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Utils
 {
-    public struct Bit : IEquatable<Bit>, IXmlSerializable
+	public struct Bit : IEquatable<Bit>, IXmlSerializable
     {
         private int Value;
 

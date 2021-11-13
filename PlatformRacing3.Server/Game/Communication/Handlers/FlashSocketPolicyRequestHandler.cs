@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Net.Buffers;
 using Net.Sockets;
 using Net.Sockets.Pipeline.Handler;
@@ -8,7 +6,7 @@ using Net.Sockets.Pipeline.Handler.Incoming;
 
 namespace PlatformRacing3.Server.Game.Communication.Handlers
 {
-    internal class FlashSocketPolicyRequestHandler : IncomingBytesHandler
+	internal class FlashSocketPolicyRequestHandler : IncomingBytesHandler
     {
         public static FlashSocketPolicyRequestHandler Instance { get; } = new FlashSocketPolicyRequestHandler();
 

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -11,7 +7,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.PrivateMessage
 {
-    public sealed class PrivateMessageManager
+	public sealed class PrivateMessageManager
     {
         private static readonly ILogger<PrivateMessageManager> logger = LoggerUtil.LoggerFactory.CreateLogger<PrivateMessageManager>();
 

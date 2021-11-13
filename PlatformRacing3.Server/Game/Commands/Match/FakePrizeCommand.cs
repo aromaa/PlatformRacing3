@@ -1,12 +1,11 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Commands.Match
 {
-    internal class FakePrizeCommand : ICommand
+	internal class FakePrizeCommand : ICommand
     {
         public string Permission => "command.fakeprize.use";
 

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Net.Sockets;
 using PlatformRacing3.Common.Database;
 using PlatformRacing3.Common.User;
@@ -18,7 +14,7 @@ using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Client
 {
-    internal class ClientSession : ICommandExecutor
+	internal class ClientSession : ICommandExecutor
     {
         internal ISocket Connection { get; }
 

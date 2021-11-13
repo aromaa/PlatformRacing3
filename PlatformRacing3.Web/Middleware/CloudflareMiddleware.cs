@@ -1,11 +1,9 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 
 namespace PlatformRacing3.Web.Middleware
 {
-    public class CloudflareMiddleware
+	public class CloudflareMiddleware
     {
         private readonly RequestDelegate Next;
 

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using PlatformRacing3.Common.Level;
 using PlatformRacing3.Web.Responses;
 
 namespace PlatformRacing3.Web.Controllers.Level
 {
-    [ApiController]
+	[ApiController]
     [Route("GetLevel")]
     [Produces("text/xml")]
     public class GetLevelController : ControllerBase

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PlatformRacing3.Common.Server;
 using PlatformRacing3.Server.Game.Chat;
 using PlatformRacing3.Server.Game.Client;
@@ -11,7 +9,7 @@ using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages
 {
-    internal sealed class PacketManager
+	internal sealed class PacketManager
     {
         private Dictionary<Type, IMessageIncomingJson> IncomingPacketsJSON;
 

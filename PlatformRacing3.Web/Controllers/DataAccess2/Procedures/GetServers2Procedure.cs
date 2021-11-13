@@ -1,13 +1,11 @@
-﻿using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using System.Xml.Linq;
 using PlatformRacing3.Common.Server;
 using PlatformRacing3.Web.Responses;
 using PlatformRacing3.Web.Responses.Procedures;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
-    public class GetServers2Procedure : IProcedure
+	public class GetServers2Procedure : IProcedure
     {
         private readonly ServerManager serverManager;
 

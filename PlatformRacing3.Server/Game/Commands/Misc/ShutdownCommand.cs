@@ -1,10 +1,9 @@
-﻿using System;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using PlatformRacing3.Server.API.Game.Commands;
 
 namespace PlatformRacing3.Server.Game.Commands.Misc
 {
-    internal sealed class ShutdownCommand : ICommand
+	internal sealed class ShutdownCommand : ICommand
     {
         private readonly IHostApplicationLifetime applicationLifetime;
 

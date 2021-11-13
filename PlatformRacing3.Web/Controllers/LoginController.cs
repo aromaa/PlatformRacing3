@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Web.Extensions;
 
 namespace PlatformRacing3.Web.Controllers
 {
-    [ApiController]
+	[ApiController]
     [Route("login")]
     public class LoginController : ControllerBase
     {

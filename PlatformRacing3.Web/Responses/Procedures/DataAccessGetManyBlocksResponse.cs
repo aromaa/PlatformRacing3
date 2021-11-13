@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.Block;
+﻿using PlatformRacing3.Common.Block;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetManyBlocksResponse : DataAccessDataResponse<BlockData>
+	public class DataAccessGetManyBlocksResponse : DataAccessDataResponse<BlockData>
     {
         public DataAccessGetManyBlocksResponse()
         {

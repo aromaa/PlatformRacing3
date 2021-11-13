@@ -1,11 +1,10 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Commands.Match
 {
-    internal class BroadcasterCommand : ICommand
+	internal class BroadcasterCommand : ICommand
     {
         public string Permission => "command.broadcaster.use";
 

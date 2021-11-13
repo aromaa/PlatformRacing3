@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.Level;
+﻿using PlatformRacing3.Common.Level;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyLevels2Response : DataAccessDataResponse<LevelData>
+	public class DataAccessGetMyLevels2Response : DataAccessDataResponse<LevelData>
     {
         private DataAccessGetMyLevels2Response()
         {

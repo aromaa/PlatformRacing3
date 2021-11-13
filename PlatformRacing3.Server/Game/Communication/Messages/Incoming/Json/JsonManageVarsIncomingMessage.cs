@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json
 {
-    internal sealed class JsonManageVarsIncomingMessage : JsonPacket
+	internal sealed class JsonManageVarsIncomingMessage : JsonPacket
     {
         [JsonPropertyName("user_vars")]
         public HashSet<string> UserVars { get; set; }

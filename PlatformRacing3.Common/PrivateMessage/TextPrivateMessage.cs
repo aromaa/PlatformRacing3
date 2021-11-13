@@ -1,9 +1,8 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace PlatformRacing3.Common.PrivateMessage
 {
-    public class TextPrivateMessage : IPrivateMessage
+	public class TextPrivateMessage : IPrivateMessage
     {
         public uint Id { get; }
         public uint ReceiverId { get; }

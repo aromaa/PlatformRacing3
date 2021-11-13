@@ -1,9 +1,8 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace PlatformRacing3.Server.Utils
 {
-    internal class Maths
+	internal class Maths
     {
         internal const double DEG_RAD = 0.0174533;
 

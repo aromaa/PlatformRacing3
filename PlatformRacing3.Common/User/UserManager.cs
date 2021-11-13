@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Drawing;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -19,7 +14,7 @@ using StackExchange.Redis;
 
 namespace PlatformRacing3.Common.User
 {
-    public sealed class UserManager
+	public sealed class UserManager
     {
         private static readonly ILogger<UserManager> logger = LoggerUtil.LoggerFactory.CreateLogger<UserManager>();
 

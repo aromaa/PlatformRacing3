@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Diagnostics;
 using System.Net;
 using System.Xml;
@@ -8,7 +7,7 @@ using System.Xml.Serialization;
 
 namespace PlatformRacing3.Common.Server
 {
-    public class ServerDetails : IXmlSerializable
+	public class ServerDetails : IXmlSerializable
     {
         public uint Id { get; }
         

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
+﻿using System.Xml.Linq;
 using PlatformRacing3.Common.Stamp;
 using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Exceptions;
 using PlatformRacing3.Web.Responses;
@@ -10,7 +6,7 @@ using PlatformRacing3.Web.Responses.Procedures.Stamps;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Stamps
 {
-    public class GetManyStampsProcedure : IProcedure
+	public class GetManyStampsProcedure : IProcedure
     {
         public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
         {

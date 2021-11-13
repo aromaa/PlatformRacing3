@@ -1,16 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Security.Principal;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using PlatformRacing3.Common.Database;
 
 namespace PlatformRacing3.Web.Extensions
 {
-    internal static class HttpContextExtensions
+	internal static class HttpContextExtensions
     {
         private const string AUTHENICATION_TYPE = "Login";
         private const string AUTHENICATION_IDENTITY = "PlatformRacing3Identity";

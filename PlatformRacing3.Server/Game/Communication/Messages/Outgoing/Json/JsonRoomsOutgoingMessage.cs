@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using PlatformRacing3.Server.Game.Chat;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal sealed class JsonRoomsOutgoingMessage : JsonPacket
+	internal sealed class JsonRoomsOutgoingMessage : JsonPacket
     {
         private protected override string InternalType => "receiveRooms";
 

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessCountMyIgnoredProcedureResponse : DataAccessDataResponse<DataAccessCountMyIgnoredProcedureResponse.CountMyIgnoredResponse>
+	public class DataAccessCountMyIgnoredProcedureResponse : DataAccessDataResponse<DataAccessCountMyIgnoredProcedureResponse.CountMyIgnoredResponse>
     {
         private DataAccessCountMyIgnoredProcedureResponse()
         {

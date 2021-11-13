@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-
-namespace PlatformRacing3.Web.Utils
+﻿namespace PlatformRacing3.Web.Utils
 {
 	internal static class EventIds
 	{

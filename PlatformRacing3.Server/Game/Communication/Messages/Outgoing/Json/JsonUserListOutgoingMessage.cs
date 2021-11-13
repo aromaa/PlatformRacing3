@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal sealed class JsonUserListOutgoingMessage : JsonPacket
+	internal sealed class JsonUserListOutgoingMessage : JsonPacket
     {
         private protected override string InternalType => "receiveUserList";
 

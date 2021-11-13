@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using PlatformRacing3.Common.PrivateMessage;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json
 {
-    internal sealed class JsonPmsOutgoingMessage : JsonPacket
+	internal sealed class JsonPmsOutgoingMessage : JsonPacket
     {
         private protected override string InternalType => "receivePMs";
 

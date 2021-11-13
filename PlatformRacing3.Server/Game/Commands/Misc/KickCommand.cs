@@ -1,10 +1,9 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Game.Commands.Misc
 {
-    internal sealed class KickCommand : ICommand
+	internal sealed class KickCommand : ICommand
     {
         private readonly ClientManager clientManager;
 

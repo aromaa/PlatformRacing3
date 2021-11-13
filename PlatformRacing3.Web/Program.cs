@@ -1,10 +1,7 @@
-﻿using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
 using PlatformRacing3.Common.Database;
 using PlatformRacing3.Common.Redis;
 using PlatformRacing3.Web.Config;
@@ -12,7 +9,7 @@ using PlatformRacing3.Web.Controllers.DataAccess2;
 
 namespace PlatformRacing3.Web
 {
-    internal class Program
+	internal class Program
     {
         internal static WebConfig Config { get; private set; }
         

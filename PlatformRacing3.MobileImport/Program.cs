@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Xml.Linq;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using Newtonsoft.Json;
@@ -12,7 +9,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace PlatformRacing3.MobileImport
 {
-    internal class Program
+	internal class Program
     {
         private static void Main(string[] args)
         {

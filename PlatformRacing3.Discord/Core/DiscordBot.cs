@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -11,7 +9,7 @@ using PlatformRacing3.Discord.Config;
 
 namespace PlatformRacing3.Discord.Core
 {
-    internal class DiscordBot
+	internal class DiscordBot
     {
         private DiscordBotConfig Config;
 

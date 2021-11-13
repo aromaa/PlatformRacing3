@@ -1,11 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using PlatformRacing3.Server.Extensions;
 
 namespace PlatformRacing3.Server
 {
-    internal static class Program
+	internal static class Program
     {
         private static async Task Main(string[] args)
         {

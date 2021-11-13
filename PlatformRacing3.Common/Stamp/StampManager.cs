@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Threading.Tasks;
+﻿using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -9,7 +6,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.Stamp
 {
-    public sealed class StampManager
+	public sealed class StampManager
     {
         private static readonly ILogger<StampManager> logger = LoggerUtil.LoggerFactory.CreateLogger<StampManager>();
 

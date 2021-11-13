@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums
+﻿namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums
 {
-    [Flags]
+	[Flags]
     public enum UpdateStatus
     {
         None = 1 << 0,

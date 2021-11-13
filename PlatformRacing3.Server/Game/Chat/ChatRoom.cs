@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Common.Utils;
@@ -15,7 +12,7 @@ using PlatformRacing3.Server.Game.User.Identifiers;
 
 namespace PlatformRacing3.Server.Game.Chat
 {
-    internal class ChatRoom
+	internal class ChatRoom
     {
         private const uint MAX_RECENT_MESSAGES = 25;
 

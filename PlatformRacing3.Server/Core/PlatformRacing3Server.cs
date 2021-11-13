@@ -1,10 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Discord.Webhook;
 using Microsoft.Extensions.Logging;
 using Net.Sockets.Listener;
@@ -21,7 +17,7 @@ using StackExchange.Redis;
 
 namespace PlatformRacing3.Server.Core
 {
-    internal sealed class PlatformRacing3Server : PlatformRacing3.Server.API.Core.PlatformRacing3
+	internal sealed class PlatformRacing3Server : PlatformRacing3.Server.API.Core.PlatformRacing3
     {
         public const uint PROTOCOL_VERSION = 24;
 

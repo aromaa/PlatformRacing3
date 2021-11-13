@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace PlatformRacing3.Server.Game.Match
 {
-    internal class MatchTimer
+	internal class MatchTimer
     {
         private Stopwatch Stopwatch { get; }
         private TimeSpan Delay { get; set; }

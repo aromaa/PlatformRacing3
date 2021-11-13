@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using System.Net;
 using System.Text.Json.Serialization;
 using PlatformRacing3.Common.Customization;
@@ -11,7 +9,7 @@ using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
 namespace PlatformRacing3.Server.Game.Match
 {
-    internal class MatchPlayer
+	internal class MatchPlayer
     {
         internal MultiplayerMatch Match { get; } //IMatch?
         internal UserData UserData { get; }

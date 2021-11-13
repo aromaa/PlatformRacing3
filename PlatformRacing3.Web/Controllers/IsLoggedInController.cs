@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Web.Extensions;
 using PlatformRacing3.Web.Responses;
 
 namespace PlatformRacing3.Web.Controllers
 {
-    [ApiController]
+	[ApiController]
     [Route("isloggedin")]
     [Produces("text/xml")]
     public class IsLoggedInController : ControllerBase

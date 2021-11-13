@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Threading.Tasks;
+﻿using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -9,7 +6,7 @@ using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.Block
 {
-    public sealed class BlockManager
+	public sealed class BlockManager
     {
         private static readonly ILogger<BlockManager> logger = LoggerUtil.LoggerFactory.CreateLogger<BlockManager>();
 

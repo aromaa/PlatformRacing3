@@ -1,9 +1,5 @@
-﻿using System;
-using System.Buffers;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Npgsql;
 using NpgsqlTypes;
 using PlatformRacing3.Common.Campaign;
@@ -12,7 +8,7 @@ using PlatformRacing3.Common.Level;
 
 namespace PlatformRacing3.Common.Database
 {
-    public class DatabaseConnection : IDisposable
+	public class DatabaseConnection : IDisposable
     {
         private static string ConnectionString;
 

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Drawing;
 using System.Xml.Linq;
-using Microsoft.AspNetCore.Http;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.Level;
 using PlatformRacing3.Web.Controllers.DataAccess2.Procedures.Exceptions;
@@ -15,7 +10,7 @@ using PlatformRacing3.Web.Utils;
 
 namespace PlatformRacing3.Web.Controllers.DataAccess2.Procedures
 {
-    public class SaveLevel4Procedure : IProcedure
+	public class SaveLevel4Procedure : IProcedure
     {
         private const uint TITLE_MIN_LENGTH = 1;
         private const uint TITLE_MAX_LENGTH = 50;

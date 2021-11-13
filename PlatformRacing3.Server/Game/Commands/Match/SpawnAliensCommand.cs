@@ -1,12 +1,11 @@
-﻿using System;
-using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Commands.Match
 {
-    internal class SpawnAliensCommand : ICommand
+	internal class SpawnAliensCommand : ICommand
     {
         public string Permission => "command.spawnaliens.use";
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Discord;
 using Discord.Commands;
 using PlatformRacing3.Common.Customization;
@@ -9,7 +7,7 @@ using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Discord.Commands
 {
-    public class MyPartsCommand : ModuleBase<SocketCommandContext>
+	public class MyPartsCommand : ModuleBase<SocketCommandContext>
     {
         [Command("pr3parts")]
         [Summary("PARTS! PARTS! WHICH ONE AM I MISSING!?")]

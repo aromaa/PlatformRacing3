@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessGetMyBlocks2Response : DataAccessDataResponse<DataAccessGetMyBlocks2Response.MyBlocksData>
+	public class DataAccessGetMyBlocks2Response : DataAccessDataResponse<DataAccessGetMyBlocks2Response.MyBlocksData>
     {
         [XmlElement("category")]
         public string Category { get; set; }

@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PlatformRacing3.Server.Game.Client;
+﻿using PlatformRacing3.Server.Game.Client;
 
 namespace PlatformRacing3.Server.Game.Lobby
 {
-    internal class LobbySession
+	internal class LobbySession
     {
         private ClientSession Session { get; }
 

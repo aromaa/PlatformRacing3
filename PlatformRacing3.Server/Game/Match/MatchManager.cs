@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Linq;
-using System.Threading;
 using Microsoft.Extensions.Logging;
 using PlatformRacing3.Server.Extensions;
 using PlatformRacing3.Server.Game.Client;
@@ -9,7 +7,7 @@ using PlatformRacing3.Server.Game.Lobby;
 
 namespace PlatformRacing3.Server.Game.Match
 {
-    internal sealed class MatchManager
+	internal sealed class MatchManager
     {
         private readonly CommandManager commandManager;
 

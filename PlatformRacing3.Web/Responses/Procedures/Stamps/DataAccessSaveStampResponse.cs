@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 using PlatformRacing3.Web.Utils;
 
 namespace PlatformRacing3.Web.Responses.Procedures.Stamps
 {
-    public class DataAccessSaveStampResponse : DataAccessDataResponse<DataAccessSaveStampResponse.StampSavedResponse>
+	public class DataAccessSaveStampResponse : DataAccessDataResponse<DataAccessSaveStampResponse.StampSavedResponse>
     {
         public DataAccessSaveStampResponse()
         {

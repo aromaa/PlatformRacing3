@@ -1,12 +1,11 @@
-﻿using System;
-using PlatformRacing3.Common.Customization;
+﻿using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Commands.Match
 {
-    internal class AddHatCommand : ICommand
+	internal class AddHatCommand : ICommand
     {
         public string Permission => "command.addhat.use";
 

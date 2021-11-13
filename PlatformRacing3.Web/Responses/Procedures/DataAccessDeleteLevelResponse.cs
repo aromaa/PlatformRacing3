@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-
-namespace PlatformRacing3.Web.Responses.Procedures
+﻿namespace PlatformRacing3.Web.Responses.Procedures
 {
-    public class DataAccessDeleteLevelResponse : DataAccessDataResponse<bool>
+	public class DataAccessDeleteLevelResponse : DataAccessDataResponse<bool>
     {
         public DataAccessDeleteLevelResponse()
         {

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Commands;
 
 namespace PlatformRacing3.Server.Game.Chat
 {
-    internal sealed class ChatRoomManager
+	internal sealed class ChatRoomManager
     {
         private readonly CommandManager commandManager;
 

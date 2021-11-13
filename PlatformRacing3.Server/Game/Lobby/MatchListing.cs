@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Drawing;
-using System.Linq;
 using System.Text.Json.Serialization;
-using System.Threading;
 using Net.Sockets;
 using PlatformRacing3.Common.Level;
 using PlatformRacing3.Common.User;
@@ -17,7 +13,7 @@ using PlatformRacing3.Server.Game.User.Identifiers;
 
 namespace PlatformRacing3.Server.Game.Lobby
 {
-    internal class MatchListing
+	internal class MatchListing
     {
         private const int SPOTS_LEFT_GAME_STARTED = int.MinValue;
         private const int SPOTS_LEFT_DIED = int.MinValue + 1;

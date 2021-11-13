@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Server.Game.Client;
+﻿using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 using PlatformRacing3.Server.Game.Lobby;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
-    internal sealed class RequestMatchesIncominggMessage : MessageIncomingJson<JsonRequestMatchesIncomingMessage>
+	internal sealed class RequestMatchesIncominggMessage : MessageIncomingJson<JsonRequestMatchesIncomingMessage>
     {
         private readonly MatchListingManager matchListingManager;
 

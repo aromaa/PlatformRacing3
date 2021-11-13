@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using PlatformRacing3.Common.Level;
+﻿using PlatformRacing3.Common.Level;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
-    internal class GetLevelListIncomingMessage : MessageIncomingJson<JsonGetLevelListIncomingMessage>
+	internal class GetLevelListIncomingMessage : MessageIncomingJson<JsonGetLevelListIncomingMessage>
     {
         internal override void Handle(ClientSession session, JsonGetLevelListIncomingMessage message)
         {

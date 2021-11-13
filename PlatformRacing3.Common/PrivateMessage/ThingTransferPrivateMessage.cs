@@ -1,11 +1,10 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PlatformRacing3.Common.PrivateMessage
 {
-    public class ThingTransferPrivateMessage : IPrivateMessage
+	public class ThingTransferPrivateMessage : IPrivateMessage
     {
         public uint Id { get; }
         public uint ReceiverId { get; }

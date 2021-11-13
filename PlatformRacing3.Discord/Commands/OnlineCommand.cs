@@ -1,11 +1,10 @@
 ﻿using System.Text;
-using System.Threading.Tasks;
 using Discord.Commands;
 using PlatformRacing3.Common.Server;
 
 namespace PlatformRacing3.Discord.Commands
 {
-    public class OnlineCommand : ModuleBase<SocketCommandContext>
+	public class OnlineCommand : ModuleBase<SocketCommandContext>
     {
         private ServerManager ServerManager;
 

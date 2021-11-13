@@ -1,11 +1,10 @@
-﻿using System.Linq;
-using PlatformRacing3.Server.Game.Client;
+﻿using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
 {
-    internal sealed class GetUserListIncomingMessage : MessageIncomingJson<JsonGetUserListIncomingMessage>
+	internal sealed class GetUserListIncomingMessage : MessageIncomingJson<JsonGetUserListIncomingMessage>
     {
         private readonly ClientManager clientManager;
 
