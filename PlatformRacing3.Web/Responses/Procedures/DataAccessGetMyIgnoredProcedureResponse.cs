@@ -1,17 +1,16 @@
 ﻿using PlatformRacing3.Common.User;
 
-namespace PlatformRacing3.Web.Responses.Procedures
+namespace PlatformRacing3.Web.Responses.Procedures;
+
+public class DataAccessGetMyIgnoredProcedureResponse : DataAccessDataResponse<PlayerUserData>
 {
-	public class DataAccessGetMyIgnoredProcedureResponse : DataAccessDataResponse<PlayerUserData>
-    {
-        private DataAccessGetMyIgnoredProcedureResponse()
-        {
+	private DataAccessGetMyIgnoredProcedureResponse()
+	{
 
-        }
+	}
 
-        public DataAccessGetMyIgnoredProcedureResponse(IReadOnlyCollection<PlayerUserData> players)
-        {
-            this.Rows = new List<PlayerUserData>(players);
-        }
-    }
+	public DataAccessGetMyIgnoredProcedureResponse(IReadOnlyCollection<PlayerUserData> players)
+	{
+		this.Rows = new List<PlayerUserData>(players);
+	}
 }

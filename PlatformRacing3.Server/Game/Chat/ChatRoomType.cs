@@ -1,8 +1,7 @@
-﻿namespace PlatformRacing3.Server.Game.Chat
+﻿namespace PlatformRacing3.Server.Game.Chat;
+
+public enum ChatRoomType
 {
-    public enum ChatRoomType
-    {
-        System,
-        UserCreated,
-    }
+	System,
+	UserCreated,
 }

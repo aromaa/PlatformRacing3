@@ -1,25 +1,24 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Primitives;
 
-namespace PlatformRacing3.Web.Middleware
+namespace PlatformRacing3.Web.Middleware;
+
+public class CloudflareMiddleware
 {
-	public class CloudflareMiddleware
-    {
-        private readonly RequestDelegate Next;
+	private readonly RequestDelegate Next;
 
-        public CloudflareMiddleware(RequestDelegate next)
-        {
-            this.Next = next;
-        }
+	public CloudflareMiddleware(RequestDelegate next)
+	{
+		this.Next = next;
+	}
 
-        public Task Invoke(HttpContext context)
-        {
-            if (context.Request.Headers.TryGetValue("CF-Connecting-IP", out StringValues cloudFlareIpForward))
-            {
-                context.Connection.RemoteIpAddress = IPAddress.Parse(cloudFlareIpForward);
-            }
+	public Task Invoke(HttpContext context)
+	{
+		if (context.Request.Headers.TryGetValue("CF-Connecting-IP", out StringValues cloudFlareIpForward))
+		{
+			context.Connection.RemoteIpAddress = IPAddress.Parse(cloudFlareIpForward);
+		}
             
-            return this.Next(context);
-        }
-    }
+		return this.Next(context);
+	}
 }

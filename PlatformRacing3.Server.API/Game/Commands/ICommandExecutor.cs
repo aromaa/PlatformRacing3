@@ -1,11 +1,10 @@
-﻿namespace PlatformRacing3.Server.API.Game.Commands
+﻿namespace PlatformRacing3.Server.API.Game.Commands;
+
+public interface ICommandExecutor
 {
-    public interface ICommandExecutor
-    {
-        uint PermissionRank { get; }
+	uint PermissionRank { get; }
 
-        void SendMessage(string message);
+	void SendMessage(string message);
 
-        bool HasPermission(string permission);
-    }
+	bool HasPermission(string permission);
 }

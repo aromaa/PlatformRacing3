@@ -5,103 +5,102 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Primitives;
 using PlatformRacing3.Common.Database;
 
-namespace PlatformRacing3.Web.Extensions
+namespace PlatformRacing3.Web.Extensions;
+
+internal static class HttpContextExtensions
 {
-	internal static class HttpContextExtensions
-    {
-        private const string AUTHENICATION_TYPE = "Login";
-        private const string AUTHENICATION_IDENTITY = "PlatformRacing3Identity";
+	private const string AUTHENICATION_TYPE = "Login";
+	private const string AUTHENICATION_IDENTITY = "PlatformRacing3Identity";
 
-        private static readonly ISet<string> ALLOWED_DOMAINS = new HashSet<string>()
-        {
-            //The actual site
-            "http://pr3hub.com",
-            "https://pr3hub.com",
+	private static readonly ISet<string> ALLOWED_DOMAINS = new HashSet<string>()
+	{
+		//The actual site
+		"http://pr3hub.com",
+		"https://pr3hub.com",
 
-            //The Flash apps
-            "app:/Platform Racing 3 Preloader.swf",
-            "app:/Platform Racing 3 Client.swf",
-            "app:/Platform%20Racing%203%20Preloader.swf",
-            "app:/Platform%20Racing%203%20Client.swf",
+		//The Flash apps
+		"app:/Platform Racing 3 Preloader.swf",
+		"app:/Platform Racing 3 Client.swf",
+		"app:/Platform%20Racing%203%20Preloader.swf",
+		"app:/Platform%20Racing%203%20Client.swf",
 
-            //Third party sites
-            "http://jiggmin2.com",
-            "https://jiggmin2.com",
-            "https://discord.com",
-        };
+		//Third party sites
+		"http://jiggmin2.com",
+		"https://jiggmin2.com",
+		"https://discord.com",
+	};
 
-        internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
-        {
-            if (httpContext.Request.Headers.TryGetValue("Referer", out StringValues referer) && !HttpContextExtensions.IsAllowed(referer))
-            {
-                return 0u; //Block possible bad request
-            }
+	internal static uint IsAuthenicatedPr3User(this HttpContext httpContext)
+	{
+		if (httpContext.Request.Headers.TryGetValue("Referer", out StringValues referer) && !HttpContextExtensions.IsAllowed(referer))
+		{
+			return 0u; //Block possible bad request
+		}
 
-            if (httpContext.Request.Headers.TryGetValue("Origin", out StringValues origin) && !HttpContextExtensions.IsAllowed(origin))
-            {
-                return 0u; //Block possible bad request
-            }
+		if (httpContext.Request.Headers.TryGetValue("Origin", out StringValues origin) && !HttpContextExtensions.IsAllowed(origin))
+		{
+			return 0u; //Block possible bad request
+		}
 
-            ClaimsPrincipal claimsPrincipal = httpContext.User;
-            if (claimsPrincipal != null)
-            {
-                IIdentity identity = claimsPrincipal.Identity;
-                if (identity != null && identity.IsAuthenticated && identity.Name == HttpContextExtensions.AUTHENICATION_IDENTITY)
-                {
-                    if (uint.TryParse(claimsPrincipal.FindFirstValue(ClaimTypes.Sid), out uint userId))
-                    {
-                        return userId;
-                    }
-                }
-            }
+		ClaimsPrincipal claimsPrincipal = httpContext.User;
+		if (claimsPrincipal != null)
+		{
+			IIdentity identity = claimsPrincipal.Identity;
+			if (identity != null && identity.IsAuthenticated && identity.Name == HttpContextExtensions.AUTHENICATION_IDENTITY)
+			{
+				if (uint.TryParse(claimsPrincipal.FindFirstValue(ClaimTypes.Sid), out uint userId))
+				{
+					return userId;
+				}
+			}
+		}
 
-            return 0u;
-        }
+		return 0u;
+	}
 
-        private static bool IsAllowed(string domain)
-        {
-            if (HttpContextExtensions.ALLOWED_DOMAINS.Contains(domain))
-            {
-                return true;
-            }
+	private static bool IsAllowed(string domain)
+	{
+		if (HttpContextExtensions.ALLOWED_DOMAINS.Contains(domain))
+		{
+			return true;
+		}
 
-            foreach(string allowedDomain in HttpContextExtensions.ALLOWED_DOMAINS)
-            {
-                if (domain.StartsWith(allowedDomain))
-                {
-                    return true;
-                }
-            }
+		foreach(string allowedDomain in HttpContextExtensions.ALLOWED_DOMAINS)
+		{
+			if (domain.StartsWith(allowedDomain))
+			{
+				return true;
+			}
+		}
 
-            return false;
-        }
+		return false;
+	}
 
-        internal static Task AuthenicatePr3UserAsync(this HttpContext httpContext, uint userId)
-        {
-            return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users_logins(user_id, ip, data, type) VALUES({userId}, {httpContext.Connection.RemoteIpAddress}, '', 'web')").ContinueWith(async (task) =>
-            {
-                if (task.IsCompletedSuccessfully)
-                {
-                    ClaimsIdentity identity = new(HttpContextExtensions.AUTHENICATION_TYPE);
-                    identity.AddClaim(new Claim(ClaimTypes.Name, HttpContextExtensions.AUTHENICATION_IDENTITY));
-                    identity.AddClaim(new Claim(ClaimTypes.Sid, userId.ToString(), ClaimValueTypes.UInteger32));
+	internal static Task AuthenicatePr3UserAsync(this HttpContext httpContext, uint userId)
+	{
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users_logins(user_id, ip, data, type) VALUES({userId}, {httpContext.Connection.RemoteIpAddress}, '', 'web')").ContinueWith(async (task) =>
+		{
+			if (task.IsCompletedSuccessfully)
+			{
+				ClaimsIdentity identity = new(HttpContextExtensions.AUTHENICATION_TYPE);
+				identity.AddClaim(new Claim(ClaimTypes.Name, HttpContextExtensions.AUTHENICATION_IDENTITY));
+				identity.AddClaim(new Claim(ClaimTypes.Sid, userId.ToString(), ClaimValueTypes.UInteger32));
 
-                    await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties()
-                    {
-                        IsPersistent = true,
-                    });
-                }
-                else if (task.IsFaulted)
-                {
-                    //TODO: Should fallback the exception
-                    //HttpContextExtensions.Logger.Error("Failed to insert login", task.Exception);
-                }
-            }));
-        }
+				await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties()
+				{
+					IsPersistent = true,
+				});
+			}
+			else if (task.IsFaulted)
+			{
+				//TODO: Should fallback the exception
+				//HttpContextExtensions.Logger.Error("Failed to insert login", task.Exception);
+			}
+		}));
+	}
 
-        internal static Task LogOutPr3UserAsync(this HttpContext httpContext)
-        {
-            return httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        }
-    }
+	internal static Task LogOutPr3UserAsync(this HttpContext httpContext)
+	{
+		return httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+	}
 }

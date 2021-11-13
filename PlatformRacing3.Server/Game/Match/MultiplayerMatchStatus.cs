@@ -1,14 +1,13 @@
-﻿namespace PlatformRacing3.Server.Game.Match
+﻿namespace PlatformRacing3.Server.Game.Match;
+
+public enum MultiplayerMatchStatus
 {
-    public enum MultiplayerMatchStatus
-    {
-        PreparingForStart,
-        ServerDrawing,
-        WaitingForUsersToJoin,
-        WaitingForUsersToDraw,
-        Starting,
-        Ongoing,
-        Ended,
-        Died,
-    }
+	PreparingForStart,
+	ServerDrawing,
+	WaitingForUsersToJoin,
+	WaitingForUsersToDraw,
+	Starting,
+	Ongoing,
+	Ended,
+	Died,
 }

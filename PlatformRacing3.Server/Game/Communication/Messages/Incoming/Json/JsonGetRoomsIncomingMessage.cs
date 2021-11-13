@@ -1,6 +1,5 @@
-﻿namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json
+﻿namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+
+internal sealed class JsonGetRoomsIncomingMessage : JsonPacket
 {
-	internal sealed class JsonGetRoomsIncomingMessage : JsonPacket
-	{
-	}
 }

@@ -4,59 +4,58 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using PlatformRacing3.Common.User;
 
-namespace PlatformRacing3.Web.Controllers
+namespace PlatformRacing3.Web.Controllers;
+
+[ApiController]
+[Route("resetpassword")]
+public class ResetPasswordController : ControllerBase
 {
-	[ApiController]
-    [Route("resetpassword")]
-    public class ResetPasswordController : ControllerBase
-    {
-        [HttpPost]
-        public async Task<string> PostAsync([FromForm] string email, [FromForm] string token, [FromForm] string password)
-        {
-            //Password check
-            if (string.IsNullOrWhiteSpace(password))
-            {
-                return "Please enter password";
-            }
-            else if (password.Length < RegisterController.PASSWORD_MIN_LENGTH)
-            {
-                return $"Password must be at least {RegisterController.PASSWORD_MIN_LENGTH} chars long";
-            }
+	[HttpPost]
+	public async Task<string> PostAsync([FromForm] string email, [FromForm] string token, [FromForm] string password)
+	{
+		//Password check
+		if (string.IsNullOrWhiteSpace(password))
+		{
+			return "Please enter password";
+		}
+		else if (password.Length < RegisterController.PASSWORD_MIN_LENGTH)
+		{
+			return $"Password must be at least {RegisterController.PASSWORD_MIN_LENGTH} chars long";
+		}
 
-            PlayerUserData player = await UserManager.TryGetUserDataByEmailAsync(email);
-            if (player == null)
-            {
-                return "Invalid token";
-            }
+		PlayerUserData player = await UserManager.TryGetUserDataByEmailAsync(email);
+		if (player == null)
+		{
+			return "Invalid token";
+		}
 
-            string hashedToken;
-            using (SHA512 sha = SHA512.Create())
-            {
-                hashedToken = Convert.ToBase64String(sha.ComputeHash(WebEncoders.Base64UrlDecode(token)));
-            }
+		string hashedToken;
+		using (SHA512 sha = SHA512.Create())
+		{
+			hashedToken = Convert.ToBase64String(sha.ComputeHash(WebEncoders.Base64UrlDecode(token)));
+		}
 
-            uint userId = await UserManager.TryGetForgotPasswordToken(hashedToken);
-            if (userId == 0 || userId != player.Id)
-            {
-                return "Invalid token";
-            }
+		uint userId = await UserManager.TryGetForgotPasswordToken(hashedToken);
+		if (userId == 0 || userId != player.Id)
+		{
+			return "Invalid token";
+		}
 
-            if (!await UserManager.TryConsumePasswordToken(hashedToken, password, this.HttpContext.Connection.RemoteIpAddress))
-            {
-                return "Error, try again";
-            }
+		if (!await UserManager.TryConsumePasswordToken(hashedToken, password, this.HttpContext.Connection.RemoteIpAddress))
+		{
+			return "Error, try again";
+		}
 
-            using (MailMessage mail = new())
-            {
-                mail.To.Add(email);
-                mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";
-                mail.From = new MailAddress(Program.Config.SmtpUser);
-                mail.Body = $"Your account {player.Username} password was reset! If you did not do this change your password immediately!";
+		using (MailMessage mail = new())
+		{
+			mail.To.Add(email);
+			mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";
+			mail.From = new MailAddress(Program.Config.SmtpUser);
+			mail.Body = $"Your account {player.Username} password was reset! If you did not do this change your password immediately!";
 
-                Program.SmtpClient.Send(mail);
-            }
+			Program.SmtpClient.Send(mail);
+		}
 
-            return "Password has been reset! Start the grind :sunglasses:";
-        }
-    }
+		return "Password has been reset! Start the grind :sunglasses:";
+	}
 }

@@ -1,9 +1,8 @@
-﻿namespace PlatformRacing3.Server.Game.Lobby
+﻿namespace PlatformRacing3.Server.Game.Lobby;
+
+public enum MatchListingType
 {
-    public enum MatchListingType
-    {
-        Normal,
-        LevelOfTheDay,
-        Tournament,
-    }
+	Normal,
+	LevelOfTheDay,
+	Tournament,
 }

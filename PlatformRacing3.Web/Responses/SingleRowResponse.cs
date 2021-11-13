@@ -1,20 +1,19 @@
 ﻿using System.Xml.Serialization;
 
-namespace PlatformRacing3.Web.Responses
+namespace PlatformRacing3.Web.Responses;
+
+public class SingleRowResponse<T>
 {
-    public class SingleRowResponse<T>
-    {
-        [XmlElement("Row")]
-        public T Row;
+	[XmlElement("Row")]
+	public T Row;
 
-        public SingleRowResponse()
-        {
+	public SingleRowResponse()
+	{
 
-        }
+	}
 
-        public SingleRowResponse(T row)
-        {
-            this.Row = row;
-        }
-    }
+	public SingleRowResponse(T row)
+	{
+		this.Row = row;
+	}
 }

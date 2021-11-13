@@ -1,9 +1,8 @@
-﻿namespace PlatformRacing3.Server.Game.Client
+﻿namespace PlatformRacing3.Server.Game.Client;
+
+public enum ClientStatus
 {
-    public enum ClientStatus
-    {
-        None,
-        ConnectionConfirmed,
-        LoggedIn,
-    }
+	None,
+	ConnectionConfirmed,
+	LoggedIn,
 }

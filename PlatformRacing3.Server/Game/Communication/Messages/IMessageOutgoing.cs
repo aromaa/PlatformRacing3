@@ -1,9 +1,8 @@
 ﻿using Net.Buffers;
 
-namespace PlatformRacing3.Server.Game.Communication.Messages
+namespace PlatformRacing3.Server.Game.Communication.Messages;
+
+internal interface IMessageOutgoing
 {
-    internal interface IMessageOutgoing
-    {
-        void Write(ref PacketWriter writer);
-    }
+	void Write(ref PacketWriter writer);
 }

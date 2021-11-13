@@ -1,6 +1,5 @@
-﻿namespace PlatformRacing3.Common.Exceptions
+﻿namespace PlatformRacing3.Common.Exceptions;
+
+public class XmlSerializerCompatibleException : Exception
 {
-	public class XmlSerializerCompatibleException : Exception
-    {
-    }
 }

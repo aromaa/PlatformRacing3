@@ -1,35 +1,34 @@
 ﻿using System.Diagnostics;
 
-namespace PlatformRacing3.Server.Game.Match
+namespace PlatformRacing3.Server.Game.Match;
+
+internal class MatchTimer
 {
-	internal class MatchTimer
-    {
-        private Stopwatch Stopwatch { get; }
-        private TimeSpan Delay { get; set; }
+	private Stopwatch Stopwatch { get; }
+	private TimeSpan Delay { get; set; }
 
-        public MatchTimer()
-        {
-            this.Stopwatch = new Stopwatch();
-        }
+	public MatchTimer()
+	{
+		this.Stopwatch = new Stopwatch();
+	}
 
-        public void Start(TimeSpan delay = default)
-        {
-            if (!this.Stopwatch.IsRunning)
-            {
-                this.Stopwatch.Start();
+	public void Start(TimeSpan delay = default)
+	{
+		if (!this.Stopwatch.IsRunning)
+		{
+			this.Stopwatch.Start();
 
-                this.Delay = delay;
-            }
-        }
+			this.Delay = delay;
+		}
+	}
 
-        public TimeSpan Elapsed => this.Stopwatch.Elapsed - this.Delay;
+	public TimeSpan Elapsed => this.Stopwatch.Elapsed - this.Delay;
 
-        public static MatchTimer StartNew(TimeSpan delay = default)
-        {
-            MatchTimer timer = new();
-            timer.Start(delay);
+	public static MatchTimer StartNew(TimeSpan delay = default)
+	{
+		MatchTimer timer = new();
+		timer.Start(delay);
 
-            return timer;
-        }
-    }
+		return timer;
+	}
 }

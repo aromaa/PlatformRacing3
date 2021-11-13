@@ -1,11 +1,10 @@
 ﻿using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Json;
 
-namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing
+namespace PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
+
+internal class SpawnAliensOutgoingPacket : JsonOutgoingMessage<JsonSpawnAliensOutgoingPacket>
 {
-    internal class SpawnAliensOutgoingPacket : JsonOutgoingMessage<JsonSpawnAliensOutgoingPacket>
-    {
-        internal SpawnAliensOutgoingPacket(uint count, int seed) : base(new JsonSpawnAliensOutgoingPacket(count, seed))
-        {
-        }
-    }
+	internal SpawnAliensOutgoingPacket(uint count, int seed) : base(new JsonSpawnAliensOutgoingPacket(count, seed))
+	{
+	}
 }

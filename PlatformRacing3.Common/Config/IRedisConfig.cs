@@ -1,8 +1,7 @@
-﻿namespace PlatformRacing3.Common.Config
+﻿namespace PlatformRacing3.Common.Config;
+
+public interface IRedisConfig
 {
-    public interface IRedisConfig
-    {
-        string RedisHost { get; }
-        uint RedisPort { get; }
-    }
+	string RedisHost { get; }
+	uint RedisPort { get; }
 }

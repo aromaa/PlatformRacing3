@@ -7,31 +7,30 @@ using PlatformRacing3.Common.Utils;
 using PlatformRacing3.Discord.Config;
 using PlatformRacing3.Discord.Core;
 
-namespace PlatformRacing3.Discord
+namespace PlatformRacing3.Discord;
+
+internal class Program
 {
-	internal class Program
-    {
-        private static async Task Main(string[] args)
-        {
-            LoggerUtil.LoggerFactory = NullLoggerFactory.Instance;
+	private static async Task Main(string[] args)
+	{
+		LoggerUtil.LoggerFactory = NullLoggerFactory.Instance;
 
-            DiscordBotConfig config = JsonConvert.DeserializeObject<DiscordBotConfig>(File.ReadAllText("settings.json"));
+		DiscordBotConfig config = JsonConvert.DeserializeObject<DiscordBotConfig>(File.ReadAllText("settings.json"));
 
-            DatabaseConnection.Init(config);
-            RedisConnection.Init(config);
+		DatabaseConnection.Init(config);
+		RedisConnection.Init(config);
 
-            CampaignManager campaignManager = new();
+		CampaignManager campaignManager = new();
 
-            Task.WaitAll(campaignManager.LoadCampaignTimesAsync(), campaignManager.LoadPrizesAsync());
+		Task.WaitAll(campaignManager.LoadCampaignTimesAsync(), campaignManager.LoadPrizesAsync());
 
-            DiscordBot bot = new(config);
+		DiscordBot bot = new(config);
 
-            await bot.LoadCommandsAsync();
-            await bot.SetupDiscordBot();
+		await bot.LoadCommandsAsync();
+		await bot.SetupDiscordBot();
 
-            Console.WriteLine("Ready!");
+		Console.WriteLine("Ready!");
 
-            await Task.Delay(-1);
-        }
-    }
+		await Task.Delay(-1);
+	}
 }

@@ -1,9 +1,8 @@
 ﻿using System.Net;
 
-namespace PlatformRacing3.Server.Game.User.Identifiers
+namespace PlatformRacing3.Server.Game.User.Identifiers;
+
+public interface IUserIdentifier
 {
-    public interface IUserIdentifier
-    {
-        bool Matches(uint userId, uint socketId, IPAddress ipAddress);
-    }
+	bool Matches(uint userId, uint socketId, IPAddress ipAddress);
 }

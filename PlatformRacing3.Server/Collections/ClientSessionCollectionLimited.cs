@@ -1,94 +1,93 @@
 ﻿using Net.Sockets;
 using PlatformRacing3.Server.Game.Client;
 
-namespace PlatformRacing3.Server.Collections
+namespace PlatformRacing3.Server.Collections;
+
+internal class ClientSessionCollectionLimited : ClientSessionCollection
 {
-	internal class ClientSessionCollectionLimited : ClientSessionCollection
-    {
-        private const int FULL_CAPACITY = int.MinValue;
+	private const int FULL_CAPACITY = int.MinValue;
 
-        private int Capacity;
+	private int Capacity;
 
-        internal ClientSessionCollectionLimited(int capacity, Action<ClientSession> removeCallback = null) : base(removeCallback: removeCallback)
-        {
-            this.Capacity = capacity;
-        }
+	internal ClientSessionCollectionLimited(int capacity, Action<ClientSession> removeCallback = null) : base(removeCallback: removeCallback)
+	{
+		this.Capacity = capacity;
+	}
 
-        internal override bool TryAdd(ClientSession session)
-        {
-            if (this.Contains(session)) //Fast path
-            {
-                return false;
-            }
+	internal override bool TryAdd(ClientSession session)
+	{
+		if (this.Contains(session)) //Fast path
+		{
+			return false;
+		}
 
-            while (true)
-            {
-                int capacity = this.Capacity;
-                if (capacity <= 0)
-                {
-                    return false;
-                }
+		while (true)
+		{
+			int capacity = this.Capacity;
+			if (capacity <= 0)
+			{
+				return false;
+			}
 
-                if (Interlocked.CompareExchange(ref this.Capacity, capacity - 1, capacity) == capacity)
-                {
-                    if (base.TryAdd(session))
-                    {
-                        return true;
-                    }
+			if (Interlocked.CompareExchange(ref this.Capacity, capacity - 1, capacity) == capacity)
+			{
+				if (base.TryAdd(session))
+				{
+					return true;
+				}
 
-                    this.TryAddSlotBack();
+				this.TryAddSlotBack();
 
-                    return false;
-                }
-            }
-        }
+				return false;
+			}
+		}
+	}
 
-        protected override void OnRemoved(ISocket socket, ref ClientSession session)
-        {
-            this.TryAddSlotBack();
+	protected override void OnRemoved(ISocket socket, ref ClientSession session)
+	{
+		this.TryAddSlotBack();
 
-            base.OnRemoved(socket, ref session);
-        }
+		base.OnRemoved(socket, ref session);
+	}
 
-        internal void TryAddSlotBack()
-        {
-            while (true)
-            {
-                int capacity = this.Capacity;
-                if (capacity < 0)
-                {
-                    break;
-                }
+	internal void TryAddSlotBack()
+	{
+		while (true)
+		{
+			int capacity = this.Capacity;
+			if (capacity < 0)
+			{
+				break;
+			}
 
-                if (Interlocked.CompareExchange(ref this.Capacity, capacity + 1, capacity) == capacity)
-                {
-                    break;
-                }
-            }
-        }
+			if (Interlocked.CompareExchange(ref this.Capacity, capacity + 1, capacity) == capacity)
+			{
+				break;
+			}
+		}
+	}
 
-        internal bool MarkFullIfFull() => this.MarkFullIf(0);
-        internal bool MarkFullIf(int condition) => Interlocked.CompareExchange(ref this.Capacity, ClientSessionCollectionLimited.FULL_CAPACITY, condition) == condition;
+	internal bool MarkFullIfFull() => this.MarkFullIf(0);
+	internal bool MarkFullIf(int condition) => Interlocked.CompareExchange(ref this.Capacity, ClientSessionCollectionLimited.FULL_CAPACITY, condition) == condition;
 
-        internal int MarkFull()
-        {
-            while (true)
-            {
-                int capacity = this.Capacity;
-                if (capacity < 0)
-                {
-                    break;
-                }
+	internal int MarkFull()
+	{
+		while (true)
+		{
+			int capacity = this.Capacity;
+			if (capacity < 0)
+			{
+				break;
+			}
 
-                if (this.MarkFullIf(capacity))
-                {
-                    return capacity;
-                }
-            }
+			if (this.MarkFullIf(capacity))
+			{
+				return capacity;
+			}
+		}
 
-            return 0;
-        }
+		return 0;
+	}
 
-        internal bool IsFull => this.Capacity <= 0;
-    }
+	internal bool IsFull => this.Capacity <= 0;
 }

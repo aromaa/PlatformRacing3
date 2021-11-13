@@ -6,69 +6,68 @@ using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Managers;
 using PlatformRacing3.Server.Game.Communication.Messages;
 
-namespace PlatformRacing3.Server.Game.Communication.Handlers
+namespace PlatformRacing3.Server.Game.Communication.Handlers;
+
+internal sealed class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
 {
-    internal sealed class SplitPacketHandler : IncomingBytesHandler, IOutgoingObjectHandler
-    {
-        private readonly BytePacketManager bytePacketManager;
+	private readonly BytePacketManager bytePacketManager;
 
-        private ushort CurrentPacketLength;
+	private ushort CurrentPacketLength;
 
-        private ClientSession Session;
+	private ClientSession Session;
 
-        internal SplitPacketHandler(BytePacketManager bytePacketManager, ClientSession session)
-        {
-            this.bytePacketManager = bytePacketManager;
+	internal SplitPacketHandler(BytePacketManager bytePacketManager, ClientSession session)
+	{
+		this.bytePacketManager = bytePacketManager;
 
-            this.Session = session;
-        }
+		this.Session = session;
+	}
 
-        protected override void Decode(IPipelineHandlerContext context, ref PacketReader reader)
-        {
-            //We haven't read the next packet length, wait for it
-            if (this.CurrentPacketLength == 0 && !reader.TryReadUInt16(out this.CurrentPacketLength))
-            {
-                return;
-            }
+	protected override void Decode(IPipelineHandlerContext context, ref PacketReader reader)
+	{
+		//We haven't read the next packet length, wait for it
+		if (this.CurrentPacketLength == 0 && !reader.TryReadUInt16(out this.CurrentPacketLength))
+		{
+			return;
+		}
 
-            if (reader.Remaining < this.CurrentPacketLength)
-            {
-                return;
-            }
+		if (reader.Remaining < this.CurrentPacketLength)
+		{
+			return;
+		}
 
-            PacketReader readerSliced = reader.Slice(this.CurrentPacketLength);
+		PacketReader readerSliced = reader.Slice(this.CurrentPacketLength);
 
-            this.Read(context, ref readerSliced);
+		this.Read(context, ref readerSliced);
 
-            this.CurrentPacketLength = 0;
-        }
+		this.CurrentPacketLength = 0;
+	}
 
-        public void Read(IPipelineHandlerContext context, ref PacketReader reader)
-        {
-            ushort header = reader.ReadUInt16();
+	public void Read(IPipelineHandlerContext context, ref PacketReader reader)
+	{
+		ushort header = reader.ReadUInt16();
 
-            this.bytePacketManager.HandleIncomingData(header, this.Session, context, ref reader);
+		this.bytePacketManager.HandleIncomingData(header, this.Session, context, ref reader);
 
-            if (reader.Remaining > 0)
-            {
-                reader.Skip(reader.Remaining); //Skip extra bytes and head to the next packet
-            }
-        }
+		if (reader.Remaining > 0)
+		{
+			reader.Skip(reader.Remaining); //Skip extra bytes and head to the next packet
+		}
+	}
 
-        public void Handle<T>(IPipelineHandlerContext context, ref PacketWriter writer, in T packet)
-        {
-            if (packet is IMessageOutgoing message)
-            {
-                PacketWriter length = writer.ReservedFixedSlice(2);
+	public void Handle<T>(IPipelineHandlerContext context, ref PacketWriter writer, in T packet)
+	{
+		if (packet is IMessageOutgoing message)
+		{
+			PacketWriter length = writer.ReservedFixedSlice(2);
 
-                int writerLength = writer.Length;
+			int writerLength = writer.Length;
 
-                message.Write(ref writer);
+			message.Write(ref writer);
 
-                ushort size = checked((ushort)(writer.Length - writerLength));
+			ushort size = checked((ushort)(writer.Length - writerLength));
 
-                length.WriteUInt16(size);
-            }
-        }
-    }
+			length.WriteUInt16(size);
+		}
+	}
 }

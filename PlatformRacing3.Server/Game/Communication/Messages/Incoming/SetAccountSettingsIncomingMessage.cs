@@ -2,40 +2,39 @@
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
-namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming;
+
+internal class SetAccountSettingsIncomingMessage : MessageIncomingJson<JsonSetAccountSettingsMessage>
 {
-	internal class SetAccountSettingsIncomingMessage : MessageIncomingJson<JsonSetAccountSettingsMessage>
-    {
-        private static readonly HashSet<string> SendResponseVars = new()
-        {
-            "hat",
-            "hatColor",
+	private static readonly HashSet<string> SendResponseVars = new()
+	{
+		"hat",
+		"hatColor",
 
-            "head",
-            "headColor",
+		"head",
+		"headColor",
 
-            "body",
-            "bodyColor",
+		"body",
+		"bodyColor",
 
-            "feet",
-            "feetColor",
+		"feet",
+		"feetColor",
 
-            "speed",
-            "accel",
-            "jump",
-        };
+		"speed",
+		"accel",
+		"jump",
+	};
 
-        internal override void Handle(ClientSession session, JsonSetAccountSettingsMessage message)
-        {
-            if (!session.IsLoggedIn)
-            {
-                return;
-            }
+	internal override void Handle(ClientSession session, JsonSetAccountSettingsMessage message)
+	{
+		if (!session.IsLoggedIn)
+		{
+			return;
+		}
 
-            session.UserData.SetStats(message.Speed, message.Accel, message.Jump);
-            session.UserData.SetParts(message.Hat, message.HatColor, message.Head, message.HeadColor, message.Body, message.BodyColor, message.Feet, message.FeetColor);
+		session.UserData.SetStats(message.Speed, message.Accel, message.Jump);
+		session.UserData.SetParts(message.Hat, message.HatColor, message.Head, message.HeadColor, message.Body, message.BodyColor, message.Feet, message.FeetColor);
             
-            session.SendPacket(new UserVarsOutgoingMessage(session.SocketId, session.UserData.GetVars(SetAccountSettingsIncomingMessage.SendResponseVars)));
-        }
-    }
+		session.SendPacket(new UserVarsOutgoingMessage(session.SocketId, session.UserData.GetVars(SetAccountSettingsIncomingMessage.SendResponseVars)));
+	}
 }

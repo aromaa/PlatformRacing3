@@ -1,12 +1,11 @@
-﻿namespace PlatformRacing3.Common.Config
-{
-    public interface IDatabaseConfig
-    {
-        string DatabaseHost { get; }
-        uint DatabasePort { get; }
+﻿namespace PlatformRacing3.Common.Config;
 
-        string DatabaseUser { get; }
-        string DatabasePass { get; }
-        string DatabaseName { get; }
-    }
+public interface IDatabaseConfig
+{
+	string DatabaseHost { get; }
+	uint DatabasePort { get; }
+
+	string DatabaseUser { get; }
+	string DatabasePass { get; }
+	string DatabaseName { get; }
 }

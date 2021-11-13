@@ -3,63 +3,62 @@ using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
-namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming;
+
+internal sealed class GetUserPageIncomingMessage : MessageIncomingJson<JsonGetUserPageIncomingMessage>
 {
-	internal sealed class GetUserPageIncomingMessage : MessageIncomingJson<JsonGetUserPageIncomingMessage>
-    {
-        private readonly ClientManager clientManager;
+	private readonly ClientManager clientManager;
 
-        public GetUserPageIncomingMessage(ClientManager clientManager)
-        {
-            this.clientManager = clientManager;
-        }
+	public GetUserPageIncomingMessage(ClientManager clientManager)
+	{
+		this.clientManager = clientManager;
+	}
 
-        internal override void Handle(ClientSession session, JsonGetUserPageIncomingMessage message)
-        {
-            if (message.SocketId > 0 && this.clientManager.TryGetClientSessionBySocketId(message.SocketId, out ClientSession target))
-            {
-                this.SendUserPage(session, target.UserData, true);
-            }
-            else if (message.UserId > 0)
-            {
-                if (this.clientManager.TryGetClientSessionByUserId(message.UserId, out target))
-                {
-                    this.SendUserPage(session, target.UserData, true);
-                }
-                else
-                {
-                    UserManager.TryGetUserDataByIdAsync(message.UserId).ContinueWith((task) =>
-                    {
-                        if (task.Result != null)
-                        {
-                            this.SendUserPage(session, task.Result);
-                        }
-                        else
-                        {
-                            session.SendPacket(new AlertOutgoingMessage("Unable to load user data"));
-                        }
-                    });
-                }
-            }
-            else
-            {
-                session.SendPacket(new AlertOutgoingMessage("Invalid user page request"));
-            }
-        }
+	internal override void Handle(ClientSession session, JsonGetUserPageIncomingMessage message)
+	{
+		if (message.SocketId > 0 && this.clientManager.TryGetClientSessionBySocketId(message.SocketId, out ClientSession target))
+		{
+			this.SendUserPage(session, target.UserData, true);
+		}
+		else if (message.UserId > 0)
+		{
+			if (this.clientManager.TryGetClientSessionByUserId(message.UserId, out target))
+			{
+				this.SendUserPage(session, target.UserData, true);
+			}
+			else
+			{
+				UserManager.TryGetUserDataByIdAsync(message.UserId).ContinueWith((task) =>
+				{
+					if (task.Result != null)
+					{
+						this.SendUserPage(session, task.Result);
+					}
+					else
+					{
+						session.SendPacket(new AlertOutgoingMessage("Unable to load user data"));
+					}
+				});
+			}
+		}
+		else
+		{
+			session.SendPacket(new AlertOutgoingMessage("Invalid user page request"));
+		}
+	}
 
-        private void SendUserPage(ClientSession session, UserData userData, bool online = false)
-        {
-            ulong timestamp;
-            if (online)
-            {
-                timestamp = (ulong)(userData.LastLogin.HasValue ? (DateTimeOffset.UtcNow - userData.LastLogin).Value.TotalMilliseconds : 0);
-            }
-            else
-            {
-                timestamp = (ulong)(userData.LastOnline.HasValue ? userData.LastOnline.Value.ToUnixTimeMilliseconds() : 0);
-            }
+	private void SendUserPage(ClientSession session, UserData userData, bool online = false)
+	{
+		ulong timestamp;
+		if (online)
+		{
+			timestamp = (ulong)(userData.LastLogin.HasValue ? (DateTimeOffset.UtcNow - userData.LastLogin).Value.TotalMilliseconds : 0);
+		}
+		else
+		{
+			timestamp = (ulong)(userData.LastOnline.HasValue ? userData.LastOnline.Value.ToUnixTimeMilliseconds() : 0);
+		}
 
-            session.SendPacket(new UserPageOutgoingMessage(userData.Id, userData.Group, userData.Rank, online, timestamp, userData.CurrentHat, userData.CurrentHatColor, userData.CurrentHead, userData.CurrentHeadColor, userData.CurrentBody, userData.CurrentBodyColor, userData.CurrentFeet, userData.CurrentFeetColor));
-        }
-    }
+		session.SendPacket(new UserPageOutgoingMessage(userData.Id, userData.Group, userData.Rank, online, timestamp, userData.CurrentHat, userData.CurrentHatColor, userData.CurrentHead, userData.CurrentHeadColor, userData.CurrentBody, userData.CurrentBodyColor, userData.CurrentFeet, userData.CurrentFeetColor));
+	}
 }

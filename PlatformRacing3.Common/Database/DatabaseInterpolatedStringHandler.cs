@@ -2,61 +2,60 @@
 using System.Text;
 using NpgsqlTypes;
 
-namespace PlatformRacing3.Common.Database
+namespace PlatformRacing3.Common.Database;
+
+[InterpolatedStringHandler]
+public ref struct DatabaseInterpolatedStringHandler
 {
-	[InterpolatedStringHandler]
-	public ref struct DatabaseInterpolatedStringHandler
+	private readonly DatabaseConnection dbConnection;
+
+	private readonly StringBuilder stringBuilder;
+
+	private int counter;
+
+	public DatabaseInterpolatedStringHandler(int literalLength, int formattedCount, DatabaseConnection dbConnection)
 	{
-		private readonly DatabaseConnection dbConnection;
+		this.dbConnection = dbConnection;
 
-		private readonly StringBuilder stringBuilder;
+		this.stringBuilder = new(literalLength + (formattedCount * 3));
 
-		private int counter;
+		this.counter = 1;
 
-		public DatabaseInterpolatedStringHandler(int literalLength, int formattedCount, DatabaseConnection dbConnection)
-		{
-			this.dbConnection = dbConnection;
-
-			this.stringBuilder = new(literalLength + (formattedCount * 3));
-
-			this.counter = 1;
-
-			dbConnection.ResetState();
-		}
-
-		public void AppendLiteral(string value)
-		{
-			this.stringBuilder.Append(value);
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void AppendFormatted<T>(T value)
-		{
-			if (typeof(T) == typeof(ushort))
-			{
-				this.dbConnection.AddParamWithValue(Convert.ToInt32(value));
-			}
-			else if (typeof(T) == typeof(uint))
-			{
-				this.dbConnection.AddParamWithValue(value, NpgsqlDbType.Oid);
-			}
-			else if (typeof(T) == typeof(ulong))
-			{
-				this.dbConnection.AddParamWithValue(Convert.ToInt64(value));
-			}
-			else if (typeof(T) == typeof(uint[]))
-			{
-				this.dbConnection.AddParamWithValue(value, NpgsqlDbType.Array | NpgsqlDbType.Oid);
-			}
-			else
-			{
-				this.dbConnection.AddParamWithValue(value);
-			}
-
-			this.stringBuilder.Append('$');
-			this.stringBuilder.Append(this.counter++);
-		}
-
-		public string Text => this.stringBuilder.ToString();
+		dbConnection.ResetState();
 	}
+
+	public void AppendLiteral(string value)
+	{
+		this.stringBuilder.Append(value);
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void AppendFormatted<T>(T value)
+	{
+		if (typeof(T) == typeof(ushort))
+		{
+			this.dbConnection.AddParamWithValue(Convert.ToInt32(value));
+		}
+		else if (typeof(T) == typeof(uint))
+		{
+			this.dbConnection.AddParamWithValue(value, NpgsqlDbType.Oid);
+		}
+		else if (typeof(T) == typeof(ulong))
+		{
+			this.dbConnection.AddParamWithValue(Convert.ToInt64(value));
+		}
+		else if (typeof(T) == typeof(uint[]))
+		{
+			this.dbConnection.AddParamWithValue(value, NpgsqlDbType.Array | NpgsqlDbType.Oid);
+		}
+		else
+		{
+			this.dbConnection.AddParamWithValue(value);
+		}
+
+		this.stringBuilder.Append('$');
+		this.stringBuilder.Append(this.counter++);
+	}
+
+	public string Text => this.stringBuilder.ToString();
 }

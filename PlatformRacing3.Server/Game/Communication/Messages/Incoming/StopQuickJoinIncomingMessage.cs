@@ -2,25 +2,24 @@
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Lobby;
 
-namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming
+namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming;
+
+internal sealed class StopQuickJoinIncomingMessage : IMessageIncomingJson
 {
-    internal sealed class StopQuickJoinIncomingMessage : IMessageIncomingJson
-    {
-        private readonly MatchListingManager matchListingManager;
+	private readonly MatchListingManager matchListingManager;
 
-        public StopQuickJoinIncomingMessage(MatchListingManager matchListingManager)
-        {
-            this.matchListingManager = matchListingManager;
-        }
+	public StopQuickJoinIncomingMessage(MatchListingManager matchListingManager)
+	{
+		this.matchListingManager = matchListingManager;
+	}
 
-        public void Handle(ClientSession session, JsonPacket message)
-        {
-            if (session.IsLoggedIn)
-            {
-                return;
-            }
+	public void Handle(ClientSession session, JsonPacket message)
+	{
+		if (session.IsLoggedIn)
+		{
+			return;
+		}
 
-            this.matchListingManager.StopQuickJoin(session);
-        }
-    }
+		this.matchListingManager.StopQuickJoin(session);
+	}
 }

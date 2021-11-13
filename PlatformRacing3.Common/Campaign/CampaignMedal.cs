@@ -1,10 +1,9 @@
-﻿namespace PlatformRacing3.Common.Campaign
+﻿namespace PlatformRacing3.Common.Campaign;
+
+public enum CampaignMedal
 {
-    public enum CampaignMedal
-    {
-        None,
-        Bronze,
-        Silver,
-        Gold
-    }
+	None,
+	Bronze,
+	Silver,
+	Gold
 }

@@ -1,40 +1,39 @@
 ﻿using System.Xml.Serialization;
 
-namespace PlatformRacing3.Web.Responses.Procedures.Stamps
+namespace PlatformRacing3.Web.Responses.Procedures.Stamps;
+
+public class DataAccessCountMyStampsResponse : DataAccessDataResponse<DataAccessCountMyStampsResponse.StampCountResponse>
 {
-	public class DataAccessCountMyStampsResponse : DataAccessDataResponse<DataAccessCountMyStampsResponse.StampCountResponse>
-    {
-        private DataAccessCountMyStampsResponse()
-        {
+	private DataAccessCountMyStampsResponse()
+	{
 
-        }
+	}
 
-        public DataAccessCountMyStampsResponse(string category, uint stampsCount)
-        {
-            this.Rows = new List<StampCountResponse>()
-            {
-                new StampCountResponse(category, stampsCount),
-            };
-        }
+	public DataAccessCountMyStampsResponse(string category, uint stampsCount)
+	{
+		this.Rows = new List<StampCountResponse>()
+		{
+			new StampCountResponse(category, stampsCount),
+		};
+	}
 
-        public class StampCountResponse
-        {
+	public class StampCountResponse
+	{
 
-            [XmlElement("category")]
-            public string Category { get; set; }
+		[XmlElement("category")]
+		public string Category { get; set; }
 
-            [XmlElement("count")]
-            public uint StampsCount { get; set; }
-            private StampCountResponse()
-            {
+		[XmlElement("count")]
+		public uint StampsCount { get; set; }
+		private StampCountResponse()
+		{
 
-            }
+		}
 
-            public StampCountResponse(string category, uint stampsCount)
-            {
-                this.Category = category;
-                this.StampsCount = stampsCount;
-            }
-        }
-    }
+		public StampCountResponse(string category, uint stampsCount)
+		{
+			this.Category = category;
+			this.StampsCount = stampsCount;
+		}
+	}
 }

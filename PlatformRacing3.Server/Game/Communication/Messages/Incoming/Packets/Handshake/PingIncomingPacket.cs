@@ -1,6 +1,5 @@
-﻿namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Handshake
+﻿namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Handshake;
+
+internal readonly struct PingIncomingPacket
 {
-    internal readonly struct PingIncomingPacket
-    {
-    }
 }

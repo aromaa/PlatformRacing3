@@ -1,7 +1,6 @@
-﻿namespace PlatformRacing3.Web.Responses
+﻿namespace PlatformRacing3.Web.Responses;
+
+public interface IDataAccessDataResponse
 {
-    public interface IDataAccessDataResponse
-    {
-        uint DataRequestId { get; set; }
-    }
+	uint DataRequestId { get; set; }
 }

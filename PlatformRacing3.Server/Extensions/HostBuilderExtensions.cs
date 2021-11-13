@@ -14,55 +14,54 @@ using PlatformRacing3.Server.Game.Match;
 using PlatformRacing3.Server.Host;
 using PlatformRacing3.Server.Host.Implementation;
 
-namespace PlatformRacing3.Server.Extensions
+namespace PlatformRacing3.Server.Extensions;
+
+public static class HostBuilderExtensions
 {
-	public static class HostBuilderExtensions
+	public static IHostBuilder ConfigurePlatformRacingServerDefaults(this IHostBuilder builder)
 	{
-		public static IHostBuilder ConfigurePlatformRacingServerDefaults(this IHostBuilder builder)
-		{
-			return builder.ConfigurePlatformRacingServerDefaults(_ => { });
-		}
+		return builder.ConfigurePlatformRacingServerDefaults(_ => { });
+	}
 
-		public static IHostBuilder ConfigurePlatformRacingServerDefaults(this IHostBuilder builder, Action<IServerHostBuilder> configure)
+	public static IHostBuilder ConfigurePlatformRacingServerDefaults(this IHostBuilder builder, Action<IServerHostBuilder> configure)
+	{
+		return builder.ConfigurePlatformRacingServer(hostBuilder =>
 		{
-			return builder.ConfigurePlatformRacingServer(hostBuilder =>
+			hostBuilder.ConfigureServices((configure, services) =>
 			{
-				hostBuilder.ConfigureServices((configure, services) =>
-				{
-					services.AddSingleton<PlatformRacing3Server>();
-					services.AddSingleton<CommandManager>();
-					services.AddSingleton<MatchManager>();
-					services.AddSingleton<PacketManager>();
-					services.AddSingleton<ChatRoomManager>();
-					services.AddSingleton<MatchListingManager>();
-					services.AddSingleton<PacketManager>();
-					services.AddSingleton<ServerManager>();
-					services.AddSingleton<CampaignManager>();
-					services.AddSingleton<ClientManager>();
+				services.AddSingleton<PlatformRacing3Server>();
+				services.AddSingleton<CommandManager>();
+				services.AddSingleton<MatchManager>();
+				services.AddSingleton<PacketManager>();
+				services.AddSingleton<ChatRoomManager>();
+				services.AddSingleton<MatchListingManager>();
+				services.AddSingleton<PacketManager>();
+				services.AddSingleton<ServerManager>();
+				services.AddSingleton<CampaignManager>();
+				services.AddSingleton<ClientManager>();
 
-					services.Configure<ServerConfig>(configure);
-				});
-
-				configure(hostBuilder);
-			});
-		}
-
-		public static IHostBuilder ConfigurePlatformRacingServer(this IHostBuilder builder, Action<IServerHostBuilder> configure)
-		{
-			builder.ConfigureHostConfiguration(config =>
-			{
-				config.AddJsonFile("settings.json");
+				services.Configure<ServerConfig>(configure);
 			});
 
-			ServerHostBuilder hostBuilder = new(builder);
 			configure(hostBuilder);
+		});
+	}
 
-			builder.ConfigureServices((context, services) =>
-			{
-				services.AddHostedService<ServerHostService>();
-			});
+	public static IHostBuilder ConfigurePlatformRacingServer(this IHostBuilder builder, Action<IServerHostBuilder> configure)
+	{
+		builder.ConfigureHostConfiguration(config =>
+		{
+			config.AddJsonFile("settings.json");
+		});
 
-			return builder;
-		}
+		ServerHostBuilder hostBuilder = new(builder);
+		configure(hostBuilder);
+
+		builder.ConfigureServices((context, services) =>
+		{
+			services.AddHostedService<ServerHostService>();
+		});
+
+		return builder;
 	}
 }

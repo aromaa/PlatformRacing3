@@ -1,10 +1,9 @@
-﻿namespace PlatformRacing3.Server.Game.Chat
+﻿namespace PlatformRacing3.Server.Game.Chat;
+
+public enum ChatRoonLeaveReason
 {
-    public enum ChatRoonLeaveReason
-    {
-        Quit,
-        Kicked,
-        Disconnected,
-        FailedJoin,
-    }
+	Quit,
+	Kicked,
+	Disconnected,
+	FailedJoin,
 }

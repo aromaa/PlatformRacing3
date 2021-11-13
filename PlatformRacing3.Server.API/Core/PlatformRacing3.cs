@@ -1,6 +1,5 @@
-﻿namespace PlatformRacing3.Server.API.Core
+﻿namespace PlatformRacing3.Server.API.Core;
+
+public abstract class PlatformRacing3
 {
-    public abstract class PlatformRacing3
-    {
-    }
 }

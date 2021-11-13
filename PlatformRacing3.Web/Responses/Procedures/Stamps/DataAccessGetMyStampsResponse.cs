@@ -1,43 +1,42 @@
 ﻿using System.Xml.Serialization;
 
-namespace PlatformRacing3.Web.Responses.Procedures.Stamps
+namespace PlatformRacing3.Web.Responses.Procedures.Stamps;
+
+public class DataAccessGetMyStampsResponse : DataAccessDataResponse<DataAccessGetMyStampsResponse.MyStampData>
 {
-	public class DataAccessGetMyStampsResponse : DataAccessDataResponse<DataAccessGetMyStampsResponse.MyStampData>
-    {
-        [XmlElement("category")]
-        public string Category { get; set; }
+	[XmlElement("category")]
+	public string Category { get; set; }
 
-        private DataAccessGetMyStampsResponse()
-        {
+	private DataAccessGetMyStampsResponse()
+	{
 
-        }
+	}
 
-        public DataAccessGetMyStampsResponse(string category)
-        {
-            this.Rows = new List<MyStampData>();
+	public DataAccessGetMyStampsResponse(string category)
+	{
+		this.Rows = new List<MyStampData>();
 
-            this.Category = category;
-        }
+		this.Category = category;
+	}
 
-        public void AddStamp(uint stampId)
-        {
-            this.Rows.Add(new MyStampData(stampId));
-        }
+	public void AddStamp(uint stampId)
+	{
+		this.Rows.Add(new MyStampData(stampId));
+	}
 
-        public class MyStampData
-        {
-            [XmlElement("stamp_id")]
-            public uint StampId { get; set; }
+	public class MyStampData
+	{
+		[XmlElement("stamp_id")]
+		public uint StampId { get; set; }
 
-            private MyStampData()
-            {
+		private MyStampData()
+		{
 
-            }
+		}
 
-            public MyStampData(uint stampId)
-            {
-                this.StampId = stampId;
-            }
-        }
-    }
+		public MyStampData(uint stampId)
+		{
+			this.StampId = stampId;
+		}
+	}
 }
