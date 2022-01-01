@@ -82,7 +82,7 @@ public sealed class LevelManager
 		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"WITH insertTitle AS (INSERT INTO base.levels_titles(title, author_user_id) VALUES({title}, {userId}) ON CONFLICT(lower(title::text), author_user_id) DO UPDATE SET title = levels_titles.title RETURNING id) INSERT INTO base.levels(id, version, description, publish, song_id, mode, seconds, gravity, alien, sfchm, snow, wind, items, health, king_of_the_hat, bg_image, level_data, lua) SELECT (SELECT id FROM insertTitle) AS id, COALESCE(MAX(version) + 1, 1), {description}, {publish}, {songId}, {mode}, {seconds}, {gravity}, {alien}, {sfchm}, {snow}, {wind}, {items}, {health}, {kingOfTheHat}, {bgImage}, {levelData}, {lua} FROM base.levels WHERE id = (SELECT id FROM insertTitle) RETURNING id").ContinueWith(LevelManager.ParseSqlSaveLevel));
 	}
 
-	public static Task<bool> DeleteLevelAsync(uint levelId, uint? authorId = default)
+	public static Task<bool> DeleteLevelAsync(uint levelId, uint authorId = default)
 	{
 		if (levelId == 0)
 		{
