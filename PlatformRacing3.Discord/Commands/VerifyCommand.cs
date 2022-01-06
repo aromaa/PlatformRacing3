@@ -6,7 +6,7 @@ namespace PlatformRacing3.Discord.Commands;
 
 public class VerifyCommand : ModuleBase<SocketCommandContext>
 {
-	[Command("pr3verify")]
+	[Command("pr3verify", ignoreExtraArgs: true)]
 	[Summary("I swear I'm Jiggmin")]
 	public Task VerifyAccount()
 	{

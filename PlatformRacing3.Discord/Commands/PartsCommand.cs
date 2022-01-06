@@ -9,7 +9,7 @@ namespace PlatformRacing3.Discord.Commands;
 
 public class MyPartsCommand : ModuleBase<SocketCommandContext>
 {
-	[Command("pr3parts")]
+	[Command("pr3parts", ignoreExtraArgs: true)]
 	[Summary("PARTS! PARTS! WHICH ONE AM I MISSING!?")]
 	public Task GetOnlinePlayersCount()
 	{

@@ -13,7 +13,7 @@ public class OnlineCommand : ModuleBase<SocketCommandContext>
 		this.ServerManager = serverManager;
 	}
 
-	[Command("pr3online")]
+	[Command("pr3online", ignoreExtraArgs: true)]
 	[Summary("Whos online? Log in")]
 	public Task GetOnlinePlayersCount()
 	{
@@ -29,5 +29,5 @@ public class OnlineCommand : ModuleBase<SocketCommandContext>
 		}
 
 		return this.ReplyAsync(stringBuilder.ToString());
-		;        }
+	}
 }
