@@ -21,7 +21,7 @@ public sealed class PrivateMessageManager
 		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(p.id) OVER() AS results, p.id, p.to_user_id, p.from_user_id, COALESCE(u.id, 0) AS from_user_id, COALESCE(u.username, 'Unknown') AS from_username, COALESCE(u.name_color, -14855017) AS from_name_color, p.type, p.sent_time, t.title, t.message, b.block_id, b.title AS block_title, l.level_id, l.title AS level_title FROM base.pms p LEFT JOIN base.users u ON u.id = p.from_user_id LEFT JOIN base.pms_text t ON t.id = p.id LEFT JOIN base.transfers_block b ON p.id = b.id LEFT JOIN base.transfers_level l ON p.id = l.id WHERE p.id = {id} LIMIT 1").ContinueWith(PrivateMessageManager.ParseSqlPm));
 	}
 
-	public static Task<IReadOnlyCollection<uint>> DeletePMsAsync(IReadOnlyCollection<uint> pms, uint? receiverUserId = default, uint? senderUserId = default)
+	public static Task<IReadOnlyCollection<uint>> DeletePMsAsync(IReadOnlyCollection<uint> pms, uint receiverUserId = default, uint senderUserId = default)
 	{
 		if (receiverUserId == default && senderUserId == default)
 		{
