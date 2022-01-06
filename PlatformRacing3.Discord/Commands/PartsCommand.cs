@@ -27,166 +27,122 @@ public class MyPartsCommand : ModuleBase<SocketCommandContext>
 
 			PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId);
 
-			(int Count, int Max) hats = default;
-
-			StringBuilder hatsWriter = new();
-			foreach (Hat hat in Enum.GetValues(typeof(Hat)))
-			{
-				if (hat == Hat.None || hat.IsStaffOnly())
-				{
-					continue;
-				}
-
-				hats.Max++;
-
-				hatsWriter.Append(hat.ToString());
-				hatsWriter.Append(" ");
-
-				if (userData.HasHat(hat))
-				{
-					hatsWriter.Append("✓");
-
-					hats.Count++;
-				}
-				else
-				{
-					hatsWriter.Append("✕");
-				}
-
-				hatsWriter.AppendLine();
-			}
-
-			(int Head, int Body, int Feet, int Max) parts = default;
-			(int Head, int Body, int Feet, int Max) tournieParts = default;
-
-			(StringBuilder Head, StringBuilder Body, StringBuilder Feet) partWriters = (new StringBuilder(), new StringBuilder(), new StringBuilder());
-			(StringBuilder Head, StringBuilder Body, StringBuilder Feet) tourniePartWriters = (new StringBuilder(), new StringBuilder(), new StringBuilder());
-
-			foreach (Part part in Enum.GetValues(typeof(Part)))
-			{
-				if (part == Part.Undefined || part.IsStaffOnly())
-				{
-					continue;
-				}
-
-				bool isTournie = part.IsTournamentPrize();
-
-				CountTo(ref !isTournie ? ref partWriters : ref tourniePartWriters, ref !isTournie ? ref parts : ref tournieParts);
-
-				void CountTo(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers, ref (int Head, int Body, int Feet, int Max) partCounter)
-				{
-					partCounter.Max++;
-
-					AppendToAll(ref writers, part.ToString());
-					AppendToAll(ref writers, " ");
-
-					if (userData.HasHead(part))
-					{
-						writers.Head.Append("✓");
-
-						partCounter.Head++;
-					}
-					else
-					{
-						writers.Head.Append("✕");
-					}
-
-					if (userData.HasBody(part))
-					{
-						writers.Body.Append("✓");
-
-						partCounter.Body++;
-					}
-					else
-					{
-						writers.Body.Append("✕");
-					}
-
-					if (userData.HasFeet(part))
-					{
-						writers.Feet.Append("✓");
-
-						partCounter.Feet++;
-					}
-					else
-					{
-						writers.Feet.Append("✕");
-					}
-
-					BreakAll(ref writers);
-				}
-
-				void AppendToAll(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers, string value)
-				{
-					writers.Head.Append(value);
-					writers.Body.Append(value);
-					writers.Feet.Append(value);
-				}
-
-				void BreakAll(ref (StringBuilder Head, StringBuilder Body, StringBuilder Feet) writers)
-				{
-					writers.Head.AppendLine();
-					writers.Body.AppendLine();
-					writers.Feet.AppendLine();
-				}
-			}
-
 			EmbedBuilder embed = new();
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Hats ({hats.Count}/{hats.Max})",
-				Value = hatsWriter.ToString()
-			});
 
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Heads ({parts.Head}/{parts.Max})",
-				Value = partWriters.Head.ToString(),
-
-				IsInline = true
-			});
-
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Bodies ({parts.Body}/{parts.Max})",
-				Value = partWriters.Body.ToString(),
-
-				IsInline = true
-			});
-
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Feets ({parts.Feet}/{parts.Max})",
-				Value = partWriters.Feet.ToString(),
-
-				IsInline = true
-			});
-
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Tournie Heads ({tournieParts.Head}/{tournieParts.Max})",
-				Value = tourniePartWriters.Head.ToString(),
-
-				IsInline = true
-			});
-
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Tournie Bodies ({tournieParts.Body}/{tournieParts.Max})",
-				Value = tourniePartWriters.Body.ToString(),
-
-				IsInline = true
-			});
-
-			embed.AddField(new EmbedFieldBuilder()
-			{
-				Name = $"Tournie Feets ({tournieParts.Feet}/{tournieParts.Max})",
-				Value = tourniePartWriters.Feet.ToString(),
-
-				IsInline = true
-			});
+			BuildHats(embed, userData);
+			BuildParts(embed, userData);
 
 			await this.ReplyAsync(message: this.Context.User.Mention, embed: embed.Build());
+
+			static void BuildHats(EmbedBuilder embed, UserData userData)
+			{
+				PartStringBuilder builder = new();
+
+				foreach (Hat hat in Enum.GetValues<Hat>())
+				{
+					if (hat == Hat.None || hat.IsStaffOnly())
+					{
+						continue;
+					}
+
+					builder.WriteConditional(hat, userData.HasHat(hat));
+				}
+
+				AddEmbedField(embed, builder, "Hats", inline: false);
+			}
+
+			static void BuildParts(EmbedBuilder embed, UserData userData)
+			{
+				(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) normalBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
+				(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) tournamentBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
+
+				foreach (Part part in Enum.GetValues<Part>())
+				{
+					if (part.IsStaffOnly())
+					{
+						continue;
+					}
+					
+					ref (PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) builder = ref part.IsTournamentPrize() ? ref tournamentBuilder : ref normalBuilder;
+
+					(bool hasHead, bool hasBody, bool hasFeet) = part.HasParts();
+
+					if (hasHead)
+					{
+						builder.HeadBuilder.WriteConditional(part, userData.HasHead(part));
+					}
+
+					if (hasBody)
+					{
+						builder.BodyBuilder.WriteConditional(part, userData.HasBody(part));
+					}
+
+					if (hasFeet)
+					{
+						builder.FeetBuilder.WriteConditional(part, userData.HasFeet(part));
+					}
+				}
+
+				AddEmbedField(embed, normalBuilder.HeadBuilder, "Heads");
+				AddEmbedField(embed, normalBuilder.BodyBuilder, "Bodies");
+				AddEmbedField(embed, normalBuilder.FeetBuilder, "Feets");
+
+				AddEmbedField(embed, tournamentBuilder.HeadBuilder, "Tournament Heads");
+				AddEmbedField(embed, tournamentBuilder.BodyBuilder, "Tournament Bodies");
+				AddEmbedField(embed, tournamentBuilder.FeetBuilder, "Tournament Feets");
+			}
+
+			static void AddEmbedField(EmbedBuilder embed, in PartStringBuilder builder, string name, bool inline = true)
+			{
+				embed.AddField(new EmbedFieldBuilder()
+				{
+					Name = $"{name} ({builder.Count}/{builder.Max})",
+					Value = builder.Value,
+
+					IsInline = inline
+				});
+			}
+		}
+	}
+
+	private struct PartStringBuilder
+	{
+		private readonly StringBuilder stringBuilder;
+
+		private int count;
+		private int max;
+
+		public PartStringBuilder()
+		{
+			this.stringBuilder = new StringBuilder();
+
+			this.count = 0;
+			this.max = 0;
+		}
+
+		internal readonly int Count => this.count;
+		internal readonly int Max => this.max;
+
+		internal readonly string Value => this.stringBuilder.ToString();
+
+		internal void WriteConditional<T>(T value, bool condition) where T : struct, Enum
+		{
+			this.max++;
+
+			this.stringBuilder.Append($"{value} ");
+
+			if (condition)
+			{
+				this.stringBuilder.Append('✓');
+
+				this.count++;
+			}
+			else
+			{
+				this.stringBuilder.Append('✕');
+			}
+
+			this.stringBuilder.AppendLine();
 		}
 	}
 }

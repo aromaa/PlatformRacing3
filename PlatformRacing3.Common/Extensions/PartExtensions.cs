@@ -23,4 +23,14 @@ public static class PartExtensions
 			_ => false,
 		};
 	}
+
+	public static (bool Head, bool Body, bool Feet) HasParts(this Part part)
+	{
+		return part switch
+		{
+			Part.Hoodie => (false, true, false),
+
+			_ => (true, true, true)
+		};
+	}
 }
