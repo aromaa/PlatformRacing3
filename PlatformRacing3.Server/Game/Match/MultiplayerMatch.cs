@@ -1246,7 +1246,7 @@ internal sealed class MultiplayerMatch
 
 	internal void HandleData(ClientSession session, JsonSendToRoomIncomingMessage.RoomMessageData data, bool sendToSelf)
 	{
-		switch(data.Type)
+		switch (data.Type)
 		{
 			case "chat":
 			{
@@ -1254,23 +1254,33 @@ internal sealed class MultiplayerMatch
 				{
 					this.SendChatMessage(session, data.Data.GetProperty("message").GetString(), sendToSelf);
 				}
-			}
+
 				break;
+			}
 			case "useItem":
 			{
 				this.SendUseItem(session, data.Data.GetProperty("p").EnumerateArray().Select(v => v.GetDouble()).ToArray(), sendToSelf);
-			}
+
 				break;
+			}
 			case "shatterBlock":
 			{
 				this.SendShatterBlock(session, data.Data.GetProperty("tileY").GetInt32(), data.Data.GetProperty("tileX").GetInt32(), sendToSelf);
-			}
+
 				break;
+			}
 			case "explodeBlock":
 			{
 				this.SendExplodeBlock(session, data.Data.GetProperty("tileY").GetInt32(), data.Data.GetProperty("tileX").GetInt32(), sendToSelf);
-			}
+
 				break;
+			}
+			case "gameEvent":
+			{
+				this.SendGameEvent(session, data.Data, sendToSelf);
+
+				break;
+			}
 		}
 	}
 
@@ -1338,6 +1348,20 @@ internal sealed class MultiplayerMatch
 	private void SendExplodeBlock(ClientSession session, int tileY, int tileX, bool sendToSelf = false)
 	{
 		ExplodeBlockOutgoingMessage packet = new(this.Name, tileY, tileX);
+
+		if (sendToSelf)
+		{
+			this.Clients.SendAsync(packet);
+		}
+		else
+		{
+			this.Clients.SendAsync(packet, session);
+		}
+	}
+
+	private void SendGameEvent(ClientSession session, JsonElement data, bool sendToSelf = false)
+	{
+		SendGameEventOutgoingMessage packet = new(this.Name, session.SocketId, data);
 
 		if (sendToSelf)
 		{
