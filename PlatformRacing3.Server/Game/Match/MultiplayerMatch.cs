@@ -1281,6 +1281,12 @@ internal sealed class MultiplayerMatch
 
 				break;
 			}
+			case "chatBubble":
+			{
+				this.SendChatBubble(session, data.Data.GetProperty("id").GetInt32(), sendToSelf);
+
+				break;
+			}
 		}
 	}
 
@@ -1362,6 +1368,20 @@ internal sealed class MultiplayerMatch
 	private void SendGameEvent(ClientSession session, JsonElement data, bool sendToSelf = false)
 	{
 		SendGameEventOutgoingMessage packet = new(this.Name, session.SocketId, data);
+
+		if (sendToSelf)
+		{
+			this.Clients.SendAsync(packet);
+		}
+		else
+		{
+			this.Clients.SendAsync(packet, session);
+		}
+	}
+
+	private void SendChatBubble(ClientSession session, int bubbleId, bool sendToSelf = false)
+	{
+		ChatBubbleOutgoingMessage packet = new(this.Name, session.SocketId, bubbleId);
 
 		if (sendToSelf)
 		{
