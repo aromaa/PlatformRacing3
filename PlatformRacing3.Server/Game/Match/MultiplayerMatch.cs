@@ -73,6 +73,7 @@ internal sealed class MultiplayerMatch
 		Hat.MagnetHelmet,
 		Hat.PetSquid,
 		Hat.CamoCap,
+		Hat.TinFoil,
 	};
 
 	private readonly MatchManager matchManager;
