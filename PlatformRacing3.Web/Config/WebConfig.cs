@@ -31,6 +31,8 @@ public class WebConfig : IDatabaseConfig, IRedisConfig, IEmailConfig
 	public string SmtpUser { get; set; }
 	[JsonPropertyName("smtp_pass")]
 	public string SmtpPass { get; set; }
+	[JsonPropertyName("smtp_from")]
+	public string SmtpFrom { get; set; }
 
 	[JsonPropertyName("discord_client_id")]
 	public string DiscordClientId { get; set; }

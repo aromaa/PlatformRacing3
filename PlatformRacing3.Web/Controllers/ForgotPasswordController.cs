@@ -60,12 +60,12 @@ public class ForgotPasswordController : ControllerBase
 			{
 				mail.To.Add(email);
 				mail.Subject = $"Platform Racing 3 - {player.Username} - Password Reset";
-				mail.From = new MailAddress(Program.Config.SmtpUser);
+				mail.From = new MailAddress(Program.Config.SmtpFrom);
 				mail.Body = $"You have requested password reset for your {player.Username} account! Use the following link to reset your password! https://pr3hub.com/resetpassword?email={email}&token={WebEncoders.Base64UrlEncode(token)}";
 
-				Program.SmtpClient.Send(mail);
+				await Program.SmtpClient.SendMailAsync(mail);
 			}
-
+			
 			return "We have sent you email!";
 		}
 		else

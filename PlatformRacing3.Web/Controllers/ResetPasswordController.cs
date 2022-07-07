@@ -50,10 +50,10 @@ public class ResetPasswordController : ControllerBase
 		{
 			mail.To.Add(email);
 			mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";
-			mail.From = new MailAddress(Program.Config.SmtpUser);
+			mail.From = new MailAddress(Program.Config.SmtpFrom);
 			mail.Body = $"Your account {player.Username} password was reset! If you did not do this change your password immediately!";
 
-			Program.SmtpClient.Send(mail);
+			await Program.SmtpClient.SendMailAsync(mail);
 		}
 
 		return "Password has been reset! Start the grind :sunglasses:";
