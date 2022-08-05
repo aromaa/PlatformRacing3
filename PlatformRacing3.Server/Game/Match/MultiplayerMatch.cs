@@ -172,6 +172,8 @@ internal sealed class MultiplayerMatch
 		{
 			this.Players.Remove(session.SocketId);
 
+			this.Clients.SendAsync(new ForfietOutgoingMessage(session.SocketId));
+
 			foreach (ClientSession other in this.Clients.Sessions)
 			{
 				other.UntrackUserInRoom(this.Name, session.SocketId);
@@ -947,6 +949,8 @@ internal sealed class MultiplayerMatch
 			{
 				this.Players.Remove(session.SocketId);
 			}
+
+			this.Clients.SendAsync(new ForfietOutgoingMessage(session.SocketId));
 		}
 		else if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
 		{
