@@ -1,6 +1,7 @@
 ﻿using PlatformRacing3.Common.User;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming;
 
@@ -23,6 +24,8 @@ internal class WinHatIncomingMessage : MessageIncomingJson<JsonWinHatIncomingMes
 				}
 
 				session.UserData.CheckCampaignPrizes(message.Season, message.Medals);
+
+				session.SendPacket(new UserVarsOutgoingMessage(session.SocketId, session.UserData.GetVars("hatArray", "headArray", "bodyArray", "feetArray")));
 			});
 		}
 		else
