@@ -1,107 +1,101 @@
 ﻿using System.Text;
 using Discord;
-using Discord.Commands;
+using Discord.Interactions;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.Extensions;
 using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Discord.Commands;
 
-public class MyPartsCommand : ModuleBase<SocketCommandContext>
+public sealed class MyPartsCommand : InteractionModuleBase<SocketInteractionContext>
 {
-	[Command("pr3parts", ignoreExtraArgs: true)]
-	[Summary("PARTS! PARTS! WHICH ONE AM I MISSING!?")]
-	public Task GetOnlinePlayersCount()
+	[SlashCommand("pr3parts", "Displays your current part collection.")]
+	public async Task GetMyPartsCommand()
 	{
-		return DoAsync();
-
-		async Task DoAsync()
+		uint userId = await UserManager.HasDiscordLinkage(this.Context.User.Id);
+		if (userId == 0)
 		{
-			uint userId = await UserManager.HasDiscordLinkage(this.Context.User.Id);
-			if (userId == 0)
+			await this.RespondAsync("Well bruh, u ain't got ur Discord linkage");
+
+			return;
+		}
+
+		PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId);
+
+		EmbedBuilder embed = new();
+
+		BuildHats(embed, userData);
+		BuildParts(embed, userData);
+		
+		await this.RespondAsync(embed: embed.Build());
+
+		static void BuildHats(EmbedBuilder embed, UserData userData)
+		{
+			PartStringBuilder builder = new();
+
+			foreach (Hat hat in Enum.GetValues<Hat>())
 			{
-				await this.ReplyAsync("Well bruh, u ain't got ur Discord linkage");
-
-				return;
-			}
-
-			PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId);
-
-			EmbedBuilder embed = new();
-
-			BuildHats(embed, userData);
-			BuildParts(embed, userData);
-
-			await this.ReplyAsync(message: this.Context.User.Mention, embed: embed.Build());
-
-			static void BuildHats(EmbedBuilder embed, UserData userData)
-			{
-				PartStringBuilder builder = new();
-
-				foreach (Hat hat in Enum.GetValues<Hat>())
+				if (hat == Hat.None || hat.IsStaffOnly())
 				{
-					if (hat == Hat.None || hat.IsStaffOnly())
-					{
-						continue;
-					}
-
-					builder.WriteConditional(hat, userData.HasHat(hat));
+					continue;
 				}
 
-				AddEmbedField(embed, builder, "Hats", inline: false);
+				builder.WriteConditional(hat, userData.HasHat(hat));
 			}
 
-			static void BuildParts(EmbedBuilder embed, UserData userData)
+			AddEmbedField(embed, builder, "Hats", inline: false);
+		}
+
+		static void BuildParts(EmbedBuilder embed, UserData userData)
+		{
+			(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) normalBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
+			(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) tournamentBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
+
+			foreach (Part part in Enum.GetValues<Part>())
 			{
-				(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) normalBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
-				(PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) tournamentBuilder = (new PartStringBuilder(), new PartStringBuilder(), new PartStringBuilder());
-
-				foreach (Part part in Enum.GetValues<Part>())
+				if (part.IsStaffOnly())
 				{
-					if (part.IsStaffOnly())
-					{
-						continue;
-					}
-					
-					ref (PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) builder = ref part.IsTournamentPrize() ? ref tournamentBuilder : ref normalBuilder;
+					continue;
+				}
+				
+				ref (PartStringBuilder HeadBuilder, PartStringBuilder BodyBuilder, PartStringBuilder FeetBuilder) builder = ref part.IsTournamentPrize() ? ref tournamentBuilder : ref normalBuilder;
 
-					(bool hasHead, bool hasBody, bool hasFeet) = part.HasParts();
+				(bool hasHead, bool hasBody, bool hasFeet) = part.HasParts();
 
-					if (hasHead)
-					{
-						builder.HeadBuilder.WriteConditional(part, userData.HasHead(part));
-					}
-
-					if (hasBody)
-					{
-						builder.BodyBuilder.WriteConditional(part, userData.HasBody(part));
-					}
-
-					if (hasFeet)
-					{
-						builder.FeetBuilder.WriteConditional(part, userData.HasFeet(part));
-					}
+				if (hasHead)
+				{
+					builder.HeadBuilder.WriteConditional(part, userData.HasHead(part));
 				}
 
-				AddEmbedField(embed, normalBuilder.HeadBuilder, "Heads");
-				AddEmbedField(embed, normalBuilder.BodyBuilder, "Bodies");
-				AddEmbedField(embed, normalBuilder.FeetBuilder, "Feets");
-
-				AddEmbedField(embed, tournamentBuilder.HeadBuilder, "Tournament Heads");
-				AddEmbedField(embed, tournamentBuilder.BodyBuilder, "Tournament Bodies");
-				AddEmbedField(embed, tournamentBuilder.FeetBuilder, "Tournament Feets");
-			}
-
-			static void AddEmbedField(EmbedBuilder embed, in PartStringBuilder builder, string name, bool inline = true)
-			{
-				embed.AddField(new EmbedFieldBuilder()
+				if (hasBody)
 				{
-					Name = $"{name} ({builder.Count}/{builder.Max})",
-					Value = builder.Value,
+					builder.BodyBuilder.WriteConditional(part, userData.HasBody(part));
+				}
 
-					IsInline = inline
-				});
+				if (hasFeet)
+				{
+					builder.FeetBuilder.WriteConditional(part, userData.HasFeet(part));
+				}
 			}
+
+			AddEmbedField(embed, normalBuilder.HeadBuilder, "Heads");
+			AddEmbedField(embed, normalBuilder.BodyBuilder, "Bodies");
+			AddEmbedField(embed, normalBuilder.FeetBuilder, "Feets");
+
+			AddEmbedField(embed, tournamentBuilder.HeadBuilder, "Tournament Heads");
+			AddEmbedField(embed, tournamentBuilder.BodyBuilder, "Tournament Bodies");
+			AddEmbedField(embed, tournamentBuilder.FeetBuilder, "Tournament Feets");
+		}
+
+		static void AddEmbedField(EmbedBuilder embed, in PartStringBuilder builder, string name, bool inline = true)
+		{
+			embed.AddField(new EmbedFieldBuilder()
+			{
+				Name = $"{name} ({builder.Count}/{builder.Max})",
+				Value = builder.Value,
+
+				IsInline = inline
+			});
 		}
 	}
 

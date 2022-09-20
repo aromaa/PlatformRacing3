@@ -3,7 +3,7 @@ using PlatformRacing3.Common.Config;
 
 namespace PlatformRacing3.Discord.Config;
 
-internal class DiscordBotConfig : IDatabaseConfig, IRedisConfig
+internal sealed class DiscordBotConfig : IDatabaseConfig, IRedisConfig
 {
 	[JsonProperty("bot_token", Required = Required.Always)]
 	internal string BotToken { get; set; }

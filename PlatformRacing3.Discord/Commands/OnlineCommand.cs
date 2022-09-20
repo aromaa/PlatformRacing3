@@ -1,26 +1,24 @@
 ﻿using System.Text;
-using Discord.Commands;
+using Discord.Interactions;
 using PlatformRacing3.Common.Server;
 
 namespace PlatformRacing3.Discord.Commands;
 
-public class OnlineCommand : ModuleBase<SocketCommandContext>
+public sealed class OnlineCommand : InteractionModuleBase<SocketInteractionContext>
 {
-	private ServerManager ServerManager;
+	private ServerManager serverManager;
 
 	public OnlineCommand(ServerManager serverManager)
 	{
-		this.ServerManager = serverManager;
+		this.serverManager = serverManager;
 	}
 
-	[Command("pr3online", ignoreExtraArgs: true)]
-	[Summary("Whos online? Log in")]
-	public Task GetOnlinePlayersCount()
+	[SlashCommand("pr3online", "Shows the online player count.")]
+	public Task GetOnlinePlayersCountCommand()
 	{
-		StringBuilder stringBuilder = new(this.Context.User.Mention);
-		stringBuilder.AppendLine();
+		StringBuilder stringBuilder = new();
 
-		foreach (ServerDetails server in this.ServerManager.GetServers())
+		foreach (ServerDetails server in this.serverManager.GetServers())
 		{
 			stringBuilder.Append(server.Name);
 			stringBuilder.Append(": ");
@@ -28,6 +26,6 @@ public class OnlineCommand : ModuleBase<SocketCommandContext>
 			stringBuilder.AppendLine();
 		}
 
-		return this.ReplyAsync(stringBuilder.ToString());
+		return this.RespondAsync(stringBuilder.ToString());
 	}
 }
