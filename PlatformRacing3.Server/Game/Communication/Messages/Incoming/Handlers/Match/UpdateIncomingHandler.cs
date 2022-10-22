@@ -1,8 +1,11 @@
-﻿using Net.Communication.Attributes;
+﻿using System.Data.Common;
+using System.Numerics;
+using Net.Communication.Attributes;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Managers;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Packets.Match;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 using PlatformRacing3.Server.Game.Match;
 
 namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Handlers.Match;
@@ -87,7 +90,26 @@ internal class UpdateIncomingHandler : AbstractIncomingClientSessionPacketHandle
 
 			if (packet.Status.HasFlag(UpdateStatus.Item))
 			{
-				matchPlayer.Item = packet.Item;
+				if (matchPlayer.Match.ServerLevelData is { } serverLevelData && packet.Item.StartsWith("p|") && matchPlayer.Item != packet.Item)
+				{
+					int idStart = packet.Item.IndexOf("id|", StringComparison.OrdinalIgnoreCase) + 3;
+					int idEnd = packet.Item.IndexOf('|', idStart);
+
+					uint id = uint.Parse(packet.Item.AsSpan(idStart, idEnd - idStart));
+					
+					if (serverLevelData.PortableBlocks.Contains(id))
+					{
+						matchPlayer.Item = packet.Item;
+					}
+					else
+					{
+						session.SendPacket(new UpdateOutgoingPacket(UpdateStatus.Item, matchPlayer));
+					}
+				}
+				else
+				{
+					matchPlayer.Item = packet.Item;
+				}
 			}
 
 			if (packet.Status.HasFlag(UpdateStatus.Life))

@@ -15,9 +15,11 @@ using PlatformRacing3.Server.Core;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Commands;
 using PlatformRacing3.Server.Game.Communication.Messages;
+using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
+using PlatformRacing3.Server.Game.Level;
 using PlatformRacing3.Server.Game.Lobby;
 using PlatformRacing3.Server.Utils;
 
@@ -105,6 +107,8 @@ internal sealed class MultiplayerMatch
 
 	private HashSet<Point> FinishBlocks;
 
+	internal ServerLevelData ServerLevelData { get; private set; }
+
 	internal bool Broadcaster { get; set; }
 
 	internal MultiplayerMatch(MatchManager matchManager, CommandManager commandManager, ILogger<MultiplayerMatch> logger, MatchListingType type, string name, LevelData levelData)
@@ -190,7 +194,7 @@ internal sealed class MultiplayerMatch
 
 	internal void Lock()
 	{
-		if (this.LevelData.Mode == LevelMode.KingOfTheHat)
+		if (this.Type == MatchListingType.Tournament || this.LevelData.Mode == LevelMode.KingOfTheHat)
 		{
 			if (this.TryChangeStatus(MultiplayerMatchStatus.ServerDrawing, MultiplayerMatchStatus.PreparingForStart))
 			{
@@ -796,100 +800,15 @@ internal sealed class MultiplayerMatch
 	{
 		try
 		{
-			this.FinishBlocks = new HashSet<Point>();
+			this.ServerLevelData = await ServerLevelData.ParseLevelAsync(this.LevelData.Data);
 
-			if (this.LevelData.Data.StartsWith("v2 | "))
+			if (this.LevelData.Mode == LevelMode.KingOfTheHat)
 			{
-				using JsonDocument levelData = JsonDocument.Parse(this.LevelData.Data[5..]);
-				if (levelData.RootElement.TryGetProperty("blockStr", out JsonElement jsonBlockStr))
+				foreach ((Point point, uint blockId) in this.ServerLevelData.BlockMap)
 				{
-					string blockStr = jsonBlockStr.GetString();
-					if (!string.IsNullOrWhiteSpace(blockStr))
+					if (this.ServerLevelData.FinishBlocks.Contains(blockId))
 					{
-						uint blockId = 0;
-						int x = 0;
-						int y = 0;
-
-						HashSet<uint> blockIds = new();
-						Dictionary<Point, uint> blocks = new();
-						foreach (string block in blockStr.Split(','))
-						{
-							if (block[0] == 'b')
-							{
-								blockId = uint.Parse(block[1..]);
-								blockIds.Add(blockId);
-							}
-							else
-							{
-								string[] coords = block.Split(':');
-
-								x += int.Parse(coords[0]);
-								y += int.Parse(coords[1]);
-
-								blocks[new Point(x, y)] = blockId;
-							}
-						}
-
-						HashSet<uint> finishBlocks = new();
-						foreach (uint blockId_ in blockIds.ToList())
-						{
-							if (blockId_ < 700)
-							{
-								if (blockId_ % 100 == 7)
-								{
-									finishBlocks.Add(blockId_);
-								}
-
-								blockIds.Remove(blockId_); //Known block, no need to load from db
-							}
-						}
-
-						//Not found in cached blocks
-						if (blockIds.Count > 0)
-						{
-							using (DatabaseConnection dbConnection = new())
-							{
-								DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT DISTINCT ON(id) id, settings FROM base.blocks WHERE id = ANY({blockIds.ToArray()}) ORDER BY id, version DESC LIMIT {blockIds.Count}");
-								while (reader?.Read() ?? false)
-								{
-									uint id = (uint)(int)reader["id"];
-									string settings = (string)reader["settings"];
-									if (settings.StartsWith("v2 | "))
-									{
-										using JsonDocument blockData = JsonDocument.Parse(settings[5..]);
-										if (blockData.RootElement.TryGetProperty("left", out JsonElement sideSettings) && this.ReadBlockSideSettings(sideSettings))
-										{
-											finishBlocks.Add(id);
-										}
-										else if (blockData.RootElement.TryGetProperty("right", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-										{
-											finishBlocks.Add(id);
-										}
-										else if (blockData.RootElement.TryGetProperty("top", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-										{
-											finishBlocks.Add(id);
-										}
-										else if (blockData.RootElement.TryGetProperty("bottom", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-										{
-											finishBlocks.Add(id);
-										}
-										else if (blockData.RootElement.TryGetProperty("bump", out sideSettings) && this.ReadBlockSideSettings(sideSettings))
-										{
-											finishBlocks.Add(id);
-										}
-									}
-								}
-							}
-						}
-
-						//We loaded everything
-						foreach (KeyValuePair<Point, uint> block in blocks)
-						{
-							if (finishBlocks.Contains(block.Value))
-							{
-								this.FinishBlocks.Add(block.Key);
-							}
-						}
+						this.FinishBlocks.Add(point);
 					}
 				}
 			}
@@ -1245,7 +1164,26 @@ internal sealed class MultiplayerMatch
 	{
 		if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
 		{
-			player.Item = item;
+			if (player.Match.ServerLevelData is { } serverLevelData && item.StartsWith("p|") && player.Item != item)
+			{
+				int idStart = item.IndexOf("id|", StringComparison.OrdinalIgnoreCase) + 3;
+				int idEnd = item.IndexOf('|', idStart);
+
+				uint id = uint.Parse(item.AsSpan(idStart, idEnd - idStart));
+
+				if (serverLevelData.PortableBlocks.Contains(id))
+				{
+					player.Item = item;
+				}
+				else
+				{
+					session.SendPacket(new UpdateOutgoingPacket(UpdateStatus.Item, player));
+				}
+			}
+			else
+			{
+				player.Item = item;
+			}
 
 			this.SendUpdateIfRequired(session, player);
 		}
