@@ -1169,7 +1169,7 @@ internal sealed class MultiplayerMatch
 				int idStart = item.IndexOf("id|", StringComparison.OrdinalIgnoreCase) + 3;
 				int idEnd = item.IndexOf('|', idStart);
 
-				uint id = uint.Parse(item.AsSpan(idStart, idEnd - idStart));
+				uint id = uint.Parse(idEnd == -1 ? item.AsSpan(idStart) : item.AsSpan(idStart, idEnd - idStart));
 
 				if (serverLevelData.PortableBlocks.Contains(id))
 				{

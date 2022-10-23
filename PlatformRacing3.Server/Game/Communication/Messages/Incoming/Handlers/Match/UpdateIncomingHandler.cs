@@ -94,9 +94,9 @@ internal class UpdateIncomingHandler : AbstractIncomingClientSessionPacketHandle
 				{
 					int idStart = packet.Item.IndexOf("id|", StringComparison.OrdinalIgnoreCase) + 3;
 					int idEnd = packet.Item.IndexOf('|', idStart);
-
-					uint id = uint.Parse(packet.Item.AsSpan(idStart, idEnd - idStart));
 					
+					uint id = uint.Parse(idEnd == -1 ? packet.Item.AsSpan(idStart) : packet.Item.AsSpan(idStart, idEnd - idStart));
+
 					if (serverLevelData.PortableBlocks.Contains(id))
 					{
 						matchPlayer.Item = packet.Item;
