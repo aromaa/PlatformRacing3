@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Data.Common;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -95,7 +96,7 @@ internal sealed class MultiplayerMatch
 	private ClientSessionCollection Clients;
 
 	private HashSet<uint> DrawingUsers;
-	private SortedDictionary<uint, MatchPlayer> Players;
+	private PlayerCollection Players;
 
 	private int UsersReady;
 
@@ -125,7 +126,7 @@ internal sealed class MultiplayerMatch
 		this.Clients = new ClientSessionCollection(addCallback: this.OnJoinGame, removeCallback: this.Leave0);
 
 		this.DrawingUsers = new HashSet<uint>();
-		this.Players = new SortedDictionary<uint, MatchPlayer>();
+		this.Players = new PlayerCollection();
 
 		this.Name = name;
 		this.LevelData = levelData;
@@ -156,10 +157,7 @@ internal sealed class MultiplayerMatch
 
 		lock (this.Players)
 		{
-			if (!this.Players.TryAdd(session.SocketId, matchPlayer))
-			{
-				throw new InvalidOperationException();
-			}
+			this.Players.Add(matchPlayer);
 		}
 
 		session.MultiplayerMatchSession = new MultiplayerMatchSession(this, matchPlayer);
@@ -249,7 +247,7 @@ internal sealed class MultiplayerMatch
 	{
 		lock (this.Players)
 		{
-			foreach (MatchPlayer player in this.Players.Values)
+			foreach (MatchPlayer player in this.Players)
 			{
 				session.TrackUserInRoom(this.Name, player.SocketId, player.UserData.Id, player.UserData.Username, player.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
 
@@ -333,7 +331,7 @@ internal sealed class MultiplayerMatch
 					}
 				}
 
-				if (timeRanOut || this.Players.Values.All((p) => p.Forfiet || p.FinishTime != null))
+				if (timeRanOut || this.Players.All(p => p.Forfiet || p.FinishTime != null))
 				{
 					if (this.TryChangeStatus(MultiplayerMatchStatus.Ended, MultiplayerMatchStatus.Ongoing))
 					{
@@ -399,14 +397,14 @@ internal sealed class MultiplayerMatch
 			{
 				events.Add("sfchm");
 
-				foreach (MatchPlayer player in this.Players.Values)
+				foreach (MatchPlayer player in this.Players)
 				{
 					this.AddHatToPlayer(player, Hat.Cowboy, player.UserData.CurrentHatColor, false);
 				}
 			}
 			else
 			{
-				foreach (MatchPlayer player in this.Players.Values)
+				foreach (MatchPlayer player in this.Players)
 				{
 					if (player.UserData.CurrentHat != Hat.None)
 					{
@@ -430,7 +428,7 @@ internal sealed class MultiplayerMatch
 			}
 
 			//Resend hats to avoid graphical bug on client side
-			foreach (MatchPlayer player in this.Players.Values)
+			foreach (MatchPlayer player in this.Players)
 			{
 				this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
 			}
@@ -449,7 +447,7 @@ internal sealed class MultiplayerMatch
 		}
 		else if (this.Players.Count >= 2)
 		{
-			int diffIpsCount = this.Players.Values.Select((p) => p.IPAddress).Distinct().Count();
+			int diffIpsCount = this.Players.Select(p => p.IPAddress).Distinct().Count();
 			if (diffIpsCount >= 2)
 			{
 				double chance = diffIpsCount * 5;
@@ -471,7 +469,7 @@ internal sealed class MultiplayerMatch
 				}
 
 				ISet<uint> radiatingLuck = new HashSet<uint>();
-				foreach(MatchPlayer player in this.Players.Values)
+				foreach(MatchPlayer player in this.Players)
 				{
 					if (player.UserData.DainLuckRadiation())
 					{
@@ -536,7 +534,7 @@ internal sealed class MultiplayerMatch
 							uint bodysCount = 0;
 							uint feetsCount = 0;
 
-							foreach (MatchPlayer player in this.Players.Values)
+							foreach (MatchPlayer player in this.Players)
 							{
 								if (player.UserData.HasHead(specialPartId))
 								{
@@ -680,7 +678,7 @@ internal sealed class MultiplayerMatch
 						{
 							if (luck)
 							{
-								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Bodys)));
+								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Bodys)));
 							}
 
 							Part part = selectFrom.FirstOrDefault();
@@ -698,7 +696,7 @@ internal sealed class MultiplayerMatch
 						{
 							if (luck)
 							{
-								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Heads)));
+								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Heads)));
 							}
 
 							Part part = selectFrom.FirstOrDefault();
@@ -716,7 +714,7 @@ internal sealed class MultiplayerMatch
 						{
 							if (luck)
 							{
-								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Feets)));
+								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Feets)));
 							}
 
 							Part part = selectFrom.FirstOrDefault();
@@ -734,7 +732,7 @@ internal sealed class MultiplayerMatch
 						{
 							if (luck)
 							{
-								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Values.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Hats)));
+								selectFrom = selectFrom.Except(this.ContainsInAll(this.Players.Where((p) => !p.UserData.IsGuest).Select((p) => p.UserData.Hats)));
 							}
 
 							Hat hat = selectFrom.FirstOrDefault();
@@ -886,7 +884,7 @@ internal sealed class MultiplayerMatch
 			{
 				if (!player.Forfiet && this.Broadcaster)
 				{
-					int place = this.Players.Count - this.Players.Values.Count((p) => p.Forfiet);
+					int place = this.Players.Count - this.Players.Count((p) => p.Forfiet);
 
 					this.SendChatMessage("Broadcaster", 0, 0, Color.Red, $"User {player.UserData.Username} forfeit at place #{place}");
 				}
@@ -901,7 +899,7 @@ internal sealed class MultiplayerMatch
 				player.Gone = true;
 			}
 
-			this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, this.Players.Values));
+			this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, this.Players));
 		}
 
 		this.CheckGameState();
@@ -987,7 +985,7 @@ internal sealed class MultiplayerMatch
 			}
 
 			int place = this.Players.Count;
-			foreach (MatchPlayer other in this.Players.Values)
+			foreach (MatchPlayer other in this.Players)
 			{
 				if (other != player)
 				{
@@ -1138,7 +1136,7 @@ internal sealed class MultiplayerMatch
 				}
 			}
 
-			this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, (IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+			this.Clients.SendAsync(new PlayerFinishedOutgoingMessage(session.SocketId, this.Players));
 
 			session.SendPacket(new YouFinishedOutgoingMessage(session.UserData.Rank, session.UserData.Exp, ExpUtils.GetNextRankExpRequirement(session.UserData.Rank), expEarned, expArray, place));
 
@@ -1394,7 +1392,7 @@ internal sealed class MultiplayerMatch
 			{
 				player.Coins = coins;
 
-				this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+				this.Clients.SendAsync(new CoinsOutgoingMessage(this.Players));
 			}
 		}
 	}
@@ -1407,7 +1405,7 @@ internal sealed class MultiplayerMatch
 			{
 				player.Dash = dash;
 
-				this.Clients.SendAsync(new CoinsOutgoingMessage((IReadOnlyCollection<MatchPlayer>)this.Players.Values));
+				this.Clients.SendAsync(new CoinsOutgoingMessage(this.Players));
 			}
 		}
 	}
@@ -1449,5 +1447,13 @@ internal sealed class MultiplayerMatch
 	internal void SendPacket(IMessageOutgoing packet)
 	{
 		this.Clients.SendAsync(packet);
+	}
+
+	private sealed class PlayerCollection : KeyedCollection<uint, MatchPlayer>
+	{
+		protected override uint GetKeyForItem(MatchPlayer item)
+		{
+			return item.SocketId;
+		}
 	}
 }
