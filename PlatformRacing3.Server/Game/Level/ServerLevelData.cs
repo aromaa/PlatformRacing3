@@ -175,8 +175,9 @@ internal sealed class ServerLevelData
 				if (blocks.Add(blockId))
 				{
 					blocksToFetch.Add(blockId);
-					portableBlocks.Add(blockId);
 				}
+
+				portableBlocks.Add(blockId);
 			}
 		}
 	}
