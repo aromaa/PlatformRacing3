@@ -33,7 +33,10 @@ internal class ClientSessionCollection
 	{
 		bool result = this.SessionCollection.TryRemove(session.Connection, out _, callEvent);
 
-		this.SessionsBySocketId.TryRemove(new KeyValuePair<uint, ClientSession>(session.SocketId, session));
+		if (!callEvent)
+		{
+			this.SessionsBySocketId.TryRemove(new KeyValuePair<uint, ClientSession>(session.SocketId, session));
+		}
 
 		return result;
 	}
@@ -54,6 +57,8 @@ internal class ClientSessionCollection
 
 	protected virtual void OnRemoved(ISocket socket, ref ClientSession session)
 	{
+		this.SessionsBySocketId.TryRemove(session.SocketId, out _);
+
 		this.RemoveCallback?.Invoke(session);
 	}
 }
