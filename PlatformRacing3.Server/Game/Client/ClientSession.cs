@@ -27,6 +27,7 @@ internal class ClientSession : ICommandExecutor
 	internal uint LastRoundtripTime { get; set; }
 
 	internal bool HostTournament { get; set; }
+	internal bool Spectate { get; set; }
 
 	private Lazy<LobbySession> _LobbySession;
 

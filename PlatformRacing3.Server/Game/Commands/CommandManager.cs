@@ -36,7 +36,8 @@ internal sealed class CommandManager
 			{ "broadcaster", new BroadcasterCommand() },
 			{ "givebonusexp", new GiveBonusExpCommand(clientManager) },
 			{ "life", new LifeCommand(clientManager) },
-			{ "item", new ItemCommand(clientManager) }
+			{ "item", new ItemCommand(clientManager) },
+			{ "spectate", new SpectateCommand() }
 		};
 	}
 

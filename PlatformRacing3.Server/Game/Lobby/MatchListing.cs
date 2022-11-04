@@ -327,10 +327,19 @@ internal class MatchListing
 		{
 			session.LobbySession.MatchListing = null;
 
-			if (match.Reserve(session))
+			if (!session.Spectate)
 			{
-				session.SendPacket(startGame);
+				if (!match.Reserve(session))
+				{
+					continue;
+				}
 			}
+			else
+			{
+				session.Spectate = false;
+			}
+
+			session.SendPacket(startGame);
 		}
 
 		match.Lock();
