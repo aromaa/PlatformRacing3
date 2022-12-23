@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using PlatformRacing3.Common.User;
 using PlatformRacing3.Server.Collections;
 
 namespace PlatformRacing3.Server.Game.Client;
@@ -63,6 +64,11 @@ internal sealed class ClientManager
 				if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
 				{
 					session.Disconnect("Timeout (No ping)");
+				}
+				else
+				{
+					//Temp workaround to keep the user cache actively loaded
+					_ = UserManager.TryGetUserDataByIdAsync(session.UserData.Id);
 				}
 			}
 		}

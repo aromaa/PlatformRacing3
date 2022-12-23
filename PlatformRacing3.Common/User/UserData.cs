@@ -102,6 +102,8 @@ public abstract class UserData : IXmlSerializable
 	[JsonIgnore]
 	public abstract IReadOnlyCollection<string> Permissions { get; }
 
+	public bool Muted { get; set; }
+
 	private protected UserData()
 	{
 	}
