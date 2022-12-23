@@ -9,7 +9,7 @@ internal sealed class AliveCommandTargetSelector : ICommandTargetSelector
 	{
 		if (executor is ClientSession { MultiplayerMatchSession.Match: { } match } client)
 		{
-			return match.MatchPlayers.Where(p => p.FinishTime is null).Select(p => p.Session);
+			return match.MatchPlayers.Where(p => p.FinishTime is null && !p.Forfiet).Select(p => p.Session);
 		}
 		else
 		{
