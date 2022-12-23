@@ -4,6 +4,7 @@ using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Commands.Match;
 using PlatformRacing3.Server.Game.Commands.Misc;
+using PlatformRacing3.Server.Game.Commands.Selector;
 using PlatformRacing3.Server.Game.Commands.User;
 using PlatformRacing3.Server.Utils;
 
@@ -13,11 +14,16 @@ internal sealed class CommandManager
 {
 	private readonly ILogger<CommandManager> logger;
 
+	private readonly ClientManager clientManager;
+
 	private Dictionary<string, ICommand> Commands;
+	private Dictionary<string, ICommandTargetSelector> TargetSelectors;
 
 	public CommandManager(ClientManager clientManager, ILogger<CommandManager> logger, IHostApplicationLifetime applicationLifetime)
 	{
 		this.logger = logger;
+
+		this.clientManager = clientManager;
 
 		this.Commands = new Dictionary<string, ICommand>()
 		{
@@ -26,18 +32,27 @@ internal sealed class CommandManager
 			{ "givepart", new GivePartCommand(clientManager) },
 			{ "givehat", new GiveHatCommand(clientManager) },
 			{ "broadcast", new BroadcastCommand(clientManager) },
-			{ "kick", new KickCommand(clientManager) },
-			{ "alert", new AlertCommand(clientManager) },
-			{ "addhat", new AddHatCommand() },
+			{ "kick", new KickCommand(this) },
+			{ "alert", new AlertCommand(this) },
+			{ "addhat", new AddHatCommand(this) },
 			{ "fakeprize", new FakePrizeCommand() },
 			{ "spawnaliens", new SpawnAliensCommand() },
-			{ "teleport", new TeleportCommand(clientManager) },
+			{ "teleport", new TeleportCommand(this) },
 			{ "tournament", new TournamentCommand() },
 			{ "broadcaster", new BroadcasterCommand() },
 			{ "givebonusexp", new GiveBonusExpCommand(clientManager) },
-			{ "life", new LifeCommand(clientManager) },
-			{ "item", new ItemCommand(clientManager) },
+			{ "life", new LifeCommand(this) },
+			{ "item", new ItemCommand(this) },
 			{ "spectate", new SpectateCommand() }
+		};
+
+		this.TargetSelectors = new Dictionary<string, ICommandTargetSelector>()
+		{
+			{ "@online", new OnlineCommandTargetSelector(clientManager) },
+			{ "@match", new MatchCommandTargetSelector() },
+			{ "@alive", new AliveCommandTargetSelector() },
+			{ "@dead", new DeadCommandTargetSelector() },
+			{ "@me", new MeCommandTargetSelector() }
 		};
 	}
 
@@ -67,5 +82,20 @@ internal sealed class CommandManager
 		}
 
 		return false;
+	}
+
+	internal IEnumerable<ClientSession> GetTargets(ICommandExecutor executor, string selector)
+	{
+		if (this.TargetSelectors.TryGetValue(selector, out ICommandTargetSelector targetSelector))
+		{
+			return targetSelector.FindTargets(executor, string.Empty);
+		}
+
+		if (this.clientManager.GetClientSessionByUsername(selector) is { } target)
+		{
+			return new ClientSession[] { target };
+		}
+
+		return Array.Empty<ClientSession>();
 	}
 }

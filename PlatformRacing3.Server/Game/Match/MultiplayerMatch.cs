@@ -136,6 +136,9 @@ internal sealed class MultiplayerMatch
 		this.FinishBlocks = new HashSet<Point>();
 	}
 
+	internal ICollection<ClientSession> Sessions => this.Clients.Sessions;
+	internal ICollection<MatchPlayer> MatchPlayers => this.Players;
+
 	public MultiplayerMatchStatus Status => this._Status;
 
 	private uint GetNextHatId() => Interlocked.Increment(ref this.NextHatId);
@@ -152,7 +155,7 @@ internal sealed class MultiplayerMatch
 
 	private void OnReservedFor(ClientSession session)
 	{
-		MatchPlayer matchPlayer = new(this, session.UserData, session.SocketId, session.IPAddres);
+		MatchPlayer matchPlayer = new(session, this, session.UserData, session.SocketId, session.IPAddres);
 
 		lock (this.Players)
 		{

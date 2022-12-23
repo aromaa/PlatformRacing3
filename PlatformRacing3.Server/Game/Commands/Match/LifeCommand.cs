@@ -7,11 +7,11 @@ namespace PlatformRacing3.Server.Game.Commands.Match;
 
 internal sealed class LifeCommand : ICommand
 {
-	private readonly ClientManager clientManager;
+	private readonly CommandManager commandManager;
 
-	public LifeCommand(ClientManager clientManager)
+	public LifeCommand(CommandManager commandManager)
 	{
-		this.clientManager = clientManager;
+		this.commandManager = commandManager;
 	}
 
 	public string Permission => "command.life.use";
@@ -32,42 +32,39 @@ internal sealed class LifeCommand : ICommand
 			return;
 		}
 
-		MultiplayerMatchSession matchSession;
+		IEnumerable<ClientSession> targets;
 		if (args.Length >= 2)
 		{
-			ClientSession target = this.clientManager.GetClientSessionByUsername(args[1]);
-			if (target == null)
-			{
-				executor.SendMessage("The target was not found");
-
-				return;
-			}
-
-			matchSession = target.MultiplayerMatchSession;
+			targets = this.commandManager.GetTargets(executor, args[1]);
 		}
-		else if (executor is ClientSession client)
+		else if (executor is ClientSession session)
 		{
-			matchSession = client.MultiplayerMatchSession;
+			targets = new ClientSession[] { session };
 		}
 		else
 		{
-			executor.SendMessage("No valid target was found");
+			executor.SendMessage("No target");
 
 			return;
 		}
+		
+		int i = 0;
 
-		if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
+		foreach (ClientSession target in targets)
 		{
-			matchSession.MatchPlayer.Life = amount;
-
-			if (matchSession.MatchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+			if (target is { MultiplayerMatchSession.MatchPlayer: { } matchPlayer })
 			{
-				matchSession.Match.SendPacket(packet);
+				i++;
+
+				matchPlayer.Life = amount;
+
+				if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+				{
+					matchPlayer.Match.SendPacket(packet);
+				}
 			}
 		}
-		else
-		{
-			executor.SendMessage("The target is not currently in a match");
-		}
+
+		executor.SendMessage($"Effected {i} clients");
 	}
 }

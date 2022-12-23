@@ -7,11 +7,11 @@ namespace PlatformRacing3.Server.Game.Commands.Match;
 
 internal sealed class ItemCommand : ICommand
 {
-	private readonly ClientManager clientManager;
+	private readonly CommandManager commandManager;
 
-	public ItemCommand(ClientManager clientManager)
+	public ItemCommand(CommandManager commandManager)
 	{
-		this.clientManager = clientManager;
+		this.commandManager = commandManager;
 	}
 
 	public string Permission => "command.item.use";
@@ -24,43 +24,40 @@ internal sealed class ItemCommand : ICommand
 
 			return;
 		}
-
-		MultiplayerMatchSession matchSession;
+		
+		IEnumerable<ClientSession> targets;
 		if (args.Length >= 2)
 		{
-			ClientSession target = this.clientManager.GetClientSessionByUsername(args[1]);
-			if (target == null)
-			{
-				executor.SendMessage("The target was not found");
-
-				return;
-			}
-
-			matchSession = target.MultiplayerMatchSession;
+			targets = this.commandManager.GetTargets(executor, args[1]);
 		}
-		else if (executor is ClientSession client)
+		else if (executor is ClientSession session)
 		{
-			matchSession = client.MultiplayerMatchSession;
+			targets = new ClientSession[] { session };
 		}
 		else
 		{
-			executor.SendMessage("No valid target was found");
+			executor.SendMessage("No target");
 
 			return;
 		}
 
-		if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
-		{
-			matchSession.MatchPlayer.Item = args[0];
+		int i = 0;
 
-			if (matchSession.MatchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+		foreach (ClientSession target in targets)
+		{
+			if (target is { MultiplayerMatchSession.MatchPlayer: { } matchPlayer })
 			{
-				matchSession.Match.SendPacket(packet);
+				i++;
+
+				matchPlayer.Item = args[0];
+
+				if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+				{
+					matchPlayer.Match.SendPacket(packet);
+				}
 			}
 		}
-		else
-		{
-			executor.SendMessage("The target is not currently in a match");
-		}
+
+		executor.SendMessage($"Effected {i} clients");
 	}
 }

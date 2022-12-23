@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Common.Utils;
+using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Incoming.Enums;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 
@@ -11,6 +12,7 @@ namespace PlatformRacing3.Server.Game.Match;
 
 internal class MatchPlayer
 {
+	internal ClientSession Session { get; }
 	internal MultiplayerMatch Match { get; } //IMatch?
 	internal UserData UserData { get; }
 
@@ -57,8 +59,9 @@ internal class MatchPlayer
 
 	internal UpdateStatus ToUpdate { get; private set; }
 
-	internal MatchPlayer(MultiplayerMatch match, UserData userData, uint socketId, IPAddress ipAddress)
+	internal MatchPlayer(ClientSession session, MultiplayerMatch match, UserData userData, uint socketId, IPAddress ipAddress)
 	{
+		this.Session = session;
 		this.Match = match;
 		this.UserData = userData;
 

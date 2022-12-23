@@ -5,11 +5,11 @@ namespace PlatformRacing3.Server.Game.Commands.Misc;
 
 internal sealed class KickCommand : ICommand
 {
-	private readonly ClientManager clientManager;
+	private readonly CommandManager commandManager;
 
-	public KickCommand(ClientManager clientManager)
+	public KickCommand(CommandManager commandManager)
 	{
-		this.clientManager = clientManager;
+		this.commandManager = commandManager;
 	}
 
 	public string Permission => "command.kick.use";
@@ -18,15 +18,16 @@ internal sealed class KickCommand : ICommand
 	{
 		if (args.Length >= 1)
 		{
-			ClientSession target = this.clientManager.GetClientSessionByUsername(args[0]);
-			if (target != null)
+			int i = 0;
+			
+			foreach (ClientSession target in this.commandManager.GetTargets(executor, args[0]))
 			{
 				if (target.PermissionRank > executor.PermissionRank)
 				{
-					executor.SendMessage("You do not have permissions to kick this user");
-
-					return;
+					continue;
 				}
+
+				i++;
 
 				if (args.Length == 1)
 				{
@@ -37,10 +38,8 @@ internal sealed class KickCommand : ICommand
 					target.Disconnect(string.Join(' ', args[1..].ToArray()));
 				}
 			}
-			else
-			{
-				executor.SendMessage($"Unable to find user online named {args[0]}");
-			}
+
+			executor.SendMessage($"Effected {i} clients");
 		}
 		else
 		{

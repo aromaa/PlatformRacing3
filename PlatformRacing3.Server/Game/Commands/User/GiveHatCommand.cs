@@ -31,6 +31,8 @@ internal sealed class GiveHatCommand : ICommand
 				else if (!Enum.TryParse(args[1], ignoreCase: true, out hat))
 				{
 					executor.SendMessage($"Unable to find part with name {args[1]}");
+
+					return;
 				}
 
 				bool temp = false;

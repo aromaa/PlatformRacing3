@@ -1,4 +1,5 @@
-﻿using PlatformRacing3.Server.API.Game.Commands;
+﻿using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Server.API.Game.Commands;
 using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 using PlatformRacing3.Server.Game.Match;
@@ -7,11 +8,11 @@ namespace PlatformRacing3.Server.Game.Commands.Match;
 
 internal sealed class TeleportCommand : ICommand
 {
-	private readonly ClientManager clientManager;
+	private readonly CommandManager commandManager;
 
-	public TeleportCommand(ClientManager clientManager)
+	public TeleportCommand(CommandManager commandManager)
 	{
-		this.clientManager = clientManager;
+		this.commandManager = commandManager;
 	}
 
 	public string Permission => "command.teleport.use";
@@ -38,45 +39,41 @@ internal sealed class TeleportCommand : ICommand
 
 			return;
 		}
-
-		MultiplayerMatchSession matchSession;
+		
+		IEnumerable<ClientSession> targets;
 		if (args.Length >= 3)
 		{
-			ClientSession target = this.clientManager.GetClientSessionByUsername(args[2]);
-			if (target == null)
-			{
-				executor.SendMessage("The target was not found");
-
-				return;
-			}
-
-			matchSession = target.MultiplayerMatchSession;
+			targets = this.commandManager.GetTargets(executor, args[2]);
 		}
-		else if (executor is ClientSession client)
+		else if (executor is ClientSession session)
 		{
-			matchSession = client.MultiplayerMatchSession;
+			targets = new ClientSession[] { session };
 		}
 		else
 		{
-			executor.SendMessage("No valid target was found");
+			executor.SendMessage("No target");
 
 			return;
 		}
 
-		if (matchSession != null && matchSession.Match != null && matchSession.MatchPlayer != null)
-		{
-			//40 is for block size in pixels
-			matchSession.MatchPlayer.X += x * 40;
-			matchSession.MatchPlayer.Y -= y * 40;
+		int i = 0;
 
-			if (matchSession.MatchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+		foreach (ClientSession target in targets)
+		{
+			if (target is { MultiplayerMatchSession.MatchPlayer: { } matchPlayer })
 			{
-				matchSession.Match.SendPacket(packet);
+				i++;
+
+				matchPlayer.X += x * 40;
+				matchPlayer.Y -= y * 40;
+
+				if (matchPlayer.GetUpdatePacket(out UpdateOutgoingPacket packet))
+				{
+					matchPlayer.Match.SendPacket(packet);
+				}
 			}
 		}
-		else
-		{
-			executor.SendMessage("The target is not currently in a match");
-		}
+
+		executor.SendMessage($"Effected {i} clients");
 	}
 }

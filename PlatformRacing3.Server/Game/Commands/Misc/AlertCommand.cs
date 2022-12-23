@@ -6,11 +6,11 @@ namespace PlatformRacing3.Server.Game.Commands.Misc;
 
 internal sealed class AlertCommand : ICommand
 {
-	private readonly ClientManager clientManager;
+	private readonly CommandManager commandManager;
 
-	public AlertCommand(ClientManager clientManager)
+	public AlertCommand(CommandManager commandManager)
 	{
-		this.clientManager = clientManager;
+		this.commandManager = commandManager;
 	}
 
 	public string Permission => "command.alert.use";
@@ -19,15 +19,16 @@ internal sealed class AlertCommand : ICommand
 	{
 		if (args.Length >= 2)
 		{
-			ClientSession target = this.clientManager.GetClientSessionByUsername(args[0]);
-			if (target != null)
+			int i = 0;
+
+			foreach (ClientSession target in this.commandManager.GetTargets(executor, args[0]))
 			{
+				i++;
+				
 				target.SendPacket(new AlertOutgoingMessage(string.Join(' ', args[1..].ToArray())));
 			}
-			else
-			{
-				executor.SendMessage($"Unable to find user online named {args[0]}");
-			}
+
+			executor.SendMessage($"Effected {i} clients");
 		}
 		else
 		{
