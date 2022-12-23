@@ -147,6 +147,13 @@ internal class ChatRoom
 		}
 		else if (message.Length > 0)
 		{
+			if (session.UserData.Muted)
+			{
+				session.SendPacket(new AlertOutgoingMessage("You have been muted"));
+				
+				return;
+			}
+			
 			ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
 			this.RecentMessages.Enqueue(packet);

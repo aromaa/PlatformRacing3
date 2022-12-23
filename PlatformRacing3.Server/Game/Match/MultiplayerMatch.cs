@@ -1262,6 +1262,13 @@ internal sealed class MultiplayerMatch
 		}
 		else
 		{
+			if (session.UserData.Muted)
+			{
+				session.SendPacket(new AlertOutgoingMessage("You have been muted"));
+
+				return;
+			}
+			
 			ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
 			if (sendToSelf)

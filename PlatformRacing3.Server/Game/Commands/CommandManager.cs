@@ -43,7 +43,9 @@ internal sealed class CommandManager
 			{ "givebonusexp", new GiveBonusExpCommand(clientManager) },
 			{ "life", new LifeCommand(this) },
 			{ "item", new ItemCommand(this) },
-			{ "spectate", new SpectateCommand() }
+			{ "spectate", new SpectateCommand() },
+			{ "mute", new MuteCommand(this) },
+			{ "unmute", new UnmuteCommand(this) }
 		};
 
 		this.TargetSelectors = new Dictionary<string, ICommandTargetSelector>()
