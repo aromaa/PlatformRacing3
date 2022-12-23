@@ -69,7 +69,6 @@ internal sealed class MultiplayerMatch
 		Hat.Police,
 		Hat.Ushanka,
 		Hat.Toque,
-		Hat.Fez,
 		Hat.Witch,
 		Hat.Halo,
 		Hat.TrafficCone,
