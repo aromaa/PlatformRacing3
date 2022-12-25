@@ -213,6 +213,8 @@ public class DataAccess2 : ControllerBase
 			{ "SaveStamp", new SaveStampProcedure() },
 			{ "GetManyStamps", new GetManyStampsProcedure() },
 			{ "DeleteStamp", new DeleteStampProcedure() },
+			{ "GetUserLevelData", new GetUserLevelDataProcedure() },
+			{ "SaveUserLevelData", new SaveUserLevelDataProcedure() }
 		};
 	}
 

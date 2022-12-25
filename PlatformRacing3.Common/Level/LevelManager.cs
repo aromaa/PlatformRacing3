@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using System.Text;
+using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Database;
@@ -322,6 +323,37 @@ public sealed class LevelManager
 			}
 
 			return false;
+		}
+	}
+
+	public static Task SaveUserLevelData(uint userId, uint levelId, string levelData)
+	{
+		return DatabaseConnection.NewAsyncConnection(c =>
+			c.ExecuteNonQueryAsync($"INSERT INTO base.user_level_data(user_id, level_id, level_data) VALUES({userId}, {levelId}, {JsonDocument.Parse(levelData)}) ON CONFLICT(user_id, level_id) DO UPDATE SET level_data = excluded.level_data"));
+	}
+
+	public static Task<string> GetUserLevelData(uint userId, uint levelId)
+	{
+		return DatabaseConnection.NewAsyncConnection(c =>
+			c.ReadDataAsync($"SELECT level_data FROM base.user_level_data WHERE user_id = {userId} AND level_id = {levelId} LIMIT 1")
+			.ContinueWith(Parse));
+
+		static string Parse(Task<NpgsqlDataReader> task)
+		{
+			if (task.IsCompletedSuccessfully)
+			{
+				DbDataReader reader = task.Result;
+				if (reader.Read())
+				{
+					return (string) reader["level_data"];
+				}
+			}
+			else if (task.IsFaulted)
+			{
+				LevelManager.logger.LogError(EventIds.LevelLoadFailed, task.Exception, "Failed to get user level data from sql");
+			}
+
+			return null;
 		}
 	}
 
