@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -318,6 +319,75 @@ public sealed class UserManager
 	public static Task<uint> HasDiscordLinkage(uint userId, ulong discordId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT user_id FROM base.users_discord_link WHERE user_id = {userId} OR discord_id = {discordId} LIMIT 1").ContinueWith(UserManager.ParseSqlGetDiscordLink));
 
 	public static Task<uint> HasDiscordLinkage(ulong discordId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT user_id FROM base.users_discord_link WHERE discord_id = {discordId} LIMIT 1").ContinueWith(UserManager.ParseSqlGetDiscordLink));
+
+	public static Task<bool> UseCoins(uint userId, uint price)
+	{
+		return DatabaseConnection.NewAsyncConnection(c =>
+			c.ExecuteNonQueryAsync($"UPDATE base.users SET coins = coins - {(int)price} WHERE id = {userId} AND coins >= {(int)price}").ContinueWith(Parse));
+
+		static bool Parse(Task<int> task)
+		{
+			if (task.IsCompletedSuccessfully)
+			{
+				return task.Result == 1;
+			}
+			else if (task.IsFaulted)
+			{
+				UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to complete item purchase to sql");
+			}
+
+			return false;
+		}
+	}
+	
+	public static Task<bool> PurchaseLevelItem(uint userId, uint levelId, string itemId, uint price, uint receiveAmount)
+	{
+		return DatabaseConnection.NewAsyncConnection(c =>
+			c.ReadDataAsync($"CALL base.purchase_item({(int)userId}, {(int)levelId}, {itemId}, {(int)price}, {(int)receiveAmount}, -1)").ContinueWith(Parse));
+
+		static bool Parse(Task<NpgsqlDataReader> task)
+		{
+			if (task.IsCompletedSuccessfully)
+			{
+				NpgsqlDataReader reader = task.Result;
+				if (reader.Read())
+				{
+					return (int)reader["status"] == 1;
+				}
+			}
+			else if (task.IsFaulted)
+			{
+				UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to complete item purchase to sql");
+			}
+
+			return false;
+		}
+	}
+
+	public static Task<List<string>> GetPurchasedItems(uint userId, uint levelId)
+	{
+		return DatabaseConnection.NewAsyncConnection(c =>
+			c.ReadDataAsync($"SELECT item_id FROM base.user_level_purchases WHERE user_id = {userId} AND level_id = {levelId}").ContinueWith(Parse));
+
+		static List<string> Parse(Task<NpgsqlDataReader> task)
+		{
+			List<string> items = new();
+			if (task.IsCompletedSuccessfully)
+			{
+				NpgsqlDataReader reader = task.Result;
+				while (reader.Read())
+				{
+					items.Add((string)reader["item_id"]);
+				}
+			}
+			else if (task.IsFaulted)
+			{
+				UserManager.logger.LogError(EventIds.UserLoadFailed, task.Exception, $"Failed to load purchases from sql");
+			}
+
+			return items;
+		}
+	}
 
 	private static PlayerUserData ParseRedisUserData(Task<RedisValue[]> task)
 	{

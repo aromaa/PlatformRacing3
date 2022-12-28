@@ -214,7 +214,9 @@ public class DataAccess2 : ControllerBase
 			{ "GetManyStamps", new GetManyStampsProcedure() },
 			{ "DeleteStamp", new DeleteStampProcedure() },
 			{ "GetUserLevelData", new GetUserLevelDataProcedure() },
-			{ "SaveUserLevelData", new SaveUserLevelDataProcedure() }
+			{ "SaveUserLevelData", new SaveUserLevelDataProcedure() },
+			{ "PurchaseItem", new PurchaseItemProcedure() },
+			{ "GetPurchasedItems", new GetPurchasedItemsProcedure() }
 		};
 	}
 
