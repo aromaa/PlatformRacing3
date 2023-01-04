@@ -90,7 +90,7 @@ internal class ClientSession : ICommandExecutor
 
 		async Task TriggerDisconnect(string reason)
 		{
-			await this.Connection.SendAsync(new LogoutTriggerOutgoingMessage(reason));
+			_ = this.Connection.SendAsync(new LogoutTriggerOutgoingMessage(reason));
 
 			this.Connection.Disconnect(reason);
 		}
