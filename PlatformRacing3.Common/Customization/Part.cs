@@ -45,6 +45,11 @@ public enum Part : uint
 	Bee = 40,
 	Zebra = 41,
 	Steve = 42,
-	Rat = 43,
-	Flower = 44
+	RatLegacy = 43,
+	Flower = 44,
+	Abomination = 45,
+	Scientist = 46,
+	Fly = 47,
+	Rat = 48,
+	Crow = 49
 }
