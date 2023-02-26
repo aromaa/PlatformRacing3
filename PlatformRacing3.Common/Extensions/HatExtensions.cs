@@ -8,7 +8,7 @@ public static class HatExtensions
 	{
 		return hat switch
 		{
-			Hat.Cowboy or Hat.Crown or Hat.Undefined or hat.Extraterrestrial or hat.Extraterrestrial2 => true,
+			Hat.Cowboy or Hat.Crown or hat.Extraterrestrial or hat.Alien => true,
 
 			_ => false,
 		};
