@@ -8,7 +8,7 @@ public static class PartExtensions
 	{
 		return part switch
 		{
-			Part.Invisible or Part.MEME or Part.Steve or Part.RatLegacy or Part.Undefined => true,
+			Part.Invisible or Part.MEME or Part.Steve or Part.RatLegacy => true,
 
 			_ => false,
 		};
