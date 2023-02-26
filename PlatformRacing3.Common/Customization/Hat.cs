@@ -43,6 +43,6 @@ public enum Hat : uint
 	Fan = 38,
 	SpookyBox = 39,
 	Extraterrestrial = 40,
-	Extraterrestrial2 = 41,
+	Alien = 41,
 	Photosynthetic = 42,
 }
