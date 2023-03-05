@@ -846,6 +846,20 @@ internal sealed class MultiplayerMatch
 		this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
 	}
 
+	internal void RemoveHatsFromPlayer(MatchPlayer player)
+	{
+		player.RemoveHats();
+
+		this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+	}
+
+	internal void RemoveHatFromPlayer(MatchPlayer player, Hat hat)
+	{
+		player.RemoveHat(hat);
+
+		this.Clients.SendAsync(new SetPlayerHatsOutgoingMessage(player.SocketId, player.Hats));
+	}
+
 	internal void Forfeit(ClientSession session, bool leave = false)
 	{
 		if (leave)

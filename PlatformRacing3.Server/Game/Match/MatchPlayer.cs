@@ -26,7 +26,7 @@ internal class MatchPlayer
 	[JsonPropertyName("jump")]
 	internal int _Jump;
 
-	private Queue<MatchPlayerHat> _Hats { get; }
+	private Queue<MatchPlayerHat> _Hats { get; set; }
 
 	//TODO: Mess
 	private double _X;
@@ -91,6 +91,10 @@ internal class MatchPlayer
 
 		return null;
 	}
+
+	internal void RemoveHat(Hat hat) => this._Hats = new Queue<MatchPlayerHat>(this._Hats.Where(h => h.Hat != hat));
+
+	internal void RemoveHats() => this._Hats.Clear();
 
 	internal double X
 	{
