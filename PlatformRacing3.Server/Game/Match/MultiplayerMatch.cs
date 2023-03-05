@@ -162,6 +162,11 @@ internal sealed class MultiplayerMatch
 		lock (this.Players)
 		{
 			this.Players.Add(matchPlayer);
+
+			foreach (ClientSession other in this.Clients.Sessions)
+			{
+				other.TrackUserInRoom(this.Name, matchPlayer.SocketId, matchPlayer.UserData.Id, matchPlayer.UserData.Username, matchPlayer.GetVars("speed", "accel", "jump", "hat", "head", "body", "feet", "hatColor", "headColor", "bodyColor", "feetColor"));
+			}
 		}
 
 		session.MultiplayerMatchSession = new MultiplayerMatchSession(this, matchPlayer);
