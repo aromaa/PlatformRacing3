@@ -111,6 +111,8 @@ internal sealed class MultiplayerMatch
 
 	internal bool Broadcaster { get; set; }
 
+	internal bool DelayedStart { get; set; }
+
 	internal MultiplayerMatch(MatchManager matchManager, CommandManager commandManager, ILogger<MultiplayerMatch> logger, MatchListingType type, string name, LevelData levelData)
 	{
 		this.matchManager = matchManager;
@@ -192,8 +194,10 @@ internal sealed class MultiplayerMatch
 		this.CheckGameState();
 	}
 
-	internal void Lock()
+	internal void Lock(bool delayedStart)
 	{
+		this.DelayedStart = delayedStart;
+
 		if (this.Type == MatchListingType.Tournament || this.LevelData.Mode == LevelMode.KingOfTheHat)
 		{
 			if (this.TryChangeStatus(MultiplayerMatchStatus.ServerDrawing, MultiplayerMatchStatus.PreparingForStart))
@@ -312,6 +316,11 @@ internal sealed class MultiplayerMatch
 					{
 						break;
 					}
+				}
+
+				if (this.DelayedStart)
+				{
+					return;
 				}
 
 				if (this.TryChangeStatus(MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw))

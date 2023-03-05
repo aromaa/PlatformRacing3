@@ -46,7 +46,8 @@ internal sealed class CommandManager
 			{ "spectate", new SpectateCommand() },
 			{ "mute", new MuteCommand(this) },
 			{ "unmute", new UnmuteCommand(this) },
-			{ "removehats", new RemoveHatsCommand(this) }
+			{ "removehats", new RemoveHatsCommand(this) },
+			{ "delaystart", new DelayStartCommand() }
 		};
 
 		this.TargetSelectors = new Dictionary<string, ICommandTargetSelector>()

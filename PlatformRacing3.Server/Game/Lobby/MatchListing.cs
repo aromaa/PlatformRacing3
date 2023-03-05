@@ -68,6 +68,8 @@ internal class MatchListing
 
 	private volatile int UsersReady;
 
+	internal bool DelayedStart { get; set; }
+
 	internal MatchListing(MatchListingManager matchListingManager, MatchManager matchManager, MatchListingType type, ClientSession creator, LevelData levelData, string name, uint minRank, uint maxRank, uint maxMembers, bool onlyFriends)
 	{
 		this.matchListingManager = matchListingManager;
@@ -342,7 +344,7 @@ internal class MatchListing
 			session.SendPacket(startGame);
 		}
 
-		match.Lock();
+		match.Lock(this.DelayedStart);
 
 		foreach(ClientSession session in this.LobbyClients.Sessions)
 		{
