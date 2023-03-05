@@ -341,6 +341,7 @@ internal class MatchListing
 				session.Spectate = false;
 			}
 
+			session.UntrackUsersInRoom(this.Name);
 			session.SendPacket(startGame);
 		}
 
@@ -348,8 +349,8 @@ internal class MatchListing
 
 		foreach(ClientSession session in this.LobbyClients.Sessions)
 		{
-			session.SendPacket(startGame);
 			session.UntrackUsersInRoom(this.Name);
+			session.SendPacket(startGame);
 		}
 	}
 
