@@ -7,9 +7,13 @@ internal sealed class MatchCommandTargetSelector : ICommandTargetSelector
 {
 	public IEnumerable<ClientSession> FindTargets(ICommandExecutor executor, string parameter)
 	{
-		if (executor is ClientSession { MultiplayerMatchSession.Match: { } match } client)
+		if (executor is ClientSession { MultiplayerMatchSession.Match: { } match })
 		{
 			return match.Sessions;
+		}
+		else if (executor is ClientSession { LobbySession.MatchListing: { } matchListing })
+		{
+			return matchListing.Clients;
 		}
 		else
 		{
