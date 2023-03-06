@@ -72,12 +72,12 @@ internal sealed class MultiplayerMatch
 		Hat.Witch,
 		Hat.Halo,
 		Hat.TrafficCone,
-		Hat.MagnetHelmet,
+		Hat.Magnet,
 		Hat.PetSquid,
-		Hat.CamoCap,
+		Hat.Camo,
 		Hat.Parasol,
-		Hat.TinFoil,
-		Hat.Glue,
+		Hat.Barbed,
+		Hat.Bandana,
 	};
 
 	private readonly MatchManager matchManager;

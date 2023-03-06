@@ -8,7 +8,7 @@ public static class PartExtensions
 	{
 		return part switch
 		{
-			Part.Invisible or Part.MEME or Part.Steve or Part.Rat => true,
+			Part.Invisible or Part.MEME or Part.Steve or Part.RatLegacy => true,
 
 			_ => false,
 		};
@@ -18,7 +18,7 @@ public static class PartExtensions
 	{
 		return part switch
 		{
-			Part.Hoodie or Part.Cheetah or Part.Cyborg => true,
+			Part.Hoodie or Part.Cheetah or Part.Cyborg or Part.Spider or Part.Scientist or Part.Abomination => true,
 
 			_ => false,
 		};
