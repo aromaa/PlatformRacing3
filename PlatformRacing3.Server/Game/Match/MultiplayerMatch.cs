@@ -107,6 +107,8 @@ internal sealed class MultiplayerMatch
 
 	private HashSet<Point> FinishBlocks;
 
+	private Timer ReservationTimeoutTimer;
+
 	internal ServerLevelData ServerLevelData { get; private set; }
 
 	internal bool Broadcaster { get; set; }
@@ -207,6 +209,8 @@ internal sealed class MultiplayerMatch
 		{
 			if (this.TryChangeStatus(MultiplayerMatchStatus.ServerDrawing, MultiplayerMatchStatus.PreparingForStart))
 			{
+				this.ReservationTimeoutTimer = new Timer(ReservationTimeout, this, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
+
 				Task.Run(this.DrawLevelAsync);
 
 				return;
@@ -216,9 +220,24 @@ internal sealed class MultiplayerMatch
 		{
 			if (this.TryChangeStatus(MultiplayerMatchStatus.WaitingForUsersToJoin, MultiplayerMatchStatus.PreparingForStart))
 			{
+				this.ReservationTimeoutTimer = new Timer(ReservationTimeout, this, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
+
 				this.CheckGameState();
 
 				return;
+			}
+		}
+
+		static void ReservationTimeout(object state)
+		{
+			MultiplayerMatch match = (MultiplayerMatch)state;
+
+			while (match.ReservedFor.Count > 0)
+			{
+				foreach (ClientSession session in match.ReservedFor.Sessions)
+				{
+					match.ReservedFor.TryRemove(session);
+				}
 			}
 		}
 
@@ -330,6 +349,9 @@ internal sealed class MultiplayerMatch
 
 				if (this.TryChangeStatus(MultiplayerMatchStatus.Ongoing, MultiplayerMatchStatus.WaitingForUsersToDraw))
 				{
+					this.ReservationTimeoutTimer.Dispose();
+					this.ReservationTimeoutTimer = null;
+
 					this.Start();
 				}
 			}
