@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Server.Collections;
+using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 
 namespace PlatformRacing3.Server.Game.Client;
 
-internal sealed class ClientManager
+internal sealed class ClientManager : IDisposable
 {
 	private const uint TimeoutTime = 10;
 
@@ -72,5 +73,10 @@ internal sealed class ClientManager
 				}
 			}
 		}
+	}
+
+	public void Dispose()
+	{
+		this.ClientsBySocketId.SendAsync(new LogoutTriggerOutgoingMessage("Server was shutdown."));
 	}
 }

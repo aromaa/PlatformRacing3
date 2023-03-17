@@ -99,6 +99,7 @@ internal sealed class PlatformRacing3Server : PlatformRacing3.Server.API.Core.Pl
 	public void Shutdown()
 	{
 		this.listener.Dispose();
+		this.clientManager.Dispose();
 	}
         
 	public static TimeSpan Uptime => PlatformRacing3Server.StartTime.Elapsed;
