@@ -75,10 +75,15 @@ internal sealed class PlatformRacing3Server : PlatformRacing3.Server.API.Core.Pl
 
 		BytePacketManager bytePacketManager = new(this.serviceProvider);
 
+		this.listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), 843), socket =>
+		{
+			socket.Pipeline.AddHandlerFirst(FlashSocketPolicyRequestHandler.StrictInstance);
+		}, this.serviceProvider);
+
 		this.listener = IListener.CreateTcpListener(new IPEndPoint(IPAddress.Parse(PlatformRacing3Server.ServerConfig.BindIp), PlatformRacing3Server.ServerConfig.BindPort), socket =>
 		{
 			socket.Pipeline.AddHandlerFirst(new SplitPacketHandler(bytePacketManager, new ClientSession(socket)));
-			socket.Pipeline.AddHandlerFirst(new FlashSocketPolicyRequestHandler());
+			socket.Pipeline.AddHandlerFirst(FlashSocketPolicyRequestHandler.LaxInstance);
 		}, this.serviceProvider);
 
 		_ = UpdateStatus();

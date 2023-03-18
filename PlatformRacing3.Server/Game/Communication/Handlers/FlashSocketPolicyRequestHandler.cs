@@ -6,31 +6,48 @@ using Net.Sockets.Pipeline.Handler.Incoming;
 
 namespace PlatformRacing3.Server.Game.Communication.Handlers;
 
-internal class FlashSocketPolicyRequestHandler : IncomingBytesHandler
+internal sealed class FlashSocketPolicyRequestHandler : IncomingBytesHandler
 {
-	public static FlashSocketPolicyRequestHandler Instance { get; } = new FlashSocketPolicyRequestHandler();
+	internal static FlashSocketPolicyRequestHandler StrictInstance { get; } = new(disconnectNoMatch: true);
+	internal static FlashSocketPolicyRequestHandler LaxInstance { get; } = new(disconnectNoMatch: false);
 
 	private static readonly ReadOnlyMemory<byte> FLASH_POLICY_REQUEST = Encoding.ASCII.GetBytes("<policy-file-request/>\0");
 	private static readonly ReadOnlyMemory<byte> FLASH_POLICY_RESPONSE = Encoding.ASCII.GetBytes("<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"*\" /></cross-domain-policy>\0");
 
+	private readonly bool disconnectNoMatch;
+
+	private FlashSocketPolicyRequestHandler(bool disconnectNoMatch)
+	{
+		this.disconnectNoMatch = disconnectNoMatch;
+	}
+
 	protected override void Decode(IPipelineHandlerContext context, ref PacketReader reader)
 	{
+		ISocket socket = context.Socket;
+
 		if (reader.SequenceEqual(FlashSocketPolicyRequestHandler.FLASH_POLICY_REQUEST.Span))
 		{
-			_ = SendSocketPolicy(context.Socket);
-
-			static async Task SendSocketPolicy(ISocket socket)
+			ValueTask task = socket.SendBytesAsync(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
+			if (task.IsCompletedSuccessfully)
 			{
-				await socket.SendBytesAsync(FlashSocketPolicyRequestHandler.FLASH_POLICY_RESPONSE);
-
 				socket.Disconnect("Socket policy request");
 			}
+			else
+			{
+				socket.Pipeline.RemoveHandler(this);
 
-			return;
+				task.AsTask().ContinueWith(_ => socket.Disconnect("Socket policy request"));
+			}
 		}
-
-		//Only the first data may be the policy request, remove us after that's not the case
-		context.Socket.Pipeline.RemoveHandler(this);
-		context.Socket.Pipeline.Read(ref reader);
+		else if (this.disconnectNoMatch)
+		{
+			socket.Disconnect("No socket policy request");
+		}
+		else
+		{
+			//Only the first data may be the policy request, remove us after that's not the case
+			socket.Pipeline.RemoveHandler(this);
+			socket.Pipeline.Read(ref reader);
+		}
 	}
 }
