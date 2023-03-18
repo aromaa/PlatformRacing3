@@ -31,7 +31,7 @@ internal sealed class ClientManager : IDisposable
 	internal bool TryGetClientSessionBySocketId(uint socketId, out ClientSession session) => this.ClientsBySocketId.TryGetValue(socketId, out session);
 	internal bool TryGetClientSessionByUserId(uint userId, out ClientSession session) => this.ClientsByUserId.TryGetValue(userId, out session);
 
-	internal ClientSession GetClientSessionByUsername(string username) => this.ClientsByUserId.Values.FirstOrDefault((c) => c.UserData?.Username.ToUpperInvariant() == username.ToUpperInvariant());
+	internal ClientSession GetClientSessionByUsername(string username) => this.ClientsBySocketId.Sessions.FirstOrDefault(c => username.Equals(c.UserData?.Username, StringComparison.OrdinalIgnoreCase));
 
 	private void OnAdded(ClientSession session)
 	{

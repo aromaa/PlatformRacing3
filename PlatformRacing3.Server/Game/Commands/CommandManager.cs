@@ -47,7 +47,9 @@ internal sealed class CommandManager
 			{ "mute", new MuteCommand(this) },
 			{ "unmute", new UnmuteCommand(this) },
 			{ "removehats", new RemoveHatsCommand(this) },
-			{ "delaystart", new DelayStartCommand() }
+			{ "delaystart", new DelayStartCommand() },
+			{ "teleportto", new TeleportToCommand(this) },
+			{ "teleporthere", new TeleportHereCommand(this) }
 		};
 
 		this.TargetSelectors = new Dictionary<string, ICommandTargetSelector>()
