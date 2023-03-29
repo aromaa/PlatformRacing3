@@ -66,7 +66,7 @@ internal sealed class ClientManager : IDisposable
 				{
 					session.Disconnect("Timeout (No ping)");
 				}
-				else
+				else if (!session.UserData.IsGuest)
 				{
 					//Temp workaround to keep the user cache actively loaded
 					_ = UserManager.TryGetUserDataByIdAsync(session.UserData.Id);
