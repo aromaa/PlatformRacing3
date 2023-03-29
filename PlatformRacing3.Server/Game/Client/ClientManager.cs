@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using PlatformRacing3.Common.Level;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Server.Collections;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
@@ -62,7 +63,9 @@ internal sealed class ClientManager : IDisposable
 		{
 			foreach (ClientSession session in this.ClientsBySocketId.Sessions)
 			{
-				if (session.LastPing.Elapsed.TotalSeconds >= ClientManager.TimeoutTime)
+				bool inDeathmatch = session.MultiplayerMatchSession is { Match.LevelData.Mode: LevelMode.Deathmatch };
+
+				if (session.LastPing.Elapsed.TotalSeconds >= (inDeathmatch ? ClientManager.TimeoutTime : ClientManager.TimeoutTime * 3))
 				{
 					session.Disconnect("Timeout (No ping)");
 				}
