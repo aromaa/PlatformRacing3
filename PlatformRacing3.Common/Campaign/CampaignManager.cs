@@ -81,7 +81,7 @@ public sealed class CampaignManager
 	//Change stuff for this
 	public static Task<IReadOnlyDictionary<uint, (int Time, CampaignRun Run)>> GetFriendRunsAsync(uint userId, uint levelId)
 	{
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT * FROM(SELECT DISTINCT ON (r.user_id) r.user_id, r.finish_time, r.recorded_run FROM base.friends f RIGHT JOIN base.campaigns_runs r ON r.user_id = f.friend_user_id WHERE f.user_id = {userId} AND r.level_id = {levelId}) AS r ORDER BY SIGN(r.finish_time) DESC, r.finish_time ASC LIMIT 3").ContinueWith(CampaignManager.ParseSqlFriendsRuns));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT * FROM(SELECT DISTINCT ON (r.user_id) r.user_id, r.finish_time, r.recorded_run FROM base.friends f RIGHT JOIN base.campaigns_runs r ON r.user_id = f.friend_user_id WHERE f.user_id = {userId} AND r.level_id = {levelId} ORDER BY r.user_id, SIGN(r.finish_time) DESC, r.finish_time ASC) AS r ORDER BY SIGN(r.finish_time) DESC, r.finish_time ASC LIMIT 3").ContinueWith(CampaignManager.ParseSqlFriendsRuns));
 	}
 	public static Task<string> GetRawRunAsync(uint levelId, uint userId)
 	{
