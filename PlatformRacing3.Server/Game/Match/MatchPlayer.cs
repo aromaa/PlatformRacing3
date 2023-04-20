@@ -75,6 +75,9 @@ internal class MatchPlayer
 		this._Hats = new Queue<MatchPlayerHat>();
 
 		this.ToUpdate = UpdateStatus.None;
+
+		this._Item = "n";
+		this._Team = "none";
 	}
 
 	internal IReadOnlyCollection<MatchPlayerHat> Hats => this._Hats;

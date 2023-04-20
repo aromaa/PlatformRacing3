@@ -169,7 +169,13 @@ internal sealed class ServerLevelData
 		}
 		else if (type == "customItem")
 		{
-			if (blockData.RootElement.TryGetProperty("itemType", out JsonElement itemType) && itemType.TryGetProperty("portableBlock", out JsonElement portableBlock))
+			if (!blockData.RootElement.TryGetProperty("itemType", out JsonElement itemType))
+			{
+				return;
+			}
+
+			if (itemType.TryGetProperty("portableBlock", out JsonElement portableBlock)
+				|| (itemType.TryGetProperty("type", out JsonElement itemTypeId) && itemTypeId.ValueEquals("p") && itemType.TryGetProperty("id", out portableBlock)))
 			{
 				uint blockId = portableBlock.GetUInt32();
 				if (blocks.Add(blockId))
