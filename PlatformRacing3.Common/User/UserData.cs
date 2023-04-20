@@ -220,7 +220,7 @@ public abstract class UserData : IXmlSerializable
 				this.TotalExp += exp;
 			}
 		}
-		catch (StackOverflowException)
+		catch (OverflowException)
 		{
 			this.TotalExp = ulong.MaxValue;
 		}
@@ -237,12 +237,12 @@ public abstract class UserData : IXmlSerializable
 		{
 			checked
 			{
-				this.BonusExp += this.BonusExp;
+				this.BonusExp += bonusExp;
 			}
 		}
-		catch (StackOverflowException)
+		catch (OverflowException)
 		{
-			this.BonusExp = 0;
+			this.BonusExp = ulong.MaxValue;
 		}
 	}
 
@@ -252,10 +252,10 @@ public abstract class UserData : IXmlSerializable
 		{
 			checked
 			{
-				this.BonusExp -= this.BonusExp;
+				this.BonusExp -= bonusExp;
 			}
 		}
-		catch (StackOverflowException)
+		catch (OverflowException)
 		{
 			this.BonusExp = 0;
 		}
