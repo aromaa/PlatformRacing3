@@ -50,7 +50,8 @@ public class SaveLevel4Procedure : IProcedure
 		"lc",
 		"gr",
 		"re",
-		"bu"
+		"bu",
+  		"cp"
 	};
 
 	public async Task<IDataAccessDataResponse> GetResponseAsync(HttpContext httpContext, XDocument xml)
