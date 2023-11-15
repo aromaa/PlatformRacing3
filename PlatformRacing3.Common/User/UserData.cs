@@ -33,6 +33,8 @@ public abstract class UserData : IXmlSerializable
 	public abstract string Status { get; protected set; }
 
 	[JsonIgnore]
+	public abstract DateTimeOffset Registered { get; protected set; }
+	[JsonIgnore]
 	public abstract DateTimeOffset? LastLogin { get; protected set; }
 	[JsonIgnore]
 	public abstract DateTimeOffset? LastOnline { get; protected set; }

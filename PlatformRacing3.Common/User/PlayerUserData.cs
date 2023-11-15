@@ -47,7 +47,9 @@ public class PlayerUserData : BaseUserData
 		this.PermissionRank = (uint)(int)reader["permission_rank"];
 		this.NameColor = Color.FromArgb((int)reader["name_color"]);
 		this.Group = (string)reader["group_name"];
-            
+
+		this.Registered = ((DateTime)reader["register_time"]).ToUniversalTime();
+
 		object lastOnline = reader["last_online"]; //Might be null
 		if (lastOnline is DateTime lastOnlineDate)
 		{
@@ -258,8 +260,10 @@ public class PlayerUserData : BaseUserData
 		this.NameColor = playerUserData.NameColor;
 		this.Group = playerUserData.Group;
 
+		this.Registered = playerUserData.Registered;
+
 		this.LastLogin = playerUserData.LastLogin;
-		this.LastOnline = playerUserData.LastOnline ;
+		this.LastOnline = playerUserData.LastOnline;
 
 		this.SetTotalExp(playerUserData.TotalExp); //Gonna calc the rank and exp
 		this.BonusExp= playerUserData.BonusExp;

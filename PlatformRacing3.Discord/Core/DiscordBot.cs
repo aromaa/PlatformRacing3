@@ -33,6 +33,14 @@ internal sealed class DiscordBot
 	internal async Task SetupDiscordBot()
 	{
 		await this.client.LoginAsync(TokenType.Bot, this.config.BotToken);
+		//await this.client.Rest.ModifyRoleConnectionMetadataRecordsAsync(new List<RoleConnectionMetadataProperties>
+		//{
+		//	new(RoleConnectionMetadataType.IntegerGreaterOrEqual, "rank", "Rank", "Minimum rank"),
+		//	new(RoleConnectionMetadataType.IntegerGreaterOrEqual, "hats", "Hats", "Minimum hats"),
+		//	new(RoleConnectionMetadataType.IntegerGreaterOrEqual, "permission_level", "Permission level", "Permission level"),
+		//	new(RoleConnectionMetadataType.DateTimeGreaterOrEqual, "first_login", "Registered since", "Days since registered"),
+		//	new(RoleConnectionMetadataType.DateTimeLessOrEqual, "last_login", "Last login", "Days since last login"),
+		//});
 		await this.client.StartAsync();
 	}
 

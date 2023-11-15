@@ -13,6 +13,7 @@ public abstract class BaseUserData : UserData
 
 	public override string Status { get; protected set; }
 
+	public override DateTimeOffset Registered { get; protected set; }
 	public override DateTimeOffset? LastLogin { get; protected set; }
 	public override DateTimeOffset? LastOnline { get; protected set; }
 

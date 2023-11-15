@@ -1,6 +1,7 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using Discord;
+using Discord.Rest;
 using Microsoft.AspNetCore.Mvc;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Web.Extensions;
@@ -11,8 +12,7 @@ namespace PlatformRacing3.Web.Controllers;
 [Route("linkdiscord")]
 public class LinkDiscordController : ControllerBase
 {
-	private const string DISCORD_API_TOKEN = "https://discord.com/api/v6/oauth2/token";
-	private const string DISCORD_API_ME = "https://discord.com/api/v6/users/@me";
+	private const string DISCORD_API_TOKEN = "https://discord.com/api/v10/oauth2/token";
 
 	[HttpGet]
 	[ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)] //Dynamic get
@@ -30,41 +30,47 @@ public class LinkDiscordController : ControllerBase
 
 			return this.Content($@"Are you sure that you want to link your {playerUserData.Username} account to your Discord account?
 
-<a href=""https://discordapp.com/api/oauth2/authorize?response_type=code&client_id={Program.Config.DiscordClientId}&scope=identify"">Click here to proceed</a>", "text/html");
-		}
-
-		DiscordTokenResponse tokenResponse = await RequestTokenAsync(code);
-		if (!string.IsNullOrWhiteSpace(tokenResponse.Error))
-		{
-			return this.Content($"Requesting discord token returned the following error: {tokenResponse.ErrorReason}");
-		}
-
-		DiscordUserResponse user = await GetUser(tokenResponse);
-		if (user.Code != null)
-		{
-			return this.Content($"Requesting discord profile resulted to the following error: {user.Message}");
-		}
-
-		uint linkedToAccount = await UserManager.HasDiscordLinkage(userId, user.Id);
-		if (linkedToAccount == 0)
-		{
-			if (!await UserManager.TryInsertDiscordLinkage(userId, user.Id))
-			{
-				return this.Content("Oops, something went wrong!");
-			}
-
-			return this.Content("All ok! :sunglasses:");
+<a href=""https://discordapp.com/api/oauth2/authorize?response_type=code&client_id={Program.Config.DiscordClientId}&scope=identify%20role_connections.write"">Click here to proceed</a>", "text/html");
 		}
 		else
 		{
-			if (linkedToAccount == userId)
+			DiscordTokenResponse tokenResponse = await RequestTokenAsync(code);
+			if (!string.IsNullOrWhiteSpace(tokenResponse.Error))
 			{
-				return this.Content("This account has already been linked to Discord account!");
+				return this.Content($"Requesting discord token returned the following error: {tokenResponse.ErrorReason}");
+			}
+
+			DiscordRestClient restClient = new(new DiscordRestConfig());
+			await restClient.LoginAsync(Enum.Parse<TokenType>(tokenResponse.TokenType), tokenResponse.AccessToken);
+
+			(uint linkedUserId, ulong linkedDiscordId) = await UserManager.HasDiscordLinkage(userId, restClient.CurrentUser.Id);
+			if (linkedUserId == 0)
+			{
+				if (!await UserManager.TryInsertDiscordLinkage(userId, restClient.CurrentUser.Id))
+				{
+					return this.Content("Oops, something went wrong!");
+				}
 			}
 			else
 			{
-				return this.Content("This Discord account has already been linked to different account!");
+				if (linkedUserId != userId || linkedDiscordId != restClient.CurrentUser.Id)
+				{
+					return this.Content("This Discord account has already been linked to different account!");
+				}
 			}
+
+			PlayerUserData playerUserData = await UserManager.TryGetUserDataByIdAsync(userId, false);
+			
+			await restClient.ModifyUserApplicationRoleConnectionAsync(378590199527112704, new RoleConnectionProperties("Platform Racing 3: Reborn", playerUserData.Username, new Dictionary<string, string>
+			{
+				{ "rank", playerUserData.Rank.ToString() },
+				{ "hats", playerUserData.HatsCount.ToString() },
+				{ "permission_level", playerUserData.PermissionRank.ToString() },
+				{ "first_login", playerUserData.Registered.ToString("o") },
+				{ "last_login", (playerUserData.LastOnline ?? playerUserData.Registered).ToString("o") }
+			}));
+
+			return this.Content("All ok! :sunglasses:");
 		}
 
 		static async Task<DiscordTokenResponse> RequestTokenAsync(string code)
@@ -75,7 +81,7 @@ public class LinkDiscordController : ControllerBase
 				{ "client_secret", Program.Config.DiscordClientSecret },
 
 				{ "grant_type", "authorization_code" },
-				{ "scope", "identify" },
+				{ "scope", "identify role_connections.write" },
 
 				{ "code", code },
 			};
@@ -91,16 +97,6 @@ public class LinkDiscordController : ControllerBase
 				}
 			}
 		}
-
-		static async Task<DiscordUserResponse> GetUser(DiscordTokenResponse tokenResponse)
-		{
-			using (HttpClient httpClient = new())
-			{
-				httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(tokenResponse.TokenType, tokenResponse.AccessToken);
-
-				return await httpClient.GetFromJsonAsync<DiscordUserResponse>(LinkDiscordController.DISCORD_API_ME);
-			}
-		}
 	}
 
 	private class DiscordTokenResponse
@@ -114,18 +110,5 @@ public class LinkDiscordController : ControllerBase
 		public string Error { get; set; }
 		[JsonPropertyName("error_description")]
 		public string ErrorReason { get; set; }
-	}
-
-	private class DiscordUserResponse
-	{
-		[JsonPropertyName("id")]
-		[JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-		public ulong Id { get; set; }
-
-		[JsonPropertyName("code")]
-		[JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
-		public uint? Code { get; set; }
-		[JsonPropertyName("message")]
-		public string Message { get; set; }
 	}
 }
