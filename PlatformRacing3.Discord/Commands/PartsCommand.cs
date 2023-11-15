@@ -20,7 +20,7 @@ public sealed class MyPartsCommand : InteractionModuleBase<SocketInteractionCont
 			return;
 		}
 
-		PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId);
+		PlayerUserData userData = await UserManager.TryGetUserDataByIdAsync(userId, allowCached: false);
 
 		EmbedBuilder embed = new();
 
