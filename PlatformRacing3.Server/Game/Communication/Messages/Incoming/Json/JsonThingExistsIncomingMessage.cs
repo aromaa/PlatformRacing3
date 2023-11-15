@@ -5,11 +5,11 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonThingExistsIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("thing_type")]
-	public string ThingType { get; set; }
+	public required string ThingType { get; init; }
 
 	[JsonPropertyName("thing_title")]
-	public string ThingTitle { get; set; }
+	public required string ThingTitle { get; init; }
 
 	[JsonPropertyName("thing_category")]
-	public string ThingCategory { get; set; }
+	public required string ThingCategory { get; init; }
 }

@@ -5,17 +5,17 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonJoinRoomIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("chatId")]
-	public uint ChatId { get; set; }
+	public required uint ChatId { get; init; }
 
 	[JsonPropertyName("room_name")]
-	public string RoomName { get; set; }
+	public required string RoomName { get; init; }
 
 	[JsonPropertyName("room_type")]
-	public string RoomType { get; set; }
+	public required string RoomType { get; init; }
 
 	[JsonPropertyName("pass")]
-	public string Pass { get; set; }
+	public required string Pass { get; init; }
 
 	[JsonPropertyName("note")] //Only sent when room is created
-	public string Note { get; set; }
+	public string Note { get; init; }
 }

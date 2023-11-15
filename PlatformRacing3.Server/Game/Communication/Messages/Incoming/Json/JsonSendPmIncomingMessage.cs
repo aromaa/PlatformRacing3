@@ -5,11 +5,11 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonSendPmIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("name")]
-	public string ReceiverUsername { get; set; }
+	public required string ReceiverUsername { get; init; }
 
 	[JsonPropertyName("title")]
-	public string Title { get; set; }
+	public required string Title { get; init; }
 
 	[JsonPropertyName("message")]
-	public string Message { get; set; }
+	public required string Message { get; init; }
 }

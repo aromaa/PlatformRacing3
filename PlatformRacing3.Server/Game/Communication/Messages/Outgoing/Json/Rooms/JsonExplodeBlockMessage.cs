@@ -8,7 +8,7 @@ internal sealed class JsonExplodeBlockMessage : JsonMessageOutgoingMessage
 	{
 	}
 
-	private sealed class ExplodeBlockData
+	internal sealed class ExplodeBlockData
 	{
 		[JsonPropertyName("tileY")]
 		public int TileY { get; set; }

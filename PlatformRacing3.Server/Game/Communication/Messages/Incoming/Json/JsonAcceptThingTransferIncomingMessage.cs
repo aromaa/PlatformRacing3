@@ -5,17 +5,17 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonAcceptThingTransferIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("transfer_id")]
-	public uint TransferId { get; set; }
+	public required uint TransferId { get; init; }
 
 	[JsonPropertyName("title")]
-	public string Title { get; set; }
+	public required string Title { get; init; }
 
 	[JsonPropertyName("comment")]
-	public string Description { get; set; }
+	public required string Description { get; init; }
 
 	[JsonPropertyName("category")]
-	public string Category { get; set; }
+	public required string Category { get; init; }
 
 	[JsonPropertyName("publish")]
-	public bool Publish { get; set; }
+	public required bool Publish { get; init; }
 }

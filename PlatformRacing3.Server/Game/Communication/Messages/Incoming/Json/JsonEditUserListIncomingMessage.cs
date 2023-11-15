@@ -5,11 +5,11 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonEditUserListIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("user_id")]
-	public uint UserId { get; set; }
+	public required uint UserId { get; init; }
 
 	[JsonPropertyName("list_type")]
-	public string ListType { get; set; }
+	public required string ListType { get; init; }
         
 	[JsonPropertyName("action")]
-	public string Action { get; set; }
+	public required string Action { get; init; }
 }

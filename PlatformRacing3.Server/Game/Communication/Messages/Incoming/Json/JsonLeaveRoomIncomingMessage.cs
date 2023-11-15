@@ -5,8 +5,8 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonLeaveRoomIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("room_name")]
-	public string RoomName { get; set; }
+	public required string RoomName { get; init; }
 
 	[JsonPropertyName("room_type")]
-	public string RoomType { get; set; }
+	public required string RoomType { get; init; }
 }

@@ -8,7 +8,7 @@ internal sealed class JsonShatterBlockMessage : JsonMessageOutgoingMessage
 	{
 	}
 
-	private sealed class ShatterBlockData
+	internal sealed class ShatterBlockData
 	{
 		[JsonPropertyName("tileY")]
 		public int TileY { get; set; }

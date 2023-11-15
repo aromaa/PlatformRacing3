@@ -5,5 +5,5 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonBanFromMatchListingIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("socket_id")]
-	public uint SocketId { get; set; }
+	public required uint SocketId { get; init; }
 }

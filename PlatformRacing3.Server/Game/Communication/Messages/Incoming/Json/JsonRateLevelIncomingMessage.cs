@@ -5,8 +5,8 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonRateLevelIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("level_id")]
-	public uint LevelId { get; set; }
+	public required uint LevelId { get; init; }
 
 	[JsonPropertyName("rating")]
-	public int Rating { get; set; }
+	public required int Rating { get; init; }
 }

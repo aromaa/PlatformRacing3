@@ -5,14 +5,14 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonManageVarsIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("user_vars")]
-	public HashSet<string> UserVars { get; set; }
+	public required HashSet<string> UserVars { get; init; }
 
 	[JsonPropertyName("location")]
-	public string Location { get; set; }
+	public required string Location { get; init; }
 
 	[JsonPropertyName("action")]
-	public string Action { get; set; }
+	public required string Action { get; init; }
 
 	[JsonPropertyName("id")]
-	public string Id { get; set; }
+	public required string Id { get; init; }
 }

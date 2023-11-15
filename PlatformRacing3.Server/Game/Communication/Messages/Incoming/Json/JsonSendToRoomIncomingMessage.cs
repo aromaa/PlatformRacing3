@@ -6,23 +6,23 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonSendToRoomIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("room_name")]
-	public string RoomName { get; set; }
+	public required string RoomName { get; init; }
 
 	[JsonPropertyName("room_type")]
-	public string RoomType { get; set; }
+	public required string RoomType { get; init; }
 
 	[JsonPropertyName("send_to_self")]
-	public bool SendToSelf { get; set; }
+	public required bool SendToSelf { get; init; }
 
 	[JsonPropertyName("data")]
-	public RoomMessageData Data { get; set; }
+	public required RoomMessageData Data { get; init; }
 
 	internal sealed class RoomMessageData
 	{
 		[JsonPropertyName("type")] //Optional
-		public string Type { get; set; }
+		public string Type { get; init; }
 
 		[JsonPropertyName("data")]
-		public JsonElement Data { get; set; }
+		public required JsonElement Data { get; init; }
 	}
 }

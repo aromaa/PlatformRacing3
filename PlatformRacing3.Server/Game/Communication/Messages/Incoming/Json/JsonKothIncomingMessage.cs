@@ -5,5 +5,5 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonKothIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("time")]
-	public string Time { get; set; }
+	public required string Time { get; init; }
 }

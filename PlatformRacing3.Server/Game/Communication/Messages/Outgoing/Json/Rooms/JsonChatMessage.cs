@@ -9,7 +9,7 @@ internal sealed class JsonChatMessage : JsonMessageOutgoingMessage
 	{
 	}
 
-	private sealed class ChatMessageData
+	internal sealed class ChatMessageData
 	{
 		[JsonPropertyName("message")]
 		public string Message { get; set; }

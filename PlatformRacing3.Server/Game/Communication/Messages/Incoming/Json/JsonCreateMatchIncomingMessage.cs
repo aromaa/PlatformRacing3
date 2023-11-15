@@ -5,20 +5,20 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonCreateMatchIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("level_id")]
-	public uint LevelId { get; set; }
+	public required uint LevelId { get; init; }
 
 	[JsonPropertyName("version")]
-	public uint Version { get; set; }
+	public required uint Version { get; init; }
 
 	[JsonPropertyName("min_rank")]
-	public uint MinRank { get; set; }
+	public required uint MinRank { get; init; }
 
 	[JsonPropertyName("max_rank")]
-	public uint MaxRank { get; set; }
+	public required uint MaxRank { get; init; }
 
 	[JsonPropertyName("max_members")]
-	public uint MaxMembers { get; set; }
+	public required uint MaxMembers { get; init; }
 
 	[JsonPropertyName("only_friends")]
-	public bool OnlyFriends { get; set; }
+	public required bool OnlyFriends { get; init; }
 }

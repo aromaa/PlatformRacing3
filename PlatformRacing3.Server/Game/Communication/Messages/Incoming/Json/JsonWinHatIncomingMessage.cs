@@ -5,8 +5,8 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonWinHatIncomingMessage : JsonPacket
 {
 	[JsonPropertyName("season")]
-	public string Season { get; set; }
+	public required string Season { get; init; }
 
 	[JsonPropertyName("medals")]
-	public uint Medals { get; set; }
+	public required uint Medals { get; init; }
 }

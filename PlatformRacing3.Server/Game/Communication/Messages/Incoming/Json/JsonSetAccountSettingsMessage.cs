@@ -7,29 +7,29 @@ namespace PlatformRacing3.Server.Game.Communication.Messages.Incoming.Json;
 internal sealed class JsonSetAccountSettingsMessage : JsonPacket
 {
 	[JsonPropertyName("hat")]
-	public Hat Hat { get; set; }
+	public required Hat Hat { get; init; }
 	[JsonPropertyName("hatColor")]
-	public Color HatColor { get; set; }
+	public required Color HatColor { get; init; }
 
 	[JsonPropertyName("head")]
-	public Part Head { get; set; }
+	public required Part Head { get; init; }
 	[JsonPropertyName("headColor")]
-	public Color HeadColor { get; set; }
+	public required Color HeadColor { get; init; }
 
 	[JsonPropertyName("body")]
-	public Part Body { get; set; }
+	public required Part Body { get; init; }
 	[JsonPropertyName("bodyColor")]
-	public Color BodyColor { get; set; }
+	public required Color BodyColor { get; init; }
 
 	[JsonPropertyName("feet")]
-	public Part Feet { get; set; }
+	public required Part Feet { get; init; }
 	[JsonPropertyName("feetColor")]
-	public Color FeetColor { get; set; }
+	public required Color FeetColor { get; init; }
 
 	[JsonPropertyName("speed")]
-	public uint Speed { get; set; }
+	public required uint Speed { get; init; }
 	[JsonPropertyName("accel")]
-	public uint Accel { get; set; }
+	public required uint Accel { get; init; }
 	[JsonPropertyName("jump")]
-	public uint Jump { get; set; }
+	public required uint Jump { get; init; }
 }

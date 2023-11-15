@@ -8,7 +8,7 @@ internal sealed class JsonUseItemMessage : JsonMessageOutgoingMessage
 	{
 	}
 
-	private sealed class UseItemData
+	internal sealed class UseItemData
 	{
 		[JsonPropertyName("p")]
 		public double[] Pos { get; set; }

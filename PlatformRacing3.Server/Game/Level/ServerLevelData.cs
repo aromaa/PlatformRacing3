@@ -1,14 +1,7 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing.Internal;
-using PlatformRacing3.Common.Database;
-using System;
-using System.Collections.Generic;
+﻿using PlatformRacing3.Common.Database;
 using System.Data.Common;
 using System.Drawing;
-using System.Linq;
-using System.Reactive.Joins;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PlatformRacing3.Server.Game.Level;
 

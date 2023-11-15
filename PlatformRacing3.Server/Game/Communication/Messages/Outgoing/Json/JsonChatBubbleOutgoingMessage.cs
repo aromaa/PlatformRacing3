@@ -8,7 +8,7 @@ internal class JsonChatBubbleOutgoingMessage : JsonMessageOutgoingMessage
 	{
 	}
 
-	private sealed class ChatBubbleData
+	internal sealed class ChatBubbleData
 	{
 		[JsonPropertyName("id")]
 		public int BubbleId { get; set; }
