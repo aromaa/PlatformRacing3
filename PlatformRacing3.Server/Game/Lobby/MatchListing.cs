@@ -335,6 +335,11 @@ internal class MatchListing
 				{
 					continue;
 				}
+
+				if (session.SocketId == this.HostSocketId && match.TryGetMatchPlayer(session, out MatchPlayer matchPlayer))
+				{
+					matchPlayer.Host = true;
+				}
 			}
 			else
 			{

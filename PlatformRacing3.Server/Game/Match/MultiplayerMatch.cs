@@ -1508,6 +1508,14 @@ internal sealed class MultiplayerMatch
 		this.Clients.SendAsync(packet);
 	}
 
+	internal bool TryGetMatchPlayer(ClientSession session, out MatchPlayer matchPlayer)
+	{
+		lock (this.Players)
+		{
+			return this.Players.TryGetValue(session.SocketId, out matchPlayer);
+		}
+	}
+
 	private sealed class PlayerCollection : KeyedCollection<uint, MatchPlayer>
 	{
 		protected override uint GetKeyForItem(MatchPlayer item)

@@ -49,7 +49,9 @@ internal sealed class CommandManager
 			{ "removehats", new RemoveHatsCommand(this) },
 			{ "delaystart", new DelayStartCommand() },
 			{ "teleportto", new TeleportToCommand(this) },
-			{ "teleporthere", new TeleportHereCommand(this) }
+			{ "teleporthere", new TeleportHereCommand(this) },
+			{ "forfeit", new ForfeitCommand(this) },
+			{ "finish", new FinishCommand(this) }
 		};
 
 		this.TargetSelectors = new Dictionary<string, ICommandTargetSelector>()

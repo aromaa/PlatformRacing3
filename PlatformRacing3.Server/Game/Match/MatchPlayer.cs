@@ -59,6 +59,8 @@ internal class MatchPlayer
 
 	internal UpdateStatus ToUpdate { get; private set; }
 
+	internal bool Host { get; set; }
+
 	internal MatchPlayer(ClientSession session, MultiplayerMatch match, UserData userData, uint socketId, IPAddress ipAddress)
 	{
 		this.Session = session;
