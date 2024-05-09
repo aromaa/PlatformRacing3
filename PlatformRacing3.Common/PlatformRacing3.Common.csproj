@@ -9,7 +9,7 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
-    <PackageReference Include="Npgsql" Version="8.0.0-rc.2" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.4" />
   </ItemGroup>
 
