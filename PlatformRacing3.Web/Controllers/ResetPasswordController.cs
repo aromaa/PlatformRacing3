@@ -1,7 +1,8 @@
-﻿using System.Net.Mail;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using MimeKit;
 using PlatformRacing3.Common.User;
 
 namespace PlatformRacing3.Web.Controllers;
@@ -46,14 +47,21 @@ public class ResetPasswordController : ControllerBase
 			return "Error, try again";
 		}
 
-		using (MailMessage mail = new())
+		using (SmtpClient client = new())
 		{
-			mail.To.Add(email);
-			mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";
-			mail.From = new MailAddress(Program.Config.SmtpFrom);
-			mail.Body = $"Your account {player.Username} password was reset! If you did not do this change your password immediately!";
+			await client.ConnectAsync(Program.Config.SmtpHost, Program.Config.SmtpPort).ConfigureAwait(false);
+			await client.AuthenticateAsync(Program.Config.SmtpUser, Program.Config.SmtpPass).ConfigureAwait(false);
 
-			await Program.SmtpClient.SendMailAsync(mail);
+			using MimeMessage mail = new();
+			mail.To.Add(new MailboxAddress(player.Username, email));
+			mail.From.Add(new MailboxAddress(Program.Config.SmtpFrom, Program.Config.SmtpFrom));
+			mail.Subject = $"Platform Racing 3 - {player.Username} - Security Alert";
+			mail.Body = new TextPart("plain")
+			{
+				Text = $"Your account {player.Username} password was reset! If you did not do this change your password immediately!"
+			};
+
+			await client.SendAsync(mail).ConfigureAwait(false);
 		}
 
 		return "Password has been reset! Start the grind :sunglasses:";
