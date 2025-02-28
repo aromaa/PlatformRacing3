@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Drawing;
-using System.Text.Json.Serialization;
-using Net.Sockets;
+﻿using Net.Sockets;
 using PlatformRacing3.Common.Level;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Common.Utils;
@@ -10,6 +7,10 @@ using PlatformRacing3.Server.Game.Client;
 using PlatformRacing3.Server.Game.Communication.Messages.Outgoing;
 using PlatformRacing3.Server.Game.Match;
 using PlatformRacing3.Server.Game.User.Identifiers;
+using System.Collections.Concurrent;
+using System.Drawing;
+using System.Security.Cryptography;
+using System.Text.Json.Serialization;
 
 namespace PlatformRacing3.Server.Game.Lobby;
 
@@ -324,7 +325,7 @@ internal class MatchListing
 
 		Random random = new();
 
-		StartGameOutgoingMessage startGame = new(this.Name, match.Name);
+		StartGameOutgoingMessage startGame = new(this.Name, match.Name, RandomNumberGenerator.GetInt32(int.MinValue, int.MaxValue));
 		foreach (ClientSession session in this._Clients.Sessions.OrderBy((s) => random.Next(int.MinValue, int.MaxValue)))
 		{
 			session.LobbySession.MatchListing = null;
@@ -352,7 +353,7 @@ internal class MatchListing
 
 		match.Lock(this.DelayedStart);
 
-		foreach(ClientSession session in this.LobbyClients.Sessions)
+		foreach (ClientSession session in this.LobbyClients.Sessions)
 		{
 			session.UntrackUsersInRoom(this.Name);
 			session.SendPacket(startGame);
