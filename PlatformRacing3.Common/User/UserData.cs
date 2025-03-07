@@ -1,12 +1,12 @@
-﻿using System.Drawing;
+﻿using PlatformRacing3.Common.Campaign;
+using PlatformRacing3.Common.Customization;
+using PlatformRacing3.Common.Server;
+using PlatformRacing3.Common.Utils;
+using System.Drawing;
 using System.Text.Json.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using PlatformRacing3.Common.Campaign;
-using PlatformRacing3.Common.Customization;
-using PlatformRacing3.Common.Server;
-using PlatformRacing3.Common.Utils;
 
 namespace PlatformRacing3.Common.User;
 
@@ -48,6 +48,8 @@ public abstract class UserData : IXmlSerializable
 	public abstract ulong Exp { get; protected set; }
 	[JsonIgnore]
 	public abstract ulong BonusExp { get; protected set; }
+	[JsonIgnore]
+	public abstract (double Multiplier, DateTime EndTime) BonusExpMultiplier { get; protected set; }
 
 	[JsonPropertyName("hatArray")]
 	public abstract IReadOnlyCollection<Hat> Hats { get; }
@@ -278,6 +280,11 @@ public abstract class UserData : IXmlSerializable
 		}
 
 		return false;
+	}
+
+	public virtual void SetBonusExpMultiplier(double multiplier, DateTime endTime)
+	{
+		this.BonusExpMultiplier = (multiplier, endTime);
 	}
 
 	public abstract void AddFriend(uint id);

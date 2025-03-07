@@ -41,6 +41,7 @@ internal sealed class CommandManager
 			{ "tournament", new TournamentCommand() },
 			{ "broadcaster", new BroadcasterCommand() },
 			{ "givebonusexp", new GiveBonusExpCommand(clientManager) },
+			{ "givebonusexpmultiplier", new GiveBonusExpMultiplierCommand(clientManager) },
 			{ "life", new LifeCommand(this) },
 			{ "item", new ItemCommand(this) },
 			{ "spectate", new SpectateCommand() },
@@ -74,7 +75,7 @@ internal sealed class CommandManager
 				{
 					command.OnCommand(executor, label, args);
 				}
-				catch(Exception ex)
+				catch (Exception ex)
 				{
 					this.logger.LogError(EventIds.CommandExecutionFailed, ex, "Failed to execute command");
 

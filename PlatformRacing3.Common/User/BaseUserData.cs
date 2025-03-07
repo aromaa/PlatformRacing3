@@ -1,6 +1,6 @@
-﻿using System.Drawing;
-using PlatformRacing3.Common.Campaign;
+﻿using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Customization;
+using System.Drawing;
 
 namespace PlatformRacing3.Common.User;
 
@@ -49,6 +49,8 @@ public abstract class BaseUserData : UserData
 	protected HashSet<uint> _Ignored;
 
 	public override uint RadiatingLuck { get; protected set; }
+
+	public override (double Multiplier, DateTime EndTime) BonusExpMultiplier { get; protected set; }
 
 	public BaseUserData()
 	{

@@ -1,9 +1,4 @@
-﻿using System.Data.Common;
-using System.Drawing;
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Customization;
@@ -12,6 +7,10 @@ using PlatformRacing3.Common.Extensions;
 using PlatformRacing3.Common.Redis;
 using PlatformRacing3.Common.Utils;
 using StackExchange.Redis;
+using System.Data.Common;
+using System.Drawing;
+using System.Net;
+using System.Net.Mail;
 
 namespace PlatformRacing3.Common.User;
 
@@ -45,7 +44,7 @@ public sealed class UserManager
 
 		if (allowCached)
 		{
-			if (!UserManager.Users.TryGetValue(userId, out Lazy <PlayerUserData> lazyPlayerUserData)) //We are assuming that the user is already loaded into the memory thus not needing to do extra allocation for GetOrCreate method
+			if (!UserManager.Users.TryGetValue(userId, out Lazy<PlayerUserData> lazyPlayerUserData)) //We are assuming that the user is already loaded into the memory thus not needing to do extra allocation for GetOrCreate method
 			{
 				lazyPlayerUserData = UserManager.Users.GetOrCreate(userId, (cacheEntry) =>
 				{
@@ -106,7 +105,7 @@ public sealed class UserManager
 			return Task.Factory.StartNew(() => lazyPlayerUserData.Value);
 		}
 
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.id = {userId} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.id = {userId} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
 	}
 
 	public static Task<PlayerUserData> TryGetUserDataByNameAsync(string username, bool allowCached = true)
@@ -117,7 +116,7 @@ public sealed class UserManager
 		}
 
 		username = username.ToUpperInvariant(); //Hmh.... Case insetivity needed here
-            
+
 		if (allowCached)
 		{
 			if (!UserManager.UserIds.TryGetValue(username, out Lazy<uint> lazyUserId))
@@ -135,7 +134,7 @@ public sealed class UserManager
 						}
 						else
 						{
-							return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE {username} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData)).Result?.Id ?? 0;
+							return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE {username} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData)).Result?.Id ?? 0;
 						}
 					}, LazyThreadSafetyMode.ExecutionAndPublication);
 				});
@@ -168,7 +167,7 @@ public sealed class UserManager
 			}).Unwrap(); //Unwrap should be fine?
 		}
 
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE {username} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE {username} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
 	}
 
 	public static Task<PlayerUserData> TryGetUserDataByEmailAsync(string email)
@@ -178,10 +177,10 @@ public sealed class UserManager
 			throw new ArgumentException(null, nameof(email));
 		}
 
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.email ILIKE {email} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.email ILIKE {email} LIMIT 1").ContinueWith(UserManager.ParseSqlUserData));
 	}
 
-	public static Task<PlayerUserData> TryCreateNewUserAsync(string username, string password, string email, IPAddress ip) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users(username, password, email, register_ip) VALUES({username}, {PasswordUtils.HashPassword(password)}, {email}, {ip}) RETURNING id, username, register_time, permission_rank, name_color, group_name, total_exp, bonus_exp, hats, heads, bodys, feets, current_hat, current_hat_color, current_head, current_head_color, current_body, current_body_color, current_feet, current_feet_color, speed, accel, jump, last_online, NULL AS friends, NULL AS ignored, NULL AS campaign_runs, NULL AS daily_luck").ContinueWith(UserManager.ParseSqlUserData));
+	public static Task<PlayerUserData> TryCreateNewUserAsync(string username, string password, string email, IPAddress ip) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"INSERT INTO base.users(username, password, email, register_ip) VALUES({username}, {PasswordUtils.HashPassword(password)}, {email}, {ip}) RETURNING id, username, register_time, permission_rank, name_color, group_name, total_exp, bonus_exp, hats, heads, bodys, feets, current_hat, current_hat_color, current_head, current_head_color, current_body, current_body_color, current_feet, current_feet_color, speed, accel, jump, last_online, bonus_exp_multiplier, bonus_exp_multiplier_end_time, NULL AS friends, NULL AS ignored, NULL AS campaign_runs, NULL AS daily_luck").ContinueWith(UserManager.ParseSqlUserData));
 
 	public static Task<uint> TryAuthenicateAsync(string identifier, string password)
 	{
@@ -281,20 +280,21 @@ public sealed class UserManager
 	//Update to sql and then call SetBonusExp on PlayerUserData and then update to redis
 	public static Task GiveBonusExp(uint userId, ulong amount) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp = bonus_exp + {amount} WHERE id = {userId} RETURNING id, bonus_exp").ContinueWith(UserManager.ParseSqlBonusExpUpdate));
 	public static Task DrainBonusExp(uint userId, ulong drainBonusExp) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp = bonus_exp - {drainBonusExp} WHERE id = {userId} RETURNING id, bonus_exp").ContinueWith(UserManager.ParseSqlBonusExpUpdate));
+	public static Task SetBonusExpMultiplier(uint userId, double multiplier, DateTime endTime) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"UPDATE base.users SET bonus_exp_multiplier = {multiplier}, bonus_exp_multiplier_end_time = {endTime} WHERE id = {userId}"));
 
 	public static Task AddFriendAsync(uint userId, uint friendId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.friends(user_id, friend_user_id) VALUES({userId}, {friendId}) ON CONFLICT DO NOTHING"));
 	public static Task RemoveFriendAsync(uint userId, uint ignoredId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"DELETE FROM base.friends WHERE user_id = {userId} AND friend_user_id = {ignoredId}"));
 
-	public static Task<uint> CountMyFriendsAsync(uint userId) =>  DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(user_id) AS friends_count FROM base.friends WHERE user_id = {userId}").ContinueWith(UserManager.ParseSqlMyFriendsCount));
-	public static Task<IReadOnlyCollection<PlayerUserData>> GetMyFriendsAsync(uint userId, uint start = 0, uint count = uint.MaxValue) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.friends ff LEFT JOIN base.users u ON u.id = ff.friend_user_id LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE ff.user_id = {userId} OFFSET {start} LIMIT {count}").ContinueWith(UserManager.ParseSqlMultipleUserData));
+	public static Task<uint> CountMyFriendsAsync(uint userId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(user_id) AS friends_count FROM base.friends WHERE user_id = {userId}").ContinueWith(UserManager.ParseSqlMyFriendsCount));
+	public static Task<IReadOnlyCollection<PlayerUserData>> GetMyFriendsAsync(uint userId, uint start = 0, uint count = uint.MaxValue) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.friends ff LEFT JOIN base.users u ON u.id = ff.friend_user_id LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE ff.user_id = {userId} OFFSET {start} LIMIT {count}").ContinueWith(UserManager.ParseSqlMultipleUserData));
 
 	public static Task AddIgnoredAsync(uint userId, uint friendId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.ignored(user_id, ignored_user_id) VALUES({userId}, {friendId}) ON CONFLICT DO NOTHING"));
 	public static Task RemoveIgnoredAsync(uint userId, uint ignoredId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"DELETE FROM base.ignored WHERE user_id = {userId} AND ignored_user_id = {ignoredId}"));
 
 	public static Task<uint> CountMyIgnoredAsync(uint userId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT COUNT(user_id) AS ignored_count FROM base.ignored WHERE user_id = {userId}").ContinueWith(UserManager.ParseSqlMyIgnoredCount));
-	public static Task<IReadOnlyCollection<PlayerUserData>> GetMyIgnoredAsync(uint userId, uint start = 0, uint count = uint.MaxValue) =>  DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.ignored ii LEFT JOIN base.users u ON u.id = ii.ignored_user_id LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE ii.user_id = {userId} OFFSET {start} LIMIT {count}").ContinueWith(UserManager.ParseSqlMultipleUserData));
+	public static Task<IReadOnlyCollection<PlayerUserData>> GetMyIgnoredAsync(uint userId, uint start = 0, uint count = uint.MaxValue) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.ignored ii LEFT JOIN base.users u ON u.id = ii.ignored_user_id LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE ii.user_id = {userId} OFFSET {start} LIMIT {count}").ContinueWith(UserManager.ParseSqlMultipleUserData));
 
-	public static Task<IReadOnlyCollection<PlayerUserData>> SearchUsers(string name) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE '%' || {name} || '%'").ContinueWith(UserManager.ParseSqlMultipleUserData));
+	public static Task<IReadOnlyCollection<PlayerUserData>> SearchUsers(string name) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT u.id, u.username, u.register_time, u.permission_rank, u.name_color, u.group_name, u.total_exp, u.bonus_exp, u.hats, u.heads, u.bodys, u.feets, u.current_hat, u.current_hat_color, u.current_head, u.current_head_color, u.current_body, u.current_body_color, u.current_feet, u.current_feet_color, u.speed, u.accel, u.jump, u.last_online, u.bonus_exp_multiplier, u.bonus_exp_multiplier_end_time, f.friends, i.ignored, c.campaign_runs, l.daily_luck FROM base.users u LEFT JOIN LATERAL (SELECT ARRAY_AGG(f.friend_user_id) AS friends FROM base.friends f WHERE f.user_id = u.id GROUP BY f.user_id) f ON TRUE LEFT JOIN LATERAL (SELECT array_agg(i.ignored_user_id) AS ignored FROM base.ignored i WHERE i.user_id = u.id) i ON TRUE LEFT JOIN LATERAL (SELECT array_agg((cr.level_id, cr.finish_time)) AS campaign_runs FROM base.campaigns_runs cr WHERE cr.user_id = u.id) c ON TRUE LEFT JOIN LATERAL (SELECT array_agg((udl.date, udl.uses)) AS daily_luck FROM base.users_daily_luck udl WHERE udl.user_id = u.id) l ON TRUE WHERE u.username ILIKE '%' || {name} || '%'").ContinueWith(UserManager.ParseSqlMultipleUserData));
 
 	public static Task<IReadOnlyDictionary<uint, int>> GetCampaignRuns(uint userId) => DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ReadDataAsync($"SELECT array_agg(ARRAY[level_id, finish_time]) AS campaign_runs FROM base.campaigns_runs WHERE user_id = {userId}").ContinueWith(UserManager.ParseSqlCampaignRuns));
 
@@ -339,7 +339,7 @@ public sealed class UserManager
 			return false;
 		}
 	}
-	
+
 	public static Task<bool> PurchaseLevelItem(uint userId, uint levelId, string itemId, uint price, uint receiveAmount)
 	{
 		return DatabaseConnection.NewAsyncConnection(c =>
@@ -668,7 +668,7 @@ public sealed class UserManager
 			UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to add user feet to sql");
 		}
 	}
-        
+
 	private static bool ParseSqlInsertPasswordReset(Task<NpgsqlDataReader> task)
 	{
 		if (task.IsCompletedSuccessfully)
@@ -802,7 +802,7 @@ public sealed class UserManager
 			UserManager.logger.LogError(EventIds.UserUpdateFailed, task.Exception, "Failed to get discord linkage from sql");
 		}
 
-		return  0;
+		return 0;
 	}
 
 	private static (uint UserId, ulong DiscordId) ParseSqlGetDiscordLink2(Task<NpgsqlDataReader> task)

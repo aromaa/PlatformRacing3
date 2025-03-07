@@ -1,11 +1,11 @@
-﻿using System.Data.Common;
-using System.Drawing;
-using PlatformRacing3.Common.Campaign;
+﻿using PlatformRacing3.Common.Campaign;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.Extensions;
 using PlatformRacing3.Common.Redis;
 using PlatformRacing3.Common.Utils;
 using StackExchange.Redis;
+using System.Data.Common;
+using System.Drawing;
 
 namespace PlatformRacing3.Common.User;
 
@@ -75,11 +75,11 @@ public class PlayerUserData : BaseUserData
 		{
 			this._Ignored.UnionWith(ignored_.Select((i) => (uint)i));
 		}
-            
+
 		object campaignRuns = reader["campaign_runs"]; //Might be null
 		if (campaignRuns is object[][] campaignRuns_)
 		{
-			foreach(object[] run in campaignRuns_)
+			foreach (object[] run in campaignRuns_)
 			{
 				uint levelId = Convert.ToUInt32(run[0]);
 				if (levelId > 0)
@@ -117,13 +117,15 @@ public class PlayerUserData : BaseUserData
 		object dailyLuck = reader["daily_luck"];
 		if (dailyLuck is object[] dailyLuck_)
 		{
-			foreach(object[] day in dailyLuck_)
+			foreach (object[] day in dailyLuck_)
 			{
 				this.DailyRadiatingLuck[(DateTime)day[0]] = (uint)(int)day[1];
 			}
 		}
 
 		this.SetStats(speed, accel, jump);
+
+		this.BonusExpMultiplier = ((double)reader["bonus_exp_multiplier"], (DateTime)reader["bonus_exp_multiplier_end_time"]);
 	}
 
 	public PlayerUserData(RedisValue[] hashEntries) : this()
@@ -251,7 +253,7 @@ public class PlayerUserData : BaseUserData
 			this._Feets.RemoveWhere((p) => p.IsStaffOnly());
 		}
 	}
-        
+
 	internal void Merge(PlayerUserData playerUserData)
 	{
 		this.Username = playerUserData.Username;
@@ -266,7 +268,7 @@ public class PlayerUserData : BaseUserData
 		this.LastOnline = playerUserData.LastOnline;
 
 		this.SetTotalExp(playerUserData.TotalExp); //Gonna calc the rank and exp
-		this.BonusExp= playerUserData.BonusExp;
+		this.BonusExp = playerUserData.BonusExp;
 
 		this._Hats = playerUserData._Hats;
 		this._Heads = playerUserData._Heads;
@@ -322,6 +324,13 @@ public class PlayerUserData : BaseUserData
 		base.GiveBonusExp(bonusExp);
 
 		UserManager.GiveBonusExp(this.Id, bonusExp);
+	}
+
+	public override void SetBonusExpMultiplier(double multiplier, DateTime endTime)
+	{
+		base.SetBonusExpMultiplier(multiplier, endTime);
+
+		UserManager.SetBonusExpMultiplier(this.Id, multiplier, endTime);
 	}
 
 	public override void DrainBonusExp(ulong bonusExp)

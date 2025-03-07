@@ -1,13 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
-using System.Data.Common;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using PlatformRacing3.Common.Customization;
-using PlatformRacing3.Common.Database;
 using PlatformRacing3.Common.Level;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Common.Utils;
@@ -23,6 +15,12 @@ using PlatformRacing3.Server.Game.Communication.Messages.Outgoing.Packets.Match;
 using PlatformRacing3.Server.Game.Level;
 using PlatformRacing3.Server.Game.Lobby;
 using PlatformRacing3.Server.Utils;
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace PlatformRacing3.Server.Game.Match;
 
@@ -247,7 +245,7 @@ internal sealed class MultiplayerMatch
 	private bool TryChangeStatus(MultiplayerMatchStatus newValue, MultiplayerMatchStatus oldValue)
 	{
 		ref int status = ref Unsafe.As<MultiplayerMatchStatus, int>(ref this._Status);
-            
+
 		return Interlocked.CompareExchange(ref status, (int)newValue, (int)oldValue) == (int)oldValue;
 	}
 
@@ -507,7 +505,7 @@ internal sealed class MultiplayerMatch
 				}
 
 				ISet<uint> radiatingLuck = new HashSet<uint>();
-				foreach(MatchPlayer player in this.Players)
+				foreach (MatchPlayer player in this.Players)
 				{
 					if (player.UserData.DainLuckRadiation())
 					{
@@ -821,7 +819,7 @@ internal sealed class MultiplayerMatch
 		}
 
 		ISet<T> result = new HashSet<T>();
-		foreach(KeyValuePair<T, uint> part in counts)
+		foreach (KeyValuePair<T, uint> part in counts)
 		{
 			if (part.Value == count)
 			{
@@ -1174,14 +1172,28 @@ internal sealed class MultiplayerMatch
 				expEarned += (ulong)Math.Round(baseExp * 0.25F);
 				expArray.Add(new object[] { "LOTD bonus", "EXP X 1.25" });
 			}
-                
+
 			if (player.UserData.BonusExp > 0)
 			{
-				ulong bonusExpDrained = Math.Min(player.UserData.BonusExp, baseExp);
+				DateTime utcNow = DateTime.UtcNow;
+
+				ulong baseBonusExp = baseExp;
+
+				(double bonusExpMultiplier, DateTime bonusExpEndTime) = player.UserData.BonusExpMultiplier;
+				if (bonusExpMultiplier > 1 && bonusExpEndTime > utcNow)
+				{
+					baseBonusExp = (ulong)Math.Round(baseBonusExp * bonusExpMultiplier);
+				}
+
+				ulong bonusExpDrained = Math.Min(player.UserData.BonusExp, baseBonusExp);
 				if (bonusExpDrained > 0)
 				{
 					expEarned += bonusExpDrained;
-					expArray.Add(new object[] { "Bonus exp", $"EXP X {(bonusExpDrained / baseExp) + 1}" });
+					expArray.Add(new object[] { "Bonus exp", $"EXP X {(bonusExpDrained / baseBonusExp) + 1}" });
+					if (baseBonusExp != baseExp)
+					{
+						expArray.Add(new object[] { "Bonus exp multiplier", $"EXP X {bonusExpMultiplier}" });
+					}
 					expArray.Add(new object[] { "Bonus exp left", player.UserData.BonusExp - bonusExpDrained });
 
 					player.UserData.DrainBonusExp(bonusExpDrained);
@@ -1209,7 +1221,7 @@ internal sealed class MultiplayerMatch
 			this.CheckGameState();
 		}
 	}
-        
+
 	internal void TryGetItem(ClientSession session, int x, int y, string side, string item)
 	{
 		if (this.Players.TryGetValue(session.SocketId, out MatchPlayer player))
@@ -1318,7 +1330,7 @@ internal sealed class MultiplayerMatch
 
 				return;
 			}
-			
+
 			ChatOutgoingMessage packet = new(this.Name, message, session.SocketId, session.UserData.Id, session.UserData.Username, session.UserData.NameColor);
 
 			if (sendToSelf)
