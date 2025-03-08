@@ -73,9 +73,9 @@ public sealed class CampaignManager
 		this._Prizes = prizes; //Thread-safety
 	}
 
-	public static Task SaveCampaignRunAsync(uint userId, uint levelId, uint levelVersion, string recordedRun, int finishTime)
+	public static Task SaveCampaignRunAsync(uint userId, string category, uint levelId, uint levelVersion, string recordedRun, int finishTime)
 	{
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.campaigns_runs(level_id, level_version, user_id, recorded_run, finish_time) SELECT {levelId}, {levelVersion}, {userId}, {recordedRun}, {finishTime} WHERE NOT EXISTS (SELECT 1 FROM base.campaigns_runs WHERE user_id = {userId} AND level_id = {levelId} AND level_version = {levelVersion} AND finish_time <= {finishTime} AND timestamp >= date_trunc('day', now()))"));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.campaigns_runs(category, level_id, level_version, user_id, recorded_run, finish_time) SELECT {category}, {levelId}, {levelVersion}, {userId}, {recordedRun}, {finishTime} WHERE NOT EXISTS (SELECT 1 FROM base.campaigns_runs WHERE user_id = {userId} AND category = {category} AND level_id = {levelId} AND level_version = {levelVersion} AND finish_time <= {finishTime} AND timestamp >= date_trunc('day', now()))"));
 	}
 
 	//Change stuff for this
