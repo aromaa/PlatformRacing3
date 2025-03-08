@@ -1,11 +1,11 @@
-﻿using System.Data;
-using System.Data.Common;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Npgsql;
 using PlatformRacing3.Common.Customization;
 using PlatformRacing3.Common.Database;
 using PlatformRacing3.Common.User;
 using PlatformRacing3.Common.Utils;
+using System.Data;
+using System.Data.Common;
 
 namespace PlatformRacing3.Common.Campaign;
 
@@ -30,7 +30,7 @@ public sealed class CampaignManager
 
 	public async Task LoadCampaignTimesAsync()
 	{
-		Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)>  times = new();
+		Dictionary<uint, (string Season, Dictionary<CampaignMedal, uint> Medals)> times = new();
 		using (DatabaseConnection dbConnection = new())
 		{
 			DbDataReader reader = await dbConnection.ReadDataAsync($"SELECT level_id, bronze_time, silver_time, gold_time, season FROM base.campaigns");
@@ -75,7 +75,7 @@ public sealed class CampaignManager
 
 	public static Task SaveCampaignRunAsync(uint userId, uint levelId, uint levelVersion, string recordedRun, int finishTime)
 	{
-		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.campaigns_runs(level_id, level_version, user_id, recorded_run, finish_time) VALUES({levelId}, {levelVersion}, {userId}, {recordedRun}, {finishTime})"));
+		return DatabaseConnection.NewAsyncConnection((dbConnection) => dbConnection.ExecuteNonQueryAsync($"INSERT INTO base.campaigns_runs(level_id, level_version, user_id, recorded_run, finish_time) SELECT {levelId}, {levelVersion}, {userId}, {recordedRun}, {finishTime} WHERE NOT EXISTS (SELECT 1 FROM base.campaigns_runs WHERE user_id = {userId} AND level_id = {levelId} AND level_version = {levelVersion} AND finish_time <= {finishTime} AND timestamp >= date_trunc('day', now()))"));
 	}
 
 	//Change stuff for this
